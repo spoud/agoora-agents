@@ -1,0 +1,45 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: '0'
+          token: ${{ secrets.GC_PAT }}
+          submodules: recursive
+
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Build and test
+        run: mvn -B clean package
+
+#      - name: Bump version and push tag
+#        id: tag
+#        uses: anothrNick/github-tag-action@1.17.2
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          WITH_V: true
+#
+#      - uses: frabert/replace-string-action@v1.1
+#        id: replace
+#        with:
+#          pattern: 'v(.+)'
+#          string: ${{ steps.tag.outputs.new_tag }}
+#          replace-with: '$1'
+#
+#      - name: Publish package
+#        run: |
+#          echo version${{ steps.replace.outputs.replaced }}
+#          mvn versions:set -DnewVersion=${{ steps.replace.outputs.replaced }}
+#          mvn -B deploy
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
