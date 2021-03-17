@@ -9,7 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          token: ${{ secrets.GC_PAT }}
           submodules: recursive
 
       - name: Set up JDK 11
