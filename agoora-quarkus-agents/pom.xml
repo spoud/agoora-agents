@@ -38,18 +38,12 @@
     </dependencyManagement>
 
     <dependencies>
-
         <dependency>
             <groupId>io.spoud.agoora</groupId>
             <artifactId>agoora-agents-api</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>io.spoud.sdm</groupId>-->
-<!--            <artifactId>sdm-agent-quarkus-test</artifactId>-->
-<!--            <version>${sdm-agent-library.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
 
+        <!-- Common quarkus dependencies -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-grpc</artifactId>
@@ -64,14 +58,6 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-postgresql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-agroal</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
         </dependency>
         <dependency>
@@ -79,17 +65,20 @@
             <artifactId>quarkus-config-yaml</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-micrometer</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
         </dependency>
+
+        <!-- Native compilation -->
+        <dependency>
+            <groupId>jakarta.security.jacc</groupId>
+            <artifactId>jakarta.security.jacc-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -108,19 +97,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-flyway</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>1.14.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
             <version>1.14.3</version>
             <scope>test</scope>
         </dependency>
@@ -144,73 +122,75 @@
         </dependency>
     </dependencies>
 
-<!--    <build>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>io.quarkus</groupId>-->
-<!--                <artifactId>quarkus-bootstrap-maven-plugin</artifactId>-->
-<!--                <version>${quarkus-plugin.version}</version>-->
-<!--                <configuration>-->
-<!--                    <parentFirstArtifacts>-->
-<!--                        <parentFirstArtifact>io.quarkus:quarkus-bootstrap-core</parentFirstArtifact>-->
-<!--                        <parentFirstArtifact>io.quarkus:quarkus-development-mode-spi</parentFirstArtifact>-->
-<!--                        <parentFirstArtifact>io.quarkus:quarkus-grpc</parentFirstArtifact>-->
-<!--                        <parentFirstArtifact>org.jboss.logmanager:jboss-logmanager-embedded</parentFirstArtifact>-->
-<!--                        <parentFirstArtifact>org.jboss.logging:jboss-logging</parentFirstArtifact>-->
-<!--                        <parentFirstArtifact>com.google.protobuf:protobuf-java</parentFirstArtifact>-->
-<!--                    </parentFirstArtifacts>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>io.quarkus</groupId>-->
-<!--                <artifactId>quarkus-maven-plugin</artifactId>-->
-<!--                <version>${quarkus-plugin.version}</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>build</goal>-->
-<!--                            <goal>generate-code</goal>-->
-<!--                            <goal>generate-code-tests</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <artifactId>maven-compiler-plugin</artifactId>-->
-<!--                <version>${compiler-plugin.version}</version>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <artifactId>maven-surefire-plugin</artifactId>-->
-<!--                <version>${surefire-plugin.version}</version>-->
-<!--                <configuration>-->
-<!--                    <systemPropertyVariables>-->
-<!--                        &lt;!&ndash;            <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>&ndash;&gt;-->
-<!--                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>-->
-<!--                        <maven.home>${maven.home}</maven.home>-->
-<!--                    </systemPropertyVariables>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.jacoco</groupId>-->
-<!--                <artifactId>jacoco-maven-plugin</artifactId>-->
-<!--                <version>0.8.5</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>prepare-agent</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                    <execution>-->
-<!--                        <id>report</id>-->
-<!--                        <phase>prepare-package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>report</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-bootstrap-maven-plugin</artifactId>
+                    <version>${quarkus-plugin.version}</version>
+                    <configuration>
+                        <parentFirstArtifacts>
+                            <parentFirstArtifact>io.quarkus:quarkus-bootstrap-core</parentFirstArtifact>
+                            <parentFirstArtifact>io.quarkus:quarkus-development-mode-spi</parentFirstArtifact>
+                            <parentFirstArtifact>io.quarkus:quarkus-grpc</parentFirstArtifact>
+                            <parentFirstArtifact>org.jboss.logmanager:jboss-logmanager-embedded</parentFirstArtifact>
+                            <parentFirstArtifact>org.jboss.logging:jboss-logging</parentFirstArtifact>
+                            <parentFirstArtifact>com.google.protobuf:protobuf-java</parentFirstArtifact>
+                        </parentFirstArtifacts>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-maven-plugin</artifactId>
+                    <version>${quarkus-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>build</goal>
+                                <goal>generate-code</goal>
+                                <goal>generate-code-tests</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${compiler-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${surefire-plugin.version}</version>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <!--            <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>-->
+                            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                            <maven.home>${maven.home}</maven.home>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.5</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 
     <profiles>

@@ -1,0 +1,92 @@
+sdm-endpoint: local.spoud.io
+sdm-insecure: false
+sdm-cluster: default
+sdm-transport-path: /default/postgres
+
+sdm:
+  scrapper:
+    samples-size: 500
+    state:
+      enabled: true
+      initial-delay: PT10S
+      interval: PT15M
+    profiling:
+      enabled: true
+      initial-delay: PT30S
+      interval: PT15M
+    hooks:
+      enabled: true
+      initial-delay: PT1S
+  transport:
+    sdm-path: ${sdm-transport-path}
+  auth:
+    server-url: https://${sdm-endpoint}/auth/
+    cluster: ${sdm-cluster}
+    realm: spoud
+    user:
+      name: to-be-defined
+      token: to-be-defined
+  logistics:
+    endpoint: ${sdm-endpoint}
+    cluster: ${sdm-cluster}
+    insecure: ${sdm-insecure}
+  hooks:
+    endpoint: ${sdm-endpoint}
+    cluster: ${sdm-cluster}
+    insecure: ${sdm-insecure}
+  schema:
+    endpoint: ${sdm-endpoint}
+    cluster: ${sdm-cluster}
+    insecure: ${sdm-insecure}
+  looker:
+    endpoint: ${sdm-endpoint}
+    cluster: ${sdm-cluster}
+    insecure: ${sdm-insecure}
+  blob:
+    endpoint: ${sdm-endpoint}
+    cluster: ${sdm-cluster}
+    insecure: ${sdm-insecure}
+  profiler:
+    endpoint: localhost:8089
+    insecure: true
+
+quarkus:
+  arc:
+    # Needed for the grpc interceptors
+    remove-unused-beans: fwk
+  datasource:
+    jdbc:
+      url: jdbc:postgresql://127.0.0.1:5432/sdm-logistics
+    db-kind: postgresql
+    username: postgres
+    password: postgres
+  http:
+    port: 8280
+  log:
+    category:
+      "io.spoud.sdm":
+        level: INFO
+  ssl:
+    native: true
+  native:
+    additional-build-args:
+      - --allow-incomplete-classpath
+#      - --report-unsupported-elements-at-runtime
+#      - --initialize-at-run-time=io.quarkus.runner.ApplicationImpl
+
+"%dev":
+  sdm-endpoint: local.spoud.io
+  sdm-insecure: true
+  sdm-cluster: default
+  sdm-transport-path: /default/postgres
+  sdm:
+    scrapper:
+      state:
+        initial-delay: 3s
+      profiling:
+        initial-delay: 5s
+    auth:
+      server-url: http://${sdm-endpoint}/auth/
+      user:
+        name: sdm_t_c268bcf1-c357-4cbd-b9a1-19d368f26b7d
+        token: gpzJNZlx4P8ZEUJuqeY17b2c4d0lMdhM
