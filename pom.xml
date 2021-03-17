@@ -17,6 +17,17 @@
     <compile.version>11</compile.version>
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
+
+    <sonar.projectKey>spoud_agoora-agents</sonar.projectKey>
+    <sonar.organization>spoud</sonar.organization>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <sonar.coverage.exclusions>
+      **/*Reflection.*,
+      **/*Config*.*,
+      **/*Client.*,
+      **/*Interceptor.*,
+    </sonar.coverage.exclusions>
+
     <lombok.version>1.18.18</lombok.version>
     <assertj-core.version>3.19.0</assertj-core.version>
     <slf4j.version>1.7.30</slf4j.version>
@@ -32,14 +43,14 @@
   <modules>
     <module>agoora-agents-api</module>
 <!--    <module>agoora-agents-common</module>-->
-<!--    <module>agoora-kafka-agent</module>-->
+    <module>agoora-quarkus-agents</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>io.spoud.agoora</groupId>
-        <artifactId>agoora-agents-common</artifactId>
+        <artifactId>agoora-agents-api</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -61,6 +72,11 @@
         <artifactId>lombok</artifactId>
         <version>${lombok.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.12.0</version>
       </dependency>
 
       <!-- GRPC -->
@@ -247,8 +263,37 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>2.0.0</version>
+        <configuration>
+          <excludedScopes>test</excludedScopes>
+          <fileTemplate>./license/third-party-template.ftl</fileTemplate>
+          <licensesOutputDirectory>${project.build.directory}</licensesOutputDirectory>
+          <licenseMerges>
+            <licenseMerge>The Apache Software License, Version 2.0|
+              The Apache License, Version 2.0|
+              Apache Software License, version 2.0|
+              Apache 2.0|
+              Apache-2.0|
+              Apache License, Version 2.0|
+              Apache License 2.0
+            </licenseMerge>
+          </licenseMerges>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+
 
   <distributionManagement>
     <repository>
