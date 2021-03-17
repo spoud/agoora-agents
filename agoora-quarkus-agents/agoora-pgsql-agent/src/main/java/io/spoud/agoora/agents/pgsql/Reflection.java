@@ -35,6 +35,7 @@ import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
       Transport.class,
 
       // rest easy dependencies
+            org.jboss.resteasy.spi.config.ConfigurationFactory.class,
       org.apache.commons.logging.LogFactory.class,
       org.apache.commons.logging.impl.LogFactoryImpl.class,
       org.apache.commons.logging.impl.SimpleLog.class,
