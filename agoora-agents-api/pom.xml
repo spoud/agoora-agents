@@ -23,6 +23,10 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-keycloak-admin-client</artifactId>
+        </dependency>
         <!--        <dependency>-->
         <!--            <groupId>io.quarkus</groupId>-->
         <!--            <artifactId>quarkus-rest-client-jackson</artifactId>-->

@@ -72,6 +72,11 @@
                 <artifactId>quarkus-rest-client</artifactId>
                 <version>${quarkus.platform.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-keycloak-admin-client</artifactId>
+                <version>${quarkus.platform.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>io.spoud.agoora</groupId>
