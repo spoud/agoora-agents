@@ -7,16 +7,14 @@ import io.grpc.ClientInterceptor;
 import io.grpc.ForwardingClientCall;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
+import io.spoud.agoora.agents.api.auth.token.TokenManager;
 import io.spoud.agoora.agents.api.config.SdmAgentClientAuthConfig;
 import io.spoud.agoora.agents.api.config.SdmAgentEndpointConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.LocalResteasyProviderFactory;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
-import org.keycloak.OAuth2Constants;
-import org.keycloak.admin.client.JacksonProvider;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -46,37 +44,69 @@ public class AuthClientInterceptor implements ClientInterceptor {
 
   private final SdmAgentClientAuthConfig authConfig;
   private final SdmAgentEndpointConfig sdmAgentEndpointConfig;
-  private final Keycloak keycloakClient;
+
+  private final TokenManager tokenManager;
 
   public AuthClientInterceptor(
       SdmAgentClientAuthConfig authConfig, SdmAgentEndpointConfig sdmAgentEndpointConfig) {
     this.authConfig = authConfig;
     this.sdmAgentEndpointConfig = sdmAgentEndpointConfig;
-    final KeycloakBuilder builder =
-        KeycloakBuilder.builder()
-            .serverUrl(authConfig.getServerUrl())
-            .realm(authConfig.getRealm())
-            .clientId(INTEGRATION_CLIENT_ID)
-            .grantType(OAuth2Constants.PASSWORD)
-            .username(authConfig.getUser().getName())
-            .password(authConfig.getUser().getToken());
-    try {
-      ResteasyClient resteasyClient = buildResteasyClient();
-      builder.resteasyClient(resteasyClient);
-    } catch (Exception ex) {
-      LOG.error("Error while configuring resteasy", ex);
-    }
-    this.keycloakClient = builder.build();
+
+    ResteasyClient resteasyClient = buildResteasyClient();
+    tokenManager = new TokenManager(resteasyClient, authConfig, INTEGRATION_CLIENT_ID);
+  }
+
+  @Override
+  public <R, A> ClientCall<R, A> interceptCall(
+      MethodDescriptor<R, A> method, CallOptions callOptions, Channel next) {
+
+    return new ForwardingClientCall.SimpleForwardingClientCall<>(
+        next.newCall(method, callOptions)) {
+
+      @Override
+      public void start(Listener<A> responseListener, Metadata headers) {
+        try {
+          String accessToken = tokenManager.getAccessToken();
+          if (accessToken == null) {
+            throw new IllegalStateException(
+                "JWT token is null, Keycloak agent is not able to retrieve the token");
+          }
+          headers.put(AUTH_HEADER_KEY, "Bearer " + accessToken);
+        } catch (Exception e) {
+          LOG.error("Cannot get auth token from auth for accessing endpoint", e);
+          super.cancel("Cannot get auth token from auth for accessing endpoint", e);
+          return;
+        }
+        try {
+          super.start(responseListener, headers);
+        } catch (Exception e) {
+          LOG.error("Cannot communicate", e);
+          super.cancel("Cannot communicate", e);
+          return;
+        }
+      }
+    };
   }
 
   private ResteasyClient buildResteasyClient() {
+
+    //    final Configuration configuration =
+    // ResteasyClientBuilderImpl.newBuilder().getConfiguration();
+
+    //    final ResteasyClientBuilder clientBuilder =
+    //            (ResteasyClientBuilder)
+    //                    ResteasyClientBuilderImpl.newBuilder().connectTimeout(10,
+    // TimeUnit.SECONDS);
+    //
     final ResteasyClientBuilder clientBuilder =
-        (ResteasyClientBuilder)
-            ResteasyClientBuilderImpl.newBuilder().connectTimeout(10, TimeUnit.SECONDS);
+        new ResteasyClientBuilderImpl()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .withConfig(LocalResteasyProviderFactory.getInstance());
+
     configureSslForResteasyClient(clientBuilder);
     setProxyToResteasyClient(clientBuilder);
 
-    clientBuilder.register(JacksonProvider.class, 100);
+    //          clientBuilder.register(ResteasyJackson2Provider.class, 100);
 
     return clientBuilder.build();
   }
@@ -143,37 +173,5 @@ public class AuthClientInterceptor implements ClientInterceptor {
       LOG.info("Using proxy {}:{}", proxyHost, proxyPort);
       resteasyClientBuilder.defaultProxy(proxyHost, proxyPort);
     }
-  }
-
-  @Override
-  public <R, A> ClientCall<R, A> interceptCall(
-      MethodDescriptor<R, A> method, CallOptions callOptions, Channel next) {
-
-    return new ForwardingClientCall.SimpleForwardingClientCall<>(
-        next.newCall(method, callOptions)) {
-
-      @Override
-      public void start(Listener<A> responseListener, Metadata headers) {
-        try {
-          String accessToken = keycloakClient.tokenManager().getAccessTokenString();
-          if (accessToken == null) {
-            throw new IllegalStateException(
-                "JWT token is null, Keycloak agent is not able to retrieve the token");
-          }
-          headers.put(AUTH_HEADER_KEY, "Bearer " + accessToken);
-        } catch (Exception e) {
-          LOG.error("Cannot get auth token from auth for accessing endpoint", e);
-          super.cancel("Cannot get auth token from auth for accessing endpoint", e);
-          return;
-        }
-        try {
-          super.start(responseListener, headers);
-        } catch (Exception e) {
-          LOG.error("Cannot communicate", e);
-          super.cancel("Cannot communicate", e);
-          return;
-        }
-      }
-    };
   }
 }

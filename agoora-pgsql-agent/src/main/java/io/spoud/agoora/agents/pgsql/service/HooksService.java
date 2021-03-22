@@ -46,7 +46,7 @@ public class HooksService {
     LOG.info("Start listening to hooks");
     hooksClient.startListening(
         this::logRecordChange,
-        sdmConfig.getTransport().getSdmPath().getAbsolutePath(),
+        sdmConfig.getTransport().getSdmPathObject().getAbsolutePath(),
         true,
         true,
         false);

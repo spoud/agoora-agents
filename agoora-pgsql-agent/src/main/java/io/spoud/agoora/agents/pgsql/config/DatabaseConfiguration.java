@@ -1,6 +1,7 @@
 package io.spoud.agoora.agents.pgsql.config;
 
 import io.agroal.api.AgroalDataSource;
+import io.agroal.pool.DataSource;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.Dependent;

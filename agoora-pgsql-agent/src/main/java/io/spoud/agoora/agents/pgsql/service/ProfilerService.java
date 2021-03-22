@@ -116,7 +116,7 @@ public class ProfilerService {
                     String htmlId =
                         blobClient.uploadBlobUtf8(
                             html,
-                            config.getTransport().getSdmPath().getResourceGroupPath(),
+                            config.getTransport().getSdmPathObject().getResourceGroupPath(),
                             ResourceEntity.Type.DATA_ITEM);
                     if (htmlId != null) {
                       dataProfileRequest.setProfileHtmlBlobId(htmlId);

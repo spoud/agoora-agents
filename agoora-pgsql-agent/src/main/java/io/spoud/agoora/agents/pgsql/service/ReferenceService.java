@@ -23,7 +23,7 @@ public class ReferenceService {
     return BaseRef.newBuilder()
         .setIdPath(
             IdPathRef.newBuilder()
-                .setPath(config.getTransport().getSdmPath().getAbsolutePath())
+                .setPath(config.getTransport().getSdmPathObject().getAbsolutePath())
                 .build())
         .build();
   }

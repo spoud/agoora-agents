@@ -72,7 +72,6 @@ quarkus:
     additional-build-args:
       - --allow-incomplete-classpath
 #      - --report-unsupported-elements-at-runtime
-#      - --initialize-at-run-time=io.quarkus.runner.ApplicationImpl
 
 "%dev":
   sdm-endpoint: local.spoud.io
@@ -88,5 +87,5 @@ quarkus:
     auth:
       server-url: http://${sdm-endpoint}/auth/
       user:
-        name: sdm_t_c268bcf1-c357-4cbd-b9a1-19d368f26b7d
-        token: gpzJNZlx4P8ZEUJuqeY17b2c4d0lMdhM
+        name: sdm_t_ca7cfb09-35dc-4c8a-a4c3-6be73934fd88
+        token: coG7jpnBBdl3eEYYmo1gONQUabwkDR5p

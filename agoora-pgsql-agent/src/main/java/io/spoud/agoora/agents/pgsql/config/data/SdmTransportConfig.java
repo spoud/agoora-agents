@@ -6,6 +6,10 @@ import lombok.Data;
 @Data
 public class SdmTransportConfig {
 
-  private SdmPath sdmPath;
+  private String sdmPath;
+
+  public SdmPath getSdmPathObject(){
+    return SdmPath.parse(sdmPath);
+  }
 
 }

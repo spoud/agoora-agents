@@ -112,7 +112,7 @@ public class DataService {
                         ResourceGroupRef.newBuilder()
                             .setIdPath(
                                 IdPathRef.newBuilder()
-                                    .setPath(config.getTransport().getSdmPath().getResourceGroupPath())
+                                    .setPath(config.getTransport().getSdmPathObject().getResourceGroupPath())
                                     .buildPartial())
                             .build())
                     .setProperties(PropertyMap.newBuilder().putAllProperties(allProperties).build())
@@ -163,7 +163,7 @@ public class DataService {
               .saveSchema(
                   ResourceEntity.Type.DATA_ITEM,
                   dataItem.getId(),
-                  config.getTransport().getSdmPath().getResourceGroupPath(),
+                  config.getTransport().getSdmPathObject().getResourceGroupPath(),
                   schemaContent,
                   SchemaSource.Type.INFERRED,
                   SchemaEncoding.Type.JSON) // TODO new Schema encoding ?
