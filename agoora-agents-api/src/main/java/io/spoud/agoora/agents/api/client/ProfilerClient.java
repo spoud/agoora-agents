@@ -30,6 +30,7 @@ public class ProfilerClient {
       responseObserver.awaitCompletion();
     } catch (InterruptedException ex) {
       LOG.error("Profiler interrupted");
+      Thread.currentThread().interrupt();
     }
 
     return responseObserver.getResponse();

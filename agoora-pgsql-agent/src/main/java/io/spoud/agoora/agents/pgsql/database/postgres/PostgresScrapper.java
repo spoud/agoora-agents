@@ -75,7 +75,9 @@ public class PostgresScrapper implements DatabaseScrapper {
     checkTableName(tableName);
     List<FieldDescription> fields = new ArrayList<>();
     try (Statement stmt = connection.createStatement()) {
-      ResultSet rs = stmt.executeQuery("select * from " + tableName + " LIMIT 1");
+      ResultSet rs =
+          stmt.executeQuery(
+              sanitizeQueryWithTableName("select * from $tableName LIMIT 1", tableName));
       PgResultSetMetaData rsmd = (PgResultSetMetaData) rs.getMetaData();
       for (int i = 1; i <= rsmd.getColumnCount(); i++) {
         fields.add(
@@ -94,22 +96,23 @@ public class PostgresScrapper implements DatabaseScrapper {
   @Override
   public Optional<Long> getRowCount(String tableName) {
     checkTableName(tableName);
-    return getFirstResult("select COUNT(*) from " + tableName + "");
+    return getFirstResult(sanitizeQueryWithTableName("select COUNT(*) from $tableName", tableName));
   }
 
   @Override
   public Optional<Long> getTableSizeBytes(String tableName) {
     checkTableName(tableName);
-    return getFirstResult("SELECT pg_total_relation_size('" + tableName + "')");
+    return getFirstResult(
+        sanitizeQueryWithTableName("SELECT pg_total_relation_size('$tableName')", tableName));
   }
 
   @Override
   public Optional<Long> getChangesCount(String tableName) {
     checkTableName(tableName);
     return getFirstResult(
-        "select n_tup_ins+ n_tup_upd+ n_tup_del as changes from pg_stat_user_tables WHERE relname='"
-            + tableName
-            + "'");
+        sanitizeQueryWithTableName(
+            "select n_tup_ins+ n_tup_upd+ n_tup_del as changes from pg_stat_user_tables WHERE relname='$tableName'",
+            tableName));
   }
 
   private Optional<Long> getFirstResult(String query) {
@@ -127,7 +130,7 @@ public class PostgresScrapper implements DatabaseScrapper {
   @Override
   public Optional<List<Map<String, Object>>> getSamples(String tableName, int size) {
     checkTableName(tableName);
-    String query = "SELECT * FROM " + tableName + " LIMIT ?";
+    String query = sanitizeQueryWithTableName("SELECT * FROM $tableName LIMIT ?", tableName);
     try (PreparedStatement stmt = connection.prepareStatement(query)) {
       Instant start = Instant.now();
       stmt.setInt(1, size);
@@ -162,5 +165,18 @@ public class PostgresScrapper implements DatabaseScrapper {
     if (!TABLE_NAME_PATTER.matcher(table).find()) {
       throw new InvalidParameterException("Table parameter is invalid : '" + table + "'");
     }
+  }
+
+  /** Replace $tableName with an encoded tableName (to avoid sql injections) */
+  private String sanitizeQueryWithTableName(String query, String tableName) {
+    return query.replace("$tableName", escapeSql(tableName));
+  }
+
+  /** Table name comes from the agent itself, but a little escape won't hurt */
+  public String escapeSql(String str) {
+    if (str == null) {
+      return null;
+    }
+    return StringUtils.replace(str, "'", "''");
   }
 }
