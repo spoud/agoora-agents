@@ -49,6 +49,7 @@
 
     <modules>
         <module>agoora-agents-api</module>
+        <module>agoora-agents-test</module>
         <module>agoora-pgsql-agent</module>
     </modules>
 
@@ -63,24 +64,13 @@
             </dependency>
 
             <dependency>
-                <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-grpc</artifactId>
-                <version>${quarkus.platform.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-rest-client</artifactId>
-                <version>${quarkus.platform.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-keycloak-admin-client</artifactId>
-                <version>${quarkus.platform.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>io.spoud.agoora</groupId>
                 <artifactId>agoora-agents-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.spoud.agoora</groupId>
+                <artifactId>agoora-agents-test</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

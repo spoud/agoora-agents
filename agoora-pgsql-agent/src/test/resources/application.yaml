@@ -1,0 +1,14 @@
+quarkus:
+  http:
+    test-port: 6580
+
+sdm:
+  scrapper:
+    samples-size: 500
+    hooks-delay: PT1S
+    state:
+      enabled: false
+      initial-delay: PT1S
+    profiling:
+      enabled: false
+      initial-delay: PT1S
