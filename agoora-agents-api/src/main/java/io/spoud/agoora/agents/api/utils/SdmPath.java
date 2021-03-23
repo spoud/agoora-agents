@@ -3,7 +3,6 @@ package io.spoud.agoora.agents.api.utils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder

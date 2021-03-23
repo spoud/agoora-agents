@@ -17,11 +17,11 @@ public abstract class AbstractGrpcClientFactory {
   protected final SdmAgentEndpointConfig endpointConfig;
   private final Logger logger;
 
-  public AbstractGrpcClientFactory(Logger logger, SdmAgentEndpointConfig endpointConfig) {
+  protected AbstractGrpcClientFactory(Logger logger, SdmAgentEndpointConfig endpointConfig) {
     this(logger, endpointConfig, null);
   }
 
-  public AbstractGrpcClientFactory(
+  protected AbstractGrpcClientFactory(
       Logger logger, SdmAgentEndpointConfig endpointConfig, SdmAgentClientAuthConfig authConfig) {
     this.logger = logger;
     this.endpointConfig = endpointConfig;
@@ -47,14 +47,14 @@ public abstract class AbstractGrpcClientFactory {
       throw new IllegalArgumentException(
           "No Endpoint configuration provided for " + logger.getName());
     }
-    ManagedChannelBuilder mcb = ManagedChannelBuilder.forTarget(endpointConfig.getEndpoint());
+    ManagedChannelBuilder<?> mcb = ManagedChannelBuilder.forTarget(endpointConfig.getEndpoint());
 
     if (endpointConfig.isInsecure()) {
       mcb.usePlaintext();
     }
 
     if (authConfig != null) {
-      AuthClientInterceptor interceptor = new AuthClientInterceptor(authConfig, endpointConfig);
+      AuthClientInterceptor interceptor = new AuthClientInterceptor(authConfig);
       mcb.intercept(interceptor);
 
       logger.info(

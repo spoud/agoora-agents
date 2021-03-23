@@ -10,9 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LookerClient {
 
-  private final LookerServiceGrpc.LookerServiceBlockingStub lookerClient;
+  private final LookerServiceGrpc.LookerServiceBlockingStub blockingStub;
 
   public DataProfile addDataProfile(AddDataProfileRequest dataProfileRequest) {
-    return lookerClient.addDataProfile(dataProfileRequest).getDataProfile();
+    return blockingStub.addDataProfile(dataProfileRequest).getDataProfile();
   }
 }

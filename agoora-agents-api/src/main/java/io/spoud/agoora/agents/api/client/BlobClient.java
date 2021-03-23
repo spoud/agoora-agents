@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 public class BlobClient {
 
   // 4Mb - 5bytes
-  private final int MAX_SIZE = 4194299;
+  private final static int MAX_SIZE = 4194299;
 
   private final BlobServiceGrpc.BlobServiceStub blobStub;
 
