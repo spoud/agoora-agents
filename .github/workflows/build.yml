@@ -30,6 +30,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build with Maven
+        uses: docker://spoud/build:java-graalvm-20.2.0-java11
         run: mvn -B package
 
       - name: Sonar
