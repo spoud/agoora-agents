@@ -44,12 +44,14 @@ pipeline {
     stage('Sonar pull request') {
       when { changeRequest() }
       steps{
-        withSonarQubeEnv('SonarCloud') {
-            sh "mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar\
-            -Dsonar.pullrequest.provider=GitHub \
-            -Dsonar.pullrequest.github.repository=SPOUD/agoora-agents \
-            -Dsonar.pullrequest.key=${env.CHANGE_ID} \
-            -Dsonar.pullrequest.branch=${env.CHANGE_BRANCH}"
+        withCredentials([string(credentialsId: 'agoora_agents_sonar_token', variable: 'SONAR_TOKEN')]) {
+            withSonarQubeEnv('SonarCloud') {
+                sh "mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar\
+                -Dsonar.pullrequest.provider=GitHub \
+                -Dsonar.pullrequest.github.repository=SPOUD/agoora-agents \
+                -Dsonar.pullrequest.key=${env.CHANGE_ID} \
+                -Dsonar.pullrequest.branch=${env.CHANGE_BRANCH}"
+            }
         }
       }
     }
@@ -57,9 +59,11 @@ pipeline {
     stage('Sonar branch') {
       when { not{ changeRequest() } }
       steps{
-        withSonarQubeEnv('SonarCloud') {
-            sh "mvn org.jacoco:jacoco-maven-plugin:prepare-agent verify sonar:sonar \
-            -Dsonar.branch.name=${env.BRANCH_NAME}"
+        withCredentials([string(credentialsId: 'agoora_agents_sonar_token', variable: 'SONAR_TOKEN')]) {
+            withSonarQubeEnv('SonarCloud') {
+                sh "mvn org.jacoco:jacoco-maven-plugin:prepare-agent verify sonar:sonar \
+                -Dsonar.branch.name=${env.BRANCH_NAME}"
+            }
         }
       }
     }
