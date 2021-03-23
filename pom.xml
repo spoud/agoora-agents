@@ -25,7 +25,7 @@
         <quarkus-plugin.version>1.12.2.Final</quarkus-plugin.version>
         <quarkus.platform.version>1.12.2.Final</quarkus.platform.version>
 
-        <sonar.projectKey>spoud_agoora-agents</sonar.projectKey>
+        <sonar.projectKey>spoud_${project.artifactId}</sonar.projectKey>
         <sonar.organization>spoud</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.coverage.exclusions>
