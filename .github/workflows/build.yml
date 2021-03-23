@@ -29,8 +29,8 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
+      - uses: docker://spoud/build:java-graalvm-20.2.0-java11
       - name: Build with Maven
-        uses: docker://spoud/build:java-graalvm-20.2.0-java11
         run: mvn -B package
 
       - name: Sonar
