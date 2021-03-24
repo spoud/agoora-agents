@@ -9,6 +9,7 @@ import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
 import io.spoud.agoora.agents.api.config.SdmAgentClientAuthConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
@@ -48,6 +49,21 @@ public class AuthClientInterceptor implements ClientInterceptor {
 
   public AuthClientInterceptor(SdmAgentClientAuthConfig authConfig) {
     this.authConfig = authConfig;
+
+    if (authConfig.getUser() == null
+        || authConfig.getUser().getName() == null
+        || authConfig.getUser().getToken() == null) {
+      throw new IllegalArgumentException("user credentials are required");
+    }
+
+    if (authConfig.getRealm() == null) {
+      throw new IllegalArgumentException("realm is required");
+    }
+
+    if (authConfig.getServerUrl() == null) {
+      throw new IllegalArgumentException("serverUrl is required");
+    }
+
     final KeycloakBuilder builder =
         KeycloakBuilder.builder()
             .serverUrl(authConfig.getServerUrl())
@@ -65,7 +81,7 @@ public class AuthClientInterceptor implements ClientInterceptor {
     this.keycloakClient = builder.build();
   }
 
-  private ResteasyClient buildResteasyClient() {
+  protected ResteasyClient buildResteasyClient() {
     final ResteasyClientBuilder clientBuilder =
         (ResteasyClientBuilder) ClientBuilder.newBuilder().connectTimeout(10, TimeUnit.SECONDS);
     configureSslForResteasyClient(clientBuilder);
@@ -76,7 +92,7 @@ public class AuthClientInterceptor implements ClientInterceptor {
     return clientBuilder.build();
   }
 
-  private void configureSslForResteasyClient(ResteasyClientBuilder resteasyClientBuilder) {
+  protected void configureSslForResteasyClient(ResteasyClientBuilder resteasyClientBuilder) {
     if (authConfig.isIgnoreSsl()) {
       LOG.info("Ignoring ssl");
       try {
@@ -106,8 +122,7 @@ public class AuthClientInterceptor implements ClientInterceptor {
       } catch (Exception ex) {
         throw new IllegalStateException("Unable to ignore ssl for resteasy client", ex);
       }
-    } else if (authConfig.getTrustStoreLocation() != null
-        && !authConfig.getTrustStoreLocation().isBlank()) {
+    } else if (StringUtils.isNotBlank(authConfig.getTrustStoreLocation())) {
       LOG.info("Using truststore '{}'", authConfig.getTrustStoreLocation());
       try {
         File f = new File(authConfig.getTrustStoreLocation());
@@ -123,7 +138,7 @@ public class AuthClientInterceptor implements ClientInterceptor {
     }
   }
 
-  private void setProxyToResteasyClient(ResteasyClientBuilder resteasyClientBuilder) {
+  protected void setProxyToResteasyClient(ResteasyClientBuilder resteasyClientBuilder) {
     String proxyHost = null;
     int proxyPort = 80;
 
