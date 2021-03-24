@@ -9,7 +9,6 @@ pipeline {
   }
 
   environment {
-    DOCKER_IMAGE = "spoud/agoora-agents"
     SPOUD_ARTIFACTORY_PASSWORD = credentials('artifactory_password')
     SPOUD_ARTIFACTORY_USER = credentials('artifactory_user')
     GIT_TAG = sh(script: 'git describe --tags --exclude "sdm-*" --abbrev=8', returnStdout: true).trim()
@@ -91,8 +90,8 @@ pipeline {
                     when { changeRequest() }
                     steps {
                         dir("${AGENT}"){
-                            sh "docker build -t ${AGENT}:test ."
-                            sh "docker rmi ${AGENT}:test"
+                            sh "docker build -t spoud/${AGENT}:test ."
+                            sh "docker rmi spoud/${AGENT}:test"
                         }
                     }
                 }
@@ -108,12 +107,12 @@ pipeline {
                         dir(agent){
                             withCredentials([usernamePassword(credentialsId: '95c0e4c5-7a97-4c15-a5bf-4c2f1561c762', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                                 sh "docker login -u $USER -p $PASS"
-                                sh "docker build -t ${AGENT}:${GIT_TAG} ."
-                                sh "docker tag ${AGENT}:${GIT_TAG} ${AGENT}:latest"
-                                sh "docker push ${AGENT}:${GIT_TAG}"
-                                sh "docker push ${AGENT}:latest"
-                                sh "docker rmi ${AGENT}:latest"
-                                sh "docker rmi ${AGENT}:${GIT_TAG}"
+                                sh "docker build -t spoud/${AGENT}:${GIT_TAG} ."
+                                sh "docker tag spoud/${AGENT}:${GIT_TAG} spoud/${AGENT}:latest"
+                                sh "docker push spoud/${AGENT}:${GIT_TAG}"
+                                sh "docker push spoud/${AGENT}:latest"
+                                sh "docker rmi spoud/${AGENT}:latest"
+                                sh "docker rmi spoud/${AGENT}:${GIT_TAG}"
                             }
                         }
                     }
