@@ -83,40 +83,46 @@ pipeline {
         }
     }
 
-
-   stage('Docker build') {
-      when { changeRequest() }
-      steps {
-        AGENTS.each { agent ->
-            dir(agent){
-                sh "docker build -t "+agent+":test ."
-                sh "docker rmi "+agent+":test"
-            }
-          }
-        }
-    }
-
-    stage('Docker build and publish') {
-      when {
-        anyOf {
-          branch 'master'
-          tag "*"
-        }
-      }
-      steps {
-        AGENTS.each { agent ->
-            dir(agent){
-                withCredentials([usernamePassword(credentialsId: '95c0e4c5-7a97-4c15-a5bf-4c2f1561c762', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                  sh "docker login -u $USER -p $PASS"
-                  sh "docker build -t "+agent+":${GIT_TAG} ."
-                  sh "docker tag "+agent+":${GIT_TAG} "+agent+":latest"
-                  sh "docker push "+agent+":${GIT_TAG}"
-                  sh "docker push "+agent+":latest"
-                  sh "docker rmi "+agent+":latest"
-                  sh "docker rmi "+agent+":${GIT_TAG}"
+    stage('Agent docker build'){
+        matrix {
+            axes {
+                axis{
+                    name 'AGENT'
+                    values 'agoora-pgsql-agent'
                 }
             }
-          }
+            stages{
+                stage('Docker build') {
+                    when { changeRequest() }
+                    steps {
+                        dir("${AGENT}"){
+                            sh "docker build -t ${AGENT}:test ."
+                            sh "docker rmi ${AGENT}:test"
+                        }
+                    }
+                }
+
+                stage('Docker build and publish') {
+                when {
+                    anyOf {
+                        branch 'master'
+                        tag "*"
+                    }
+                }
+                steps {
+                    dir(agent){
+                        withCredentials([usernamePassword(credentialsId: '95c0e4c5-7a97-4c15-a5bf-4c2f1561c762', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                            sh "docker login -u $USER -p $PASS"
+                            sh "docker build -t ${AGENT}:${GIT_TAG} ."
+                            sh "docker tag ${AGENT}:${GIT_TAG} ${AGENT}:latest"
+                            sh "docker push ${AGENT}:${GIT_TAG}"
+                            sh "docker push ${AGENT}:latest"
+                            sh "docker rmi ${AGENT}:latest"
+                            sh "docker rmi ${AGENT}:${GIT_TAG}"
+                        }
+                    }
+                }
+            }
         }
     }
 
