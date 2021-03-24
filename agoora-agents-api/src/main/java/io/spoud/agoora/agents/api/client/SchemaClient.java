@@ -20,14 +20,14 @@ public class SchemaClient {
       String entityId,
       String path,
       String schemaContent,
-      SchemaSource.Type type,
+      SchemaSource.Type source,
       SchemaEncoding.Type encoding) {
     return stub.saveSchema(
             SaveSchemaRequest.newBuilder()
                 .setEntityRef(
                     EntityRef.newBuilder().setEntityType(entityType).setId(entityId).build())
                 .setPath(path)
-                .setSource(type)
+                .setSource(source)
                 .setEncoding(encoding)
                 .setContent(schemaContent)
                 .build())

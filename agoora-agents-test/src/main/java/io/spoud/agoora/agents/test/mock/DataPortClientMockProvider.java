@@ -4,12 +4,14 @@ import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.sdm.logistics.domain.v1.DataPort;
 import io.spoud.sdm.logistics.service.v1.DataPortChange;
 import io.spoud.sdm.logistics.service.v1.SaveDataPortRequest;
+import lombok.experimental.UtilityClass;
 
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+@UtilityClass
 public class DataPortClientMockProvider {
 
   public static UUID lastUuid;

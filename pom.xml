@@ -30,9 +30,6 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.coverage.exclusions>
             **/*Reflection.*,
-            **/*Config*.*,
-            **/*Client.*,
-            **/*Interceptor.*,
         </sonar.coverage.exclusions>
 
         <lombok.version>1.18.18</lombok.version>

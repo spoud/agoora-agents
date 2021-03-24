@@ -12,11 +12,10 @@ import io.spoud.agoora.agents.api.client.ResourceGroupClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.api.client.TransportClient;
 import io.spoud.agoora.agents.api.factory.ClientsFactory;
+import org.mockito.Mockito;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.mockito.Mockito.mock;
 
 public class ClientMocksFactory implements ClientsFactory {
 
@@ -83,6 +82,6 @@ public class ClientMocksFactory implements ClientsFactory {
   }
 
   private <T> T getSingleton(Class<T> clazz) {
-    return (T) singleton.computeIfAbsent(clazz, c -> mock(c));
+    return (T) singleton.computeIfAbsent(clazz, Mockito::mock);
   }
 }

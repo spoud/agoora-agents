@@ -5,6 +5,8 @@ import io.spoud.sdm.global.domain.v1.ResourceEntity;
 import io.spoud.sdm.hooks.domain.v1.LogRecord;
 import io.spoud.sdm.hooks.domain.v1.StateChangeAction;
 import io.spoud.sdm.logistics.domain.v1.DataPort;
+import lombok.experimental.UtilityClass;
+import org.mockito.stubbing.Answer;
 
 import java.util.List;
 import java.util.Map;
@@ -15,15 +17,19 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 
+@UtilityClass
 public class HooksClientMockProvider {
 
   public static void withLogRecord(HooksClient mock, List<LogRecord> record) {
-    doAnswer(
-            a -> {
-              final Consumer callback = a.getArgument(0, Consumer.class);
-              record.forEach(callback::accept);
-              return null;
-            })
+    final Answer answer =
+        a -> {
+          final Consumer callback = a.getArgument(0, Consumer.class);
+          record.forEach(callback::accept);
+          return (AutoCloseable) () -> {};
+        };
+    doAnswer(answer).when(mock).startListening(any());
+    doAnswer(answer).when(mock).startListening(any(), any());
+    doAnswer(answer)
         .when(mock)
         .startListening(any(), anyString(), anyBoolean(), anyBoolean(), anyBoolean());
   }
