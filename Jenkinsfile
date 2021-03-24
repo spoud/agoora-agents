@@ -8,6 +8,8 @@ pipeline {
     }
   }
 
+  agents = ['agoora-pgsql-agent']
+
   environment {
     DOCKER_IMAGE = "spoud/agoora-agents"
     SPOUD_ARTIFACTORY_PASSWORD = credentials('artifactory_password')
@@ -78,48 +80,55 @@ pipeline {
         }
     }
 
-//    stage('Docker build') {
-//       when { changeRequest() }
-//       steps {
-//         sh "docker build -t ${DOCKER_IMAGE}:test ."
-//         sh "docker rmi ${DOCKER_IMAGE}:test"
-//       }
-//     }
-//
-//     stage('Docker build and publish') {
-//       when {
-//         anyOf {
-//           branch 'master'
-//           tag "*"
-//         }
-//       }
-//       steps {
-//         withMaven(mavenSettingsConfig: 'github_package_maven'){
-//             sh "cp $MVN_SETTINGS ."
-//         }
-//         withCredentials([usernamePassword(credentialsId: '95c0e4c5-7a97-4c15-a5bf-4c2f1561c762', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-//           sh "docker login -u $USER -p $PASS"
-//           sh "docker build -t ${DOCKER_IMAGE}:${GIT_TAG} ."
-//           sh "docker tag ${DOCKER_IMAGE}:${GIT_TAG} ${DOCKER_IMAGE}:latest"
-//           sh "docker push ${DOCKER_IMAGE}:${GIT_TAG}"
-//           sh "docker push ${DOCKER_IMAGE}:latest"
-//           sh "docker rmi ${DOCKER_IMAGE}:latest"
-//           sh "docker rmi ${DOCKER_IMAGE}:${GIT_TAG}"
-//         }
-//       }
-//     }
-//
-//     stage ('sdm-docs') {
-//       when {
-//         anyOf {
-//           branch 'master'
-//           tag "*"
-//         }
-//       }
-//       steps {
-//           build job: 'sdm-docs', wait: false, parameters: []
-//       }
-//     }
+
+   agents.each { agent ->
+       stage('Docker build '+agent) {
+          when { changeRequest() }
+          steps {
+            dir(agent){
+                sh "docker build -t "+agent+":test ."
+                sh "docker rmi "+agent+":test"
+            }
+          }
+        }
+    }
+
+    agents.each { agent ->
+        stage('Docker build and publish '+agent) {
+          when {
+            anyOf {
+              branch 'master'
+              tag "*"
+            }
+          }
+          steps {
+
+            dir(agent){
+                withCredentials([usernamePassword(credentialsId: '95c0e4c5-7a97-4c15-a5bf-4c2f1561c762', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                  sh "docker login -u $USER -p $PASS"
+                  sh "docker build -t "+agent+":${GIT_TAG} ."
+                  sh "docker tag "+agent+":${GIT_TAG} "+agent+":latest"
+                  sh "docker push "+agent+":${GIT_TAG}"
+                  sh "docker push "+agent+":latest"
+                  sh "docker rmi "+agent+":latest"
+                  sh "docker rmi "+agent+":${GIT_TAG}"
+                }
+            }
+          }
+        }
+    }
+
+    stage ('sdm-docs') {
+      when {
+        anyOf {
+          branch 'master'
+          tag "*"
+        }
+      }
+      steps {
+          build job: 'sdm-docs', wait: false, parameters: []
+      }
+    }
 
   }
 }
