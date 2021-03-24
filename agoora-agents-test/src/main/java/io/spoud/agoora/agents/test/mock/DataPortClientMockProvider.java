@@ -1,4 +1,4 @@
-package io.spoud.agoora.agents.pgsql.mock;
+package io.spoud.agoora.agents.test.mock;
 
 import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.sdm.logistics.domain.v1.DataPort;

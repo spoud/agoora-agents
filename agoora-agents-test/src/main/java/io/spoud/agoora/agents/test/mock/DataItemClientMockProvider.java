@@ -1,4 +1,4 @@
-package io.spoud.agoora.agents.pgsql.mock;
+package io.spoud.agoora.agents.test.mock;
 
 import io.spoud.agoora.agents.api.client.DataItemClient;
 import io.spoud.sdm.global.domain.v1.IdReference;
