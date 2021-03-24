@@ -17,7 +17,7 @@ pipeline {
     SPOUD_ARTIFACTORY_PASSWORD = credentials('artifactory_password')
     SPOUD_ARTIFACTORY_USER = credentials('artifactory_user')
     GIT_TAG = sh(script: 'git describe --tags --exclude "sdm-*" --abbrev=8', returnStdout: true).trim()
-
+    AGENTS=getAgents()
   }
 
   stages {
@@ -84,7 +84,7 @@ pipeline {
     }
 
 
-   getAgents().each { agent ->
+   AGENTS.each { agent ->
        stage('Docker build '+agent) {
           when { changeRequest() }
           steps {
@@ -96,7 +96,7 @@ pipeline {
         }
     }
 
-    getAgents().each { agent ->
+    AGENTS.each { agent ->
         stage('Docker build and publish '+agent) {
           when {
             anyOf {
