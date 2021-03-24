@@ -1,1 +1,1 @@
-io.spoud.agoora.agents.pgsql.config.converter.SdmPathConverter
+io.spoud.agoora.agents.api.utils.SdmPathConverter

@@ -1,9 +1,7 @@
-package io.spoud.agoora.agents.pgsql.config.converter;
+package io.spoud.agoora.agents.api.utils;
 
-import io.spoud.agoora.agents.api.utils.SdmPath;
 import org.eclipse.microprofile.config.spi.Converter;
 
-// TODO move to a common place
 public class SdmPathConverter implements Converter<SdmPath> {
 
   @Override
