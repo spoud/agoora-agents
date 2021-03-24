@@ -1,29 +1,27 @@
 package io.spoud.agoora.agents.api.config;
 
-public interface SdmAgentConfig {
-  SdmAgentClientAuthConfig getAuth();
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-  default SdmAgentEndpointConfig getLogistics() {
-    return null;
-  }
+// TODO should be optional !
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SdmAgentConfig {
+  private SdmAgentClientAuthConfig auth;
 
-  default SdmAgentEndpointConfig getHooks() {
-    return null;
-  }
+  @Builder.Default private SdmAgentEndpointConfig logistics = null;
 
-  default SdmAgentEndpointConfig getSchema() {
-    return null;
-  }
+  @Builder.Default private SdmAgentEndpointConfig hooks = null;
 
-  default SdmAgentEndpointConfig getLooker() {
-    return null;
-  }
+  @Builder.Default private SdmAgentEndpointConfig schema = null;
 
-  default SdmAgentEndpointConfig getBlob() {
-    return null;
-  }
+  @Builder.Default private SdmAgentEndpointConfig looker = null;
 
-  default SdmAgentEndpointConfig getProfiler() {
-    return null;
-  }
+  @Builder.Default private SdmAgentEndpointConfig blob = null;
+
+  @Builder.Default private SdmAgentEndpointConfig profiler = null;
 }

@@ -12,9 +12,7 @@ import io.spoud.agoora.agents.api.client.ResourceGroupClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.api.client.TransportClient;
 
-public interface ClientsFactory {
-
-  void closeAll();
+public interface ClientsFactory extends AutoCloseable  {
 
   BlobClient getBlobClient();
 

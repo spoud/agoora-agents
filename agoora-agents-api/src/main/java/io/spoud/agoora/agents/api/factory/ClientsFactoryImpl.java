@@ -36,7 +36,7 @@ public class ClientsFactoryImpl implements ClientsFactory {
   }
 
   @Override
-  public void closeAll() {
+  public void close() throws Exception {
     blobClientFactory.close();
     hooksClientFactory.close();
     logisticsClientsFactory.close();

@@ -23,7 +23,7 @@ public class ClientMocksFactory implements ClientsFactory {
   private Map<Class<?>, Object> singleton = new ConcurrentHashMap<>();
 
   @Override
-  public void closeAll() {
+  public void close() {
     // nothing to do
   }
 

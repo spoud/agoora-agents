@@ -8,14 +8,15 @@ import lombok.NoArgsConstructor;
 @Data
 @ConfigProperties(prefix = "sdm")
 @NoArgsConstructor
-public class PgsqlSdmConfig implements SdmAgentConfig {
+public class PgsqlSdmConfig extends SdmAgentConfig {
   private SdmScrapperConfig scrapper;
-  private SdmClientAuthConfig auth;
-  private SdmEndpointConfig logistics;
-  private SdmEndpointConfig hooks;
-  private SdmEndpointConfig schema;
-  private SdmEndpointConfig looker;
-  private SdmEndpointConfig blob;
-  private SdmEndpointConfig profiler;
   private SdmTransportConfig transport;
+
+//  private SdmClientAuthConfig auth;
+//  private SdmEndpointConfig logistics;
+//  private SdmEndpointConfig hooks;
+//  private SdmEndpointConfig schema;
+//  private SdmEndpointConfig looker;
+//  private SdmEndpointConfig blob;
+//  private SdmEndpointConfig profiler;
 }

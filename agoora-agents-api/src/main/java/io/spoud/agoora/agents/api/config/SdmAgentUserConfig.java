@@ -1,8 +1,17 @@
 package io.spoud.agoora.agents.api.config;
 
-public interface SdmAgentUserConfig {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-  String getName();
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SdmAgentUserConfig {
 
-  String getToken();
+  private String name;
+
+  private String token;
 }

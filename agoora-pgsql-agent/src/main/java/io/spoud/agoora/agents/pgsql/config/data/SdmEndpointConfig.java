@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class SdmEndpointConfig implements SdmAgentEndpointConfig {
-  private String endpoint;
-  private String cluster = "default";
-  private boolean insecure = false;
+public class SdmEndpointConfig extends SdmAgentEndpointConfig {
+//  private String endpoint;
+//  private boolean insecure = false;
 }

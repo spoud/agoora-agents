@@ -6,12 +6,11 @@ import io.spoud.agoora.agents.api.auth.AuthClientInterceptor;
 import io.spoud.agoora.agents.api.config.SdmAgentClientAuthConfig;
 import io.spoud.agoora.agents.api.config.SdmAgentEndpointConfig;
 import io.spoud.agoora.agents.api.utils.LazySingletonInstance;
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 
 import java.util.concurrent.TimeUnit;
 
-public abstract class AbstractGrpcClientFactory {
+public abstract class AbstractGrpcClientFactory implements AutoCloseable {
 
   protected final LazySingletonInstance<ManagedChannel> channel;
   protected final SdmAgentEndpointConfig endpointConfig;
@@ -28,8 +27,7 @@ public abstract class AbstractGrpcClientFactory {
     channel = new LazySingletonInstance<>(() -> createManagedChannel(endpointConfig, authConfig));
   }
 
-  @SneakyThrows
-  void close() {
+  public void close() throws Exception {
     logger.info("Stopping managed channel to {}", endpointConfig.getEndpoint());
     if (channel.isInstantiated()) {
       final ManagedChannel c = channel.getInstance();

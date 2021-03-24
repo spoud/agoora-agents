@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
 
@@ -16,11 +17,17 @@ import java.util.Optional;
 public class ProfileResponseObserver extends AbstractResponseObserver<ProfileDataStreamResponse> {
   @Getter private ProfilerResponse response = new ProfilerResponse();
   private String profile = "";
+  private String schema = "";
 
   @Override
   protected void accumulator(ProfileDataStreamResponse profileDataStreamResponse) {
     if (profileDataStreamResponse.hasMeta()) {
-      response.setMeta(profileDataStreamResponse.getMeta());
+      final Meta meta = profileDataStreamResponse.getMeta();
+      response.setMeta(meta);
+      if(StringUtils.isNotBlank(meta.getSchema())){
+        schema += meta.getSchema();
+      }
+
     } else {
       profile += profileDataStreamResponse.getProfile();
     }
@@ -30,6 +37,7 @@ public class ProfileResponseObserver extends AbstractResponseObserver<ProfileDat
   public void onCompleted() {
     super.onCompleted();
     response.setHtml(profile);
+    response.setSchema(schema);
 
     if (!response
         .getMeta()

@@ -4,9 +4,9 @@ import io.spoud.agoora.agents.api.config.SdmAgentUserConfig;
 import lombok.Data;
 
 @Data
-public class SdmUserConfig implements SdmAgentUserConfig {
+public class SdmUserConfig extends SdmAgentUserConfig {
 
-  private String name;
-
-  private String token;
+//  private String name;
+//
+//  private String token;
 }

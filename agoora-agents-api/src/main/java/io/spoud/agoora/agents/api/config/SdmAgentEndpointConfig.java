@@ -1,10 +1,16 @@
 package io.spoud.agoora.agents.api.config;
 
-public interface SdmAgentEndpointConfig {
-  String getEndpoint();
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-  default boolean isInsecure() {
-    return false;
-  }
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SdmAgentEndpointConfig {
+  private String endpoint;
 
+  @Builder.Default private boolean insecure = false;
 }

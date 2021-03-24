@@ -1,22 +1,25 @@
 package io.spoud.agoora.agents.api.config;
 
-public interface SdmAgentClientAuthConfig {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-  SdmAgentUserConfig getUser();
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SdmAgentClientAuthConfig {
 
-  String getServerUrl();
+  private SdmAgentUserConfig user;
 
-  String getRealm();
+  private String serverUrl;
 
-  default String getTrustStoreLocation() {
-    return null;
-  }
+  private String realm;
 
-  default String getTrustStorePassword() {
-    return null;
-  }
+  @Builder.Default private String trustStoreLocation = null;
 
-  default boolean isIgnoreSsl() {
-    return false;
-  }
+  @Builder.Default private String trustStorePassword = null;
+
+  @Builder.Default private boolean ignoreSsl = false;
 }

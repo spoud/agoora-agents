@@ -6,11 +6,11 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class SdmClientAuthConfig implements SdmAgentClientAuthConfig {
+public class SdmClientAuthConfig extends SdmAgentClientAuthConfig {
 
-  private SdmUserConfig user;
-
-  private String serverUrl;
-
-  private String realm;
+//  private SdmUserConfig user;
+//
+//  private String serverUrl;
+//
+//  private String realm;
 }
