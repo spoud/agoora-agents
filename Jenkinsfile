@@ -84,10 +84,10 @@ pipeline {
     }
 
 
-   AGENTS.each { agent ->
-       stage('Docker build '+agent) {
-          when { changeRequest() }
-          steps {
+   stage('Docker build') {
+      when { changeRequest() }
+      steps {
+        AGENTS.each { agent ->
             dir(agent){
                 sh "docker build -t "+agent+":test ."
                 sh "docker rmi "+agent+":test"
@@ -96,15 +96,15 @@ pipeline {
         }
     }
 
-    AGENTS.each { agent ->
-        stage('Docker build and publish '+agent) {
-          when {
-            anyOf {
-              branch 'master'
-              tag "*"
-            }
-          }
-          steps {
+    stage('Docker build and publish') {
+      when {
+        anyOf {
+          branch 'master'
+          tag "*"
+        }
+      }
+      steps {
+        AGENTS.each { agent ->
             dir(agent){
                 withCredentials([usernamePassword(credentialsId: '95c0e4c5-7a97-4c15-a5bf-4c2f1561c762', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                   sh "docker login -u $USER -p $PASS"
