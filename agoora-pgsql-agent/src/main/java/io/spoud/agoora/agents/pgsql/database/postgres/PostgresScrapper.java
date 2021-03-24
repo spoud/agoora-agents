@@ -177,6 +177,6 @@ public class PostgresScrapper implements DatabaseScrapper {
     if (str == null) {
       return null;
     }
-    return StringUtils.replace(str, "'", "''");
+    return str.replace(" ", "").replace("'", "''");
   }
 }

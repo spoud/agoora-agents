@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import static java.util.function.Predicate.not;
 
-@UtilityClass
 public class SchemaUtil {
 
   /**
