@@ -8,13 +8,13 @@ pipeline {
     }
   }
 
-  agents = ['agoora-pgsql-agent']
-
   environment {
     DOCKER_IMAGE = "spoud/agoora-agents"
     SPOUD_ARTIFACTORY_PASSWORD = credentials('artifactory_password')
     SPOUD_ARTIFACTORY_USER = credentials('artifactory_user')
     GIT_TAG = sh(script: 'git describe --tags --exclude "sdm-*" --abbrev=8', returnStdout: true).trim()
+
+    AGENTS = ['agoora-pgsql-agent']
   }
 
   stages {
@@ -81,7 +81,7 @@ pipeline {
     }
 
 
-   agents.each { agent ->
+   AGENTS.each { agent ->
        stage('Docker build '+agent) {
           when { changeRequest() }
           steps {
@@ -93,7 +93,7 @@ pipeline {
         }
     }
 
-    agents.each { agent ->
+    AGENTS.each { agent ->
         stage('Docker build and publish '+agent) {
           when {
             anyOf {
@@ -102,7 +102,6 @@ pipeline {
             }
           }
           steps {
-
             dir(agent){
                 withCredentials([usernamePassword(credentialsId: '95c0e4c5-7a97-4c15-a5bf-4c2f1561c762', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                   sh "docker login -u $USER -p $PASS"
