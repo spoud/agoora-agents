@@ -1,3 +1,7 @@
+def getAgents(){
+  return ['agoora-pgsql-agent']
+}
+
 pipeline {
   agent {
     docker {
@@ -7,8 +11,6 @@ pipeline {
       alwaysPull true
     }
   }
-
-  def AGENTS = ['agoora-pgsql-agent']
 
   environment {
     DOCKER_IMAGE = "spoud/agoora-agents"
@@ -82,7 +84,7 @@ pipeline {
     }
 
 
-   AGENTS.each { agent ->
+   getAgents().each { agent ->
        stage('Docker build '+agent) {
           when { changeRequest() }
           steps {
@@ -94,7 +96,7 @@ pipeline {
         }
     }
 
-    AGENTS.each { agent ->
+    getAgents().each { agent ->
         stage('Docker build and publish '+agent) {
           when {
             anyOf {
