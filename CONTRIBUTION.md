@@ -1,13 +1,6 @@
 
 ## Development
 
-### Github Maven Repo Access
-
-To be able to access additional internal libs, make sure you've setup maven for github access.
-
-See README of agoora-agents.
-
-
 ### Checkout
 
 ``` bash
