@@ -5,13 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// TODO should be optional !
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SdmAgentConfig {
   private SdmAgentClientAuthConfig auth;
+
+  private SdmTransportConfig transport;
 
   @Builder.Default private SdmAgentEndpointConfig logistics = null;
 

@@ -1,4 +1,4 @@
-package io.spoud.agoora.agents.pgsql.config;
+package io.spoud.agoora.agents.api.quarkus;
 
 import io.quarkus.arc.profile.UnlessBuildProfile;
 import io.spoud.agoora.agents.api.client.BlobClient;
@@ -9,9 +9,9 @@ import io.spoud.agoora.agents.api.client.LookerClient;
 import io.spoud.agoora.agents.api.client.MetricsClient;
 import io.spoud.agoora.agents.api.client.ProfilerClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
+import io.spoud.agoora.agents.api.config.SdmAgentConfig;
 import io.spoud.agoora.agents.api.factory.ClientsFactory;
 import io.spoud.agoora.agents.api.factory.ClientsFactoryImpl;
-import io.spoud.agoora.agents.pgsql.config.data.PgsqlSdmConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.Dependent;
@@ -20,12 +20,12 @@ import javax.enterprise.inject.Produces;
 @Slf4j
 @Dependent
 @UnlessBuildProfile("test")
-public class MoveToAgentLibConfiguration {
+public class QuarkusClientsConfiguration {
 
   private final ClientsFactory clientsFactory;
 
-  public MoveToAgentLibConfiguration(PgsqlSdmConfig pgsqlSdmConfig) {
-    clientsFactory = new ClientsFactoryImpl(pgsqlSdmConfig);
+  public QuarkusClientsConfiguration(SdmAgentConfig sdmAgentConfig) {
+    clientsFactory = new ClientsFactoryImpl(sdmAgentConfig);
   }
 
   @Produces

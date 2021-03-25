@@ -1,4 +1,4 @@
-package io.spoud.agoora.agents.pgsql.config.data;
+package io.spoud.agoora.agents.api.config;
 
 import io.spoud.agoora.agents.api.utils.SdmPath;
 import lombok.Data;

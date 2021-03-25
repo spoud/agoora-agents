@@ -1,0 +1,77 @@
+package io.spoud.agoora.agents.mqtt.service;
+
+import io.quarkus.runtime.LaunchMode;
+import io.quarkus.runtime.StartupEvent;
+import io.smallrye.mutiny.Multi;
+import io.spoud.agoora.agents.mqtt.config.data.MqttSdmConfig;
+import io.spoud.agoora.agents.mqtt.config.data.SdmScrapperConfig;
+import io.spoud.agoora.agents.mqtt.mqtt.IterationContext;
+import io.spoud.agoora.agents.mqtt.mqtt.MqttScrapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
+@Slf4j
+@ApplicationScoped
+@RequiredArgsConstructor
+public class CronService {
+
+  private final MqttScrapper mqttScrapper;
+
+  private final ExecutorService managedExecutor = Executors.newSingleThreadExecutor();
+  private final ScheduledExecutorService scheduledExecutorService =
+      Executors.newSingleThreadScheduledExecutor();
+
+  private final MqttSdmConfig sdmConfig;
+    private IterationContext lastIterationContext;
+
+    void onStart(@Observes StartupEvent ev) {
+    if (LaunchMode.current() != LaunchMode.TEST) {
+      final SdmScrapperConfig scrapperConfig = sdmConfig.getScrapper();
+
+      if (scrapperConfig.getPeriod().compareTo(scrapperConfig.getMaxWait()) < 0) {
+        LOG.error("Max wait should be smaller than than the period");
+      } else {
+        startCron(scrapperConfig);
+      }
+    }
+  }
+
+  private void startCron(SdmScrapperConfig scrapperConfig) {
+    LOG.info("Staring cron with a period of {}", scrapperConfig.getPeriod());
+    AtomicReference<ScheduledFuture<?>> terminationSchedule = new AtomicReference<>(null);
+
+    Multi.createFrom()
+        .ticks()
+        .every(scrapperConfig.getPeriod())
+        .runSubscriptionOn(managedExecutor)
+        .subscribe()
+        .with(
+            unused -> {
+              final ScheduledFuture<?> old =
+                  terminationSchedule.getAndSet(
+                      scheduledExecutorService.schedule(
+                          () -> mqttScrapper.stopRemainingOfPreviousIteration(lastIterationContext),
+                          scrapperConfig.getMaxWait().toMillis(),
+                          TimeUnit.MILLISECONDS));
+              // stop the previous iteration if not already executed
+              if (old != null) {
+                old.cancel(true);
+                // stop previous iteration if needed
+                mqttScrapper.stopRemainingOfPreviousIteration(lastIterationContext);
+              }
+
+              LOG.info(
+                  "Starting MQTT listening iteration, max-wait={}", scrapperConfig.getMaxWait());
+              lastIterationContext = mqttScrapper.startIteration();
+            });
+  }
+}

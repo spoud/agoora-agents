@@ -49,6 +49,7 @@
     <modules>
         <module>agoora-agents-api</module>
         <module>agoora-agents-test</module>
+        <module>agoora-mqtt-agent</module>
         <module>agoora-pgsql-agent</module>
     </modules>
 

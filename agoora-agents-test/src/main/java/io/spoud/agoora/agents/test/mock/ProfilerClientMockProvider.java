@@ -12,12 +12,16 @@ import static org.mockito.Mockito.when;
 @UtilityClass
 public class ProfilerClientMockProvider {
 
+  public static final String PROFILE = "<html/>";
+  public static final String SCHEMA = "Whatever";
+
   public static void defaultMock(ProfilerClient mock) {
     when(mock.profileData(any(), any()))
         .thenReturn(
             ProfileResponseObserver.ProfilerResponse.builder()
                 .error(Optional.empty())
-                .html("<html/>")
+                .schema(SCHEMA)
+                .html(PROFILE)
                 .build());
   }
 }
