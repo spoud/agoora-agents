@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SdmAgentUserConfig {
+public class AgooraAgentUserConfig {
 
   private String name;
 

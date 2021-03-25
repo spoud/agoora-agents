@@ -1,9 +1,9 @@
-sdm-endpoint: local.spoud.io
-sdm-insecure: false
-sdm-cluster: default
-sdm-transport-path: /default/postgres
+agoora-endpoint: local.spoud.io
+agoora-insecure: false
+agoora-cluster: default
+agoora-transport-path: /default/postgres
 
-sdm:
+agoora:
   scrapper:
     samples-size: 500
     state:
@@ -18,34 +18,34 @@ sdm:
       enabled: true
       initial-delay: PT1S
   transport:
-    sdm-path: ${sdm-transport-path}
+    agoora-path: ${agoora-transport-path}
   auth:
-    server-url: https://${sdm-endpoint}/auth/
-    cluster: ${sdm-cluster}
+    server-url: https://${agoora-endpoint}/auth/
+    cluster: ${agoora-cluster}
     realm: spoud
     user:
       name: to-be-defined
       token: to-be-defined
   logistics:
-    endpoint: ${sdm-endpoint}
-    cluster: ${sdm-cluster}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
   hooks:
-    endpoint: ${sdm-endpoint}
-    cluster: ${sdm-cluster}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
   schema:
-    endpoint: ${sdm-endpoint}
-    cluster: ${sdm-cluster}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
   looker:
-    endpoint: ${sdm-endpoint}
-    cluster: ${sdm-cluster}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
   blob:
-    endpoint: ${sdm-endpoint}
-    cluster: ${sdm-cluster}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
   profiler:
     endpoint: localhost:8089
     insecure: true
@@ -56,7 +56,7 @@ quarkus:
     remove-unused-beans: fwk
   datasource:
     jdbc:
-      url: jdbc:postgresql://127.0.0.1:5432/sdm-logistics
+      url: jdbc:postgresql://127.0.0.1:5432/agoora-logistics
     db-kind: postgresql
     username: postgres
     password: postgres
@@ -64,7 +64,7 @@ quarkus:
     port: 8280
   log:
     category:
-      "io.spoud.sdm":
+      "io.spoud.agoora":
         level: INFO
   ssl:
     native: true
@@ -74,18 +74,18 @@ quarkus:
 #      - --report-unsupported-elements-at-runtime
 
 "%dev":
-  sdm-endpoint: local.spoud.io
-  sdm-insecure: true
-  sdm-cluster: default
-  sdm-transport-path: /default/postgres
-  sdm:
+  agoora-endpoint: local.spoud.io
+  agoora-insecure: true
+  agoora-cluster: default
+  agoora-transport-path: /default/postgres
+  agoora:
     scrapper:
       state:
         initial-delay: 3s
       profiling:
         initial-delay: 5s
     auth:
-      server-url: http://${sdm-endpoint}/auth/
+      server-url: http://${agoora-endpoint}/auth/
       user:
-        name: sdm_t_ca7cfb09-35dc-4c8a-a4c3-6be73934fd88
+        name: agoora_t_ca7cfb09-35dc-4c8a-a4c3-6be73934fd88
         token: coG7jpnBBdl3eEYYmo1gONQUabwkDR5p

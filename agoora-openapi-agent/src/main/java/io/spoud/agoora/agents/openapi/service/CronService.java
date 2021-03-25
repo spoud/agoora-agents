@@ -2,8 +2,8 @@ package io.spoud.agoora.agents.openapi.service;
 
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
-import io.spoud.agoora.agents.openapi.config.data.OpenApiSdmConfig;
-import io.spoud.agoora.agents.openapi.config.data.SdmScrapperFeatureConfig;
+import io.spoud.agoora.agents.openapi.config.data.OpenApiAgooraConfig;
+import io.spoud.agoora.agents.openapi.config.data.ScrapperFeatureConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.context.ManagedExecutor;
@@ -20,10 +20,10 @@ public class CronService {
 
   private final ManagedExecutor managedExecutor;
 
-  private final OpenApiSdmConfig sdmConfig;
+  private final OpenApiAgooraConfig config;
 
   void onStart(@Observes StartupEvent ev) {
-    SdmScrapperFeatureConfig stateConfig = sdmConfig.getScrapper().getState();
+    ScrapperFeatureConfig stateConfig = config.getScrapper().getState();
 
     if (stateConfig.isEnabled()) {
       Multi.createFrom()

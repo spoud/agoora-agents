@@ -1,6 +1,6 @@
 package io.spoud.agoora.agents.pgsql.service;
 
-import io.spoud.agoora.agents.pgsql.config.data.PgsqlSdmConfig;
+import io.spoud.agoora.agents.pgsql.config.data.PgsqlAgooraConfig;
 import io.spoud.sdm.global.selection.v1.BaseRef;
 import io.spoud.sdm.global.selection.v1.IdPathRef;
 import lombok.RequiredArgsConstructor;
@@ -14,16 +14,16 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class ReferenceService {
 
-  private final PgsqlSdmConfig config;
+  private final PgsqlAgooraConfig config;
 
   @ConfigProperty(name = "quarkus.datasource.jdbc.url")
-  private String jdbcUrl;
+  String jdbcUrl;
 
   public BaseRef getTransportRef() {
     return BaseRef.newBuilder()
         .setIdPath(
             IdPathRef.newBuilder()
-                .setPath(config.getTransport().getSdmPathObject().getAbsolutePath())
+                .setPath(config.getTransport().getAgooraPathObject().getAbsolutePath())
                 .build())
         .build();
   }

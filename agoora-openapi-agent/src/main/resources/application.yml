@@ -1,13 +1,13 @@
-sdm-endpoint: local.spoud.io
-sdm-insecure: false
-sdm-transport-path: /default/openapi
+agoora-endpoint: local.spoud.io
+agoora-insecure: false
+agoora-transport-path: /default/openapi
 
 
-sdm:
+agoora:
   openapi:
     base-url: https://petstore3.swagger.io
-    url: ${sdm.openapi.base-url}/api/v3/openapi.json
-    ui-url: ${sdm.openapi.base-url}
+    url: ${agoora.openapi.base-url}/api/v3/openapi.json
+    ui-url: ${agoora.openapi.base-url}
   scrapper:
     samples-size: 500
     state:
@@ -18,28 +18,28 @@ sdm:
       enabled: true
       initial-delay: PT1S
   transport:
-    sdm-path: ${sdm-transport-path}
+    agoora-path: ${agoora-transport-path}
   auth:
-    server-url: https://${sdm-endpoint}/auth/
+    server-url: https://${agoora-endpoint}/auth/
     realm: spoud
     user:
       name: to-be-defined
       token: to-be-defined
   logistics:
-    endpoint: ${sdm-endpoint}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    insecure: ${agoora-insecure}
   hooks:
-    endpoint: ${sdm-endpoint}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    insecure: ${agoora-insecure}
   schema:
-    endpoint: ${sdm-endpoint}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    insecure: ${agoora-insecure}
   looker:
-    endpoint: ${sdm-endpoint}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    insecure: ${agoora-insecure}
   blob:
-    endpoint: ${sdm-endpoint}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    insecure: ${agoora-insecure}
   profiler:
     endpoint: localhost:8089
     insecure: true
@@ -52,7 +52,7 @@ quarkus:
     port: 8280
   log:
     category:
-      "io.spoud.sdm":
+      "io.spoud.agoora":
         level: INFO
   ssl:
     native: true
@@ -63,17 +63,17 @@ quarkus:
       - -H:+AddAllCharsets
 
 "%dev":
-  sdm-endpoint: local.spoud.io
-  sdm-insecure: true
-  sdm-transport-path: /default/openapi/openpai
-  sdm:
+  agoora-endpoint: local.spoud.io
+  agoora-insecure: true
+  agoora-transport-path: /default/openapi/openpai
+  agoora:
     scrapper:
       state:
         initial-delay: 3s
       profiling:
         initial-delay: 5s
     auth:
-      server-url: http://${sdm-endpoint}/auth/
+      server-url: http://${agoora-endpoint}/auth/
       user:
-        name: sdm_t_1e6c4b68-bbff-4085-b4fb-43126150ccf4
+        name: agoora_t_1e6c4b68-bbff-4085-b4fb-43126150ccf4
         token: YKmCLNJ3IkELHfYCGmJc7HtegiyJYC8r

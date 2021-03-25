@@ -5,5 +5,5 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class Constants {
 
-  public static final String SDM_MATCHING_TOPIC_NAME = "sdm.transport.mqtt.topic.name";
+  public static final String AGOORA_MATCHING_TOPIC_NAME = "sdm.transport.mqtt.topic.name";
 }

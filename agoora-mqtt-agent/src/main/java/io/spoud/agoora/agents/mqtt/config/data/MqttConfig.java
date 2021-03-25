@@ -7,7 +7,7 @@ import java.util.Optional;
 
 @Data
 @ToString(exclude = {"password"})
-public class SdmMqttConfig {
+public class MqttConfig {
   private String broker;
   private String clientId;
   private String paths;

@@ -1,6 +1,6 @@
 package io.spoud.agoora.agents.openapi.service;
 
-import io.spoud.agoora.agents.openapi.config.data.OpenApiSdmConfig;
+import io.spoud.agoora.agents.openapi.config.data.OpenApiAgooraConfig;
 import io.spoud.sdm.global.selection.v1.BaseRef;
 import io.spoud.sdm.global.selection.v1.IdPathRef;
 import lombok.RequiredArgsConstructor;
@@ -13,13 +13,13 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class ReferenceService {
 
-  private final OpenApiSdmConfig config;
+  private final OpenApiAgooraConfig config;
 
   public BaseRef getTransportRef() {
     return BaseRef.newBuilder()
         .setIdPath(
             IdPathRef.newBuilder()
-                .setPath(config.getTransport().getSdmPathObject().getAbsolutePath())
+                .setPath(config.getTransport().getAgooraPathObject().getAbsolutePath())
                 .build())
         .build();
   }

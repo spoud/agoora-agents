@@ -11,7 +11,7 @@ import io.spoud.agoora.agents.api.client.ProfilerClient;
 import io.spoud.agoora.agents.api.client.ResourceGroupClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.api.client.TransportClient;
-import io.spoud.agoora.agents.api.config.SdmAgentConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +26,7 @@ public class ClientsFactoryImpl implements ClientsFactory {
   private final ProfilerFactory profilerFactory;
   private final SchemaFactory schemaFactory;
 
-  public ClientsFactoryImpl(SdmAgentConfig config) {
+  public ClientsFactoryImpl(AgooraAgentConfig config) {
     blobClientFactory = new BlobClientFactory(config);
     hooksClientFactory = new HooksClientFactory(config);
     logisticsClientsFactory = new LogisticsClientsFactory(config);

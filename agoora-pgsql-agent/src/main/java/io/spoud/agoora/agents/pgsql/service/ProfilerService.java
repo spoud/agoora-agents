@@ -6,7 +6,7 @@ import io.spoud.agoora.agents.api.client.BlobClient;
 import io.spoud.agoora.agents.api.client.LookerClient;
 import io.spoud.agoora.agents.api.client.ProfilerClient;
 import io.spoud.agoora.agents.api.observers.ProfileResponseObserver;
-import io.spoud.agoora.agents.pgsql.config.data.PgsqlSdmConfig;
+import io.spoud.agoora.agents.pgsql.config.data.PgsqlAgooraConfig;
 import io.spoud.agoora.agents.pgsql.database.DatabaseScrapper;
 import io.spoud.agoora.agents.pgsql.repository.DataItemRepository;
 import io.spoud.sdm.global.domain.v1.ResourceEntity;
@@ -45,10 +45,7 @@ public class ProfilerService {
   private final LookerClient lookerClient;
 
   private final ObjectMapper objectMapper;
-  private final PgsqlSdmConfig config;
-
-  @ConfigProperty(name = "sdm.scrapper.samples-size")
-  int maxSampleSize;
+  private final PgsqlAgooraConfig config;
 
   public static final Timestamp now() {
     Instant now = Instant.now();
@@ -67,7 +64,7 @@ public class ProfilerService {
     LOG.debug("Start profile dataItem {} for table {}", dataItem.getId(), tableName);
 
     databaseScrapper
-        .getSamples(tableName, maxSampleSize)
+        .getSamples(tableName, config.getScrapper().getSamplesSize())
         .ifPresent(
             samples -> {
               sampleSize.set(samples.size());
@@ -116,7 +113,7 @@ public class ProfilerService {
                     String htmlId =
                         blobClient.uploadBlobUtf8(
                             html,
-                            config.getTransport().getSdmPathObject().getResourceGroupPath(),
+                            config.getTransport().getAgooraPathObject().getResourceGroupPath(),
                             ResourceEntity.Type.DATA_ITEM);
                     if (htmlId != null) {
                       dataProfileRequest.setProfileHtmlBlobId(htmlId);

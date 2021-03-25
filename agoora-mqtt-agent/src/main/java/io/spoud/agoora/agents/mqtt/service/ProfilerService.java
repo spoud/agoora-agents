@@ -7,7 +7,7 @@ import io.spoud.agoora.agents.api.client.ProfilerClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.api.mapper.StandardProtoMapper;
 import io.spoud.agoora.agents.api.observers.ProfileResponseObserver;
-import io.spoud.agoora.agents.mqtt.config.data.MqttSdmConfig;
+import io.spoud.agoora.agents.mqtt.config.data.MqttAgooraConfig;
 import io.spoud.agoora.agents.mqtt.data.TopicDescription;
 import io.spoud.agoora.agents.mqtt.repository.DataPortRepository;
 import io.spoud.sdm.global.domain.v1.ResourceEntity;
@@ -45,7 +45,7 @@ public class ProfilerService {
 
   private final DataPortRepository dataPortRepository;
 
-  private final MqttSdmConfig config;
+  private final MqttAgooraConfig config;
 
   // profiling only supports one at the time
   private final ExecutorService managedExecutor = Executors.newSingleThreadExecutor();
@@ -122,7 +122,7 @@ public class ProfilerService {
           String htmlId =
               blobClient.uploadBlobUtf8(
                   html,
-                  config.getTransport().getSdmPathObject().getResourceGroupPath(),
+                  config.getTransport().getAgooraPathObject().getResourceGroupPath(),
                   ResourceEntity.Type.DATA_PORT);
           if (htmlId != null) {
             dataProfileRequest.setProfileHtmlBlobId(htmlId);
@@ -158,7 +158,7 @@ public class ProfilerService {
                 .saveSchema(
                     ResourceEntity.Type.DATA_PORT,
                     dataPort.getId(),
-                    config.getTransport().getSdmPathObject().getResourceGroupPath(),
+                    config.getTransport().getAgooraPathObject().getResourceGroupPath(),
                     schemaContent,
                     SchemaSource.Type.INFERRED,
                     SchemaEncoding.Type.JSON)

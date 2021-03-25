@@ -2,8 +2,8 @@ package io.spoud.agoora.agents.pgsql.service;
 
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
-import io.spoud.agoora.agents.pgsql.config.data.PgsqlSdmConfig;
-import io.spoud.agoora.agents.pgsql.config.data.SdmScrapperFeatureConfig;
+import io.spoud.agoora.agents.pgsql.config.data.PgsqlAgooraConfig;
+import io.spoud.agoora.agents.pgsql.config.data.ScrapperFeatureConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.context.ManagedExecutor;
@@ -22,11 +22,11 @@ public class CronService {
 
   private final ManagedExecutor managedExecutor;
 
-  private final PgsqlSdmConfig sdmConfig;
+  private final PgsqlAgooraConfig config;
 
   void onStart(@Observes StartupEvent ev) {
-    SdmScrapperFeatureConfig stateConfig = sdmConfig.getScrapper().getState();
-    SdmScrapperFeatureConfig profilingConfig = sdmConfig.getScrapper().getProfiling();
+    ScrapperFeatureConfig stateConfig = config.getScrapper().getState();
+    ScrapperFeatureConfig profilingConfig = config.getScrapper().getProfiling();
 
     if (stateConfig.isEnabled()) {
       Multi.createFrom()

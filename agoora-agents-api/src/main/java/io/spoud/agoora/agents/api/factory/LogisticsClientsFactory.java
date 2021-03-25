@@ -1,6 +1,6 @@
 package io.spoud.agoora.agents.api.factory;
 
-import io.spoud.agoora.agents.api.config.SdmAgentConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
 import io.spoud.agoora.agents.api.utils.LazySingletonInstance;
 import io.spoud.sdm.logistics.service.v1.DataItemServiceGrpc;
 import io.spoud.sdm.logistics.service.v1.DataPortServiceGrpc;
@@ -24,7 +24,7 @@ public class LogisticsClientsFactory extends AbstractGrpcClientFactory {
   private final LazySingletonInstance<ResourceGroupServiceGrpc.ResourceGroupServiceBlockingStub>
       resourceGroupStub;
 
-  public LogisticsClientsFactory(SdmAgentConfig config) {
+  public LogisticsClientsFactory(AgooraAgentConfig config) {
     super(LOG, config.getLogistics(), config.getAuth());
     dataPortServiceStub =
         new LazySingletonInstance<>(

@@ -5,10 +5,10 @@ import lombok.Data;
 import java.time.Duration;
 
 @Data
-public class SdmScrapperConfig {
+public class ScrapperConfig {
   private Integer maxSamples;
   private Duration period;
   private Duration maxWait;
-  private SdmScrapperFeatureConfig profiling;
-  private SdmScrapperFeatureConfig hooks;
+  private ScrapperFeatureConfig profiling;
+  private ScrapperFeatureConfig hooks;
 }

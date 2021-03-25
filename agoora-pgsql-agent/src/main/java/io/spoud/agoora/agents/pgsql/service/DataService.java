@@ -7,7 +7,7 @@ import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.agoora.agents.api.client.MetricsClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.pgsql.Constants;
-import io.spoud.agoora.agents.pgsql.config.data.PgsqlSdmConfig;
+import io.spoud.agoora.agents.pgsql.config.data.PgsqlAgooraConfig;
 import io.spoud.agoora.agents.pgsql.data.DatabaseDescription;
 import io.spoud.agoora.agents.pgsql.data.JsonSchema;
 import io.spoud.agoora.agents.pgsql.data.TableDescription;
@@ -56,7 +56,7 @@ public class DataService {
   private final SchemaClient schemaClient;
   private final MetricsClient metricsClient;
 
-  private final PgsqlSdmConfig config;
+  private final PgsqlAgooraConfig config;
 
   public void updateStates() {
     // TODO diff with hooks and repository
@@ -89,9 +89,9 @@ public class DataService {
     StringValue tableName = stringValue(database.getName());
 
     Map<String, String> matchingProperties =
-        Map.of(Constants.SDM_MATCHING_DATABASE_NAME, database.getName());
+        Map.of(Constants.AGOORA_MATCHING_DATABASE_NAME, database.getName());
     Map<String, String> allProperties = new HashMap<>(matchingProperties);
-    allProperties.put(Constants.SDM_DATABASE_URL, referenceService.getDatabaseUrl());
+    allProperties.put(Constants.AGOORA_DATABASE_URL, referenceService.getDatabaseUrl());
 
     return dataPortClient.save(
         SaveDataPortRequest.newBuilder()
@@ -112,7 +112,7 @@ public class DataService {
                         ResourceGroupRef.newBuilder()
                             .setIdPath(
                                 IdPathRef.newBuilder()
-                                    .setPath(config.getTransport().getSdmPathObject().getResourceGroupPath())
+                                    .setPath(config.getTransport().getAgooraPathObject().getResourceGroupPath())
                                     .buildPartial())
                             .build())
                     .setProperties(PropertyMap.newBuilder().putAllProperties(allProperties).build())
@@ -125,7 +125,7 @@ public class DataService {
     StringValue tableName = stringValue(table.getName());
 
     Map<String, String> matchingProperties =
-        Map.of(Constants.SDM_MATCHING_TABLE_NAME, table.getName());
+        Map.of(Constants.AGOORA_MATCHING_TABLE_NAME, table.getName());
     Map<String, String> allProperties = new HashMap<>(matchingProperties);
 
     return dataItemClient.save(
@@ -163,7 +163,7 @@ public class DataService {
               .saveSchema(
                   ResourceEntity.Type.DATA_ITEM,
                   dataItem.getId(),
-                  config.getTransport().getSdmPathObject().getResourceGroupPath(),
+                  config.getTransport().getAgooraPathObject().getResourceGroupPath(),
                   schemaContent,
                   SchemaSource.Type.INFERRED,
                   SchemaEncoding.Type.JSON) // TODO new Schema encoding ?

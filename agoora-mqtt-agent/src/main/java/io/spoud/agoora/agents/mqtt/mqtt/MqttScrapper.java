@@ -1,7 +1,7 @@
 package io.spoud.agoora.agents.mqtt.mqtt;
 
-import io.spoud.agoora.agents.mqtt.config.data.MqttSdmConfig;
-import io.spoud.agoora.agents.mqtt.config.data.SdmScrapperConfig;
+import io.spoud.agoora.agents.mqtt.config.data.MqttAgooraConfig;
+import io.spoud.agoora.agents.mqtt.config.data.ScrapperConfig;
 import io.spoud.agoora.agents.mqtt.data.TopicDescription;
 import io.spoud.agoora.agents.mqtt.service.DataService;
 import io.spoud.agoora.agents.mqtt.service.ProfilerService;
@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 @ApplicationScoped
 public class MqttScrapper {
 
-  private final MqttSdmConfig config;
+  private final MqttAgooraConfig config;
   private final MqttClient mqttClient;
   private final DataService dataService;
   private final ProfilerService profilerService;
@@ -79,7 +79,7 @@ public class MqttScrapper {
   }
 
   public void stopRemainingOfPreviousIteration(IterationContext context) {
-    final SdmScrapperConfig scrapperConfig = config.getScrapper();
+    final ScrapperConfig scrapperConfig = config.getScrapper();
     final double ratio =
         1.0 * scrapperConfig.getPeriod().toMillis() / scrapperConfig.getMaxWait().toMillis();
 

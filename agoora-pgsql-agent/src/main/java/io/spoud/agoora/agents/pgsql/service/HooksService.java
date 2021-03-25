@@ -3,7 +3,7 @@ package io.spoud.agoora.agents.pgsql.service;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Uni;
 import io.spoud.agoora.agents.api.client.HooksClient;
-import io.spoud.agoora.agents.pgsql.config.data.PgsqlSdmConfig;
+import io.spoud.agoora.agents.pgsql.config.data.PgsqlAgooraConfig;
 import io.spoud.agoora.agents.pgsql.repository.DataItemRepository;
 import io.spoud.agoora.agents.pgsql.repository.DataPortRepository;
 import io.spoud.sdm.global.domain.v1.ResourceEntity;
@@ -26,16 +26,16 @@ public class HooksService {
   private final DataPortRepository dataPortRepository;
   private final DataItemRepository dataItemRepository;
   private final ManagedExecutor managedExecutor;
-  private final PgsqlSdmConfig sdmConfig;
+  private final PgsqlAgooraConfig config;
 
   void onStart(@Observes StartupEvent ev) {
-    if (sdmConfig.getScrapper().getHooks().isEnabled()) {
+    if (config.getScrapper().getHooks().isEnabled()) {
       // We delay hooks to let the app starts peacefully
       Uni.createFrom()
           .item("")
           .onItem()
           .delayIt()
-          .by(sdmConfig.getScrapper().getHooks().getInitialDelay())
+          .by(config.getScrapper().getHooks().getInitialDelay())
           .runSubscriptionOn(managedExecutor)
           .subscribe()
           .with(v -> startListeningToHooks());
@@ -46,7 +46,7 @@ public class HooksService {
     LOG.info("Start listening to hooks");
     hooksClient.startListening(
         this::logRecordChange,
-        sdmConfig.getTransport().getSdmPathObject().getAbsolutePath(),
+        config.getTransport().getAgooraPathObject().getAbsolutePath(),
         true,
         true,
         false);

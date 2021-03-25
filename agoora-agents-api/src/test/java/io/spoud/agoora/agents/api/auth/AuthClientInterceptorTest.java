@@ -1,7 +1,7 @@
 package io.spoud.agoora.agents.api.auth;
 
-import io.spoud.agoora.agents.api.config.SdmAgentClientAuthConfig;
-import io.spoud.agoora.agents.api.config.SdmAgentUserConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentClientAuthConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentUserConfig;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,38 +14,38 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AuthClientInterceptorTest {
 
-  private SdmAgentClientAuthConfig.SdmAgentClientAuthConfigBuilder baseBuilder;
+  private AgooraAgentClientAuthConfig.AgooraAgentClientAuthConfigBuilder baseBuilder;
 
   @BeforeEach
   void setup() {
     baseBuilder =
-        SdmAgentClientAuthConfig.builder()
+        AgooraAgentClientAuthConfig.builder()
             .serverUrl("http://localhost")
             .realm("spoud")
-            .user(SdmAgentUserConfig.builder().name("name").token("token").build());
+            .user(AgooraAgentUserConfig.builder().name("name").token("token").build());
   }
 
   @Test
   void testWrongConfig() {
-    final SdmAgentClientAuthConfig noServer =
-        SdmAgentClientAuthConfig.builder()
+    final AgooraAgentClientAuthConfig noServer =
+        AgooraAgentClientAuthConfig.builder()
             .realm("spoud")
-            .user(SdmAgentUserConfig.builder().name("name").token("token").build())
+            .user(AgooraAgentUserConfig.builder().name("name").token("token").build())
             .build();
     assertThatThrownBy(() -> new AuthClientInterceptor(noServer))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("serverUrl is required");
 
-    final SdmAgentClientAuthConfig noUser =
-        SdmAgentClientAuthConfig.builder().serverUrl("http://localhost").realm("spoud").build();
+    final AgooraAgentClientAuthConfig noUser =
+        AgooraAgentClientAuthConfig.builder().serverUrl("http://localhost").realm("spoud").build();
     assertThatThrownBy(() -> new AuthClientInterceptor(noUser))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("user credentials are required");
 
-    final SdmAgentClientAuthConfig noRealm =
-        SdmAgentClientAuthConfig.builder()
+    final AgooraAgentClientAuthConfig noRealm =
+        AgooraAgentClientAuthConfig.builder()
             .serverUrl("http://localhost")
-            .user(SdmAgentUserConfig.builder().name("name").token("token").build())
+            .user(AgooraAgentUserConfig.builder().name("name").token("token").build())
             .build();
     assertThatThrownBy(() -> new AuthClientInterceptor(noRealm))
         .isInstanceOf(IllegalArgumentException.class)
@@ -54,7 +54,7 @@ class AuthClientInterceptorTest {
 
   @Test
   void testNoSsl() {
-    final SdmAgentClientAuthConfig config =
+    final AgooraAgentClientAuthConfig config =
         baseBuilder.ignoreSsl(true).trustStoreLocation("blablab").build();
 
     final AuthClientInterceptor authClientInterceptor = new AuthClientInterceptor(config);

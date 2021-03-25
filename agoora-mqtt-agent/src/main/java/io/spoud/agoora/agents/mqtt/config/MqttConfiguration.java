@@ -1,7 +1,7 @@
 package io.spoud.agoora.agents.mqtt.config;
 
-import io.spoud.agoora.agents.mqtt.config.data.MqttSdmConfig;
-import io.spoud.agoora.agents.mqtt.config.data.SdmMqttConfig;
+import io.spoud.agoora.agents.mqtt.config.data.MqttAgooraConfig;
+import io.spoud.agoora.agents.mqtt.config.data.MqttConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -19,8 +19,8 @@ public class MqttConfiguration {
 
   @Produces
   @Singleton
-  MqttClient mqttClient(MqttSdmConfig config) {
-    final SdmMqttConfig mqtt = config.getMqtt();
+  MqttClient mqttClient(MqttAgooraConfig config) {
+    final MqttConfig mqtt = config.getMqtt();
     try {
       final MqttClient client =
           new MqttClient(mqtt.getBroker(), mqtt.getClientId(), new MemoryPersistence());

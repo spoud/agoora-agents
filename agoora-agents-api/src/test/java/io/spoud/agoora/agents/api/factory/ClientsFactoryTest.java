@@ -11,10 +11,10 @@ import io.spoud.agoora.agents.api.client.ProfilerClient;
 import io.spoud.agoora.agents.api.client.ResourceGroupClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.api.client.TransportClient;
-import io.spoud.agoora.agents.api.config.SdmAgentClientAuthConfig;
-import io.spoud.agoora.agents.api.config.SdmAgentConfig;
-import io.spoud.agoora.agents.api.config.SdmAgentEndpointConfig;
-import io.spoud.agoora.agents.api.config.SdmAgentUserConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentClientAuthConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentEndpointConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentUserConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,20 +32,20 @@ class ClientsFactoryTest {
   void setup() {
     factory =
         new ClientsFactoryImpl(
-            SdmAgentConfig.builder()
+            AgooraAgentConfig.builder()
                 .auth(
-                    SdmAgentClientAuthConfig.builder()
+                    AgooraAgentClientAuthConfig.builder()
                         .realm("realm")
                         .serverUrl("http://localhost/auth")
-                        .user(SdmAgentUserConfig.builder().name("name").token("token").build())
+                        .user(AgooraAgentUserConfig.builder().name("name").token("token").build())
                         .build())
-                .blob(SdmAgentEndpointConfig.builder().endpoint(ENDPOINT).insecure(true).build())
+                .blob(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).insecure(true).build())
                 .logistics(
-                    SdmAgentEndpointConfig.builder().endpoint(ENDPOINT).insecure(true).build())
-                .schema(SdmAgentEndpointConfig.builder().endpoint(ENDPOINT).insecure(true).build())
-                .profiler(SdmAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
-                .looker(SdmAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
-                .hooks(SdmAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
+                    AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).insecure(true).build())
+                .schema(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).insecure(true).build())
+                .profiler(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
+                .looker(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
+                .hooks(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
                 .build());
   }
 
@@ -56,7 +56,7 @@ class ClientsFactoryTest {
 
   @Test
   void blob() {
-    ClientsFactory factory1 = new ClientsFactoryImpl(SdmAgentConfig.builder().build());
+    ClientsFactory factory1 = new ClientsFactoryImpl(AgooraAgentConfig.builder().build());
 
     assertThatThrownBy(() -> factory1.getBlobClient())
         .isInstanceOf(IllegalArgumentException.class)
@@ -64,8 +64,8 @@ class ClientsFactoryTest {
 
     ClientsFactory factory2 =
         new ClientsFactoryImpl(
-            SdmAgentConfig.builder()
-                .blob(SdmAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
+            AgooraAgentConfig.builder()
+                .blob(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
                 .build());
 
     assertThat(factory2.getBlobClient()).isNotNull().isInstanceOf(BlobClient.class);

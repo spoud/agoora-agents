@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SdmAgentClientAuthConfig {
+public class AgooraAgentClientAuthConfig {
 
-  private SdmAgentUserConfig user;
+  private AgooraAgentUserConfig user;
 
   private String serverUrl;
 

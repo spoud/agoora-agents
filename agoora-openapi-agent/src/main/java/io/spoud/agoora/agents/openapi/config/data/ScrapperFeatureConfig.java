@@ -1,11 +1,11 @@
-package io.spoud.agoora.agents.pgsql.config.data;
+package io.spoud.agoora.agents.openapi.config.data;
 
 import lombok.Data;
 
 import java.time.Duration;
 
 @Data
-public class SdmScrapperFeatureConfig {
+public class ScrapperFeatureConfig {
   private boolean enabled;
   private Duration initialDelay;
   private Duration interval = Duration.ofMinutes(15);

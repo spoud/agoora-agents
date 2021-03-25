@@ -3,8 +3,8 @@ package io.spoud.agoora.agents.api.factory;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.spoud.agoora.agents.api.auth.AuthClientInterceptor;
-import io.spoud.agoora.agents.api.config.SdmAgentClientAuthConfig;
-import io.spoud.agoora.agents.api.config.SdmAgentEndpointConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentClientAuthConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentEndpointConfig;
 import io.spoud.agoora.agents.api.utils.LazySingletonInstance;
 import org.slf4j.Logger;
 
@@ -13,15 +13,15 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractGrpcClientFactory implements AutoCloseable {
 
   protected final LazySingletonInstance<ManagedChannel> channel;
-  protected final SdmAgentEndpointConfig endpointConfig;
+  protected final AgooraAgentEndpointConfig endpointConfig;
   private final Logger logger;
 
-  protected AbstractGrpcClientFactory(Logger logger, SdmAgentEndpointConfig endpointConfig) {
+  protected AbstractGrpcClientFactory(Logger logger, AgooraAgentEndpointConfig endpointConfig) {
     this(logger, endpointConfig, null);
   }
 
   protected AbstractGrpcClientFactory(
-      Logger logger, SdmAgentEndpointConfig endpointConfig, SdmAgentClientAuthConfig authConfig) {
+          Logger logger, AgooraAgentEndpointConfig endpointConfig, AgooraAgentClientAuthConfig authConfig) {
     this.logger = logger;
     this.endpointConfig = endpointConfig;
     channel = new LazySingletonInstance<>(() -> createManagedChannel(endpointConfig, authConfig));
@@ -40,7 +40,7 @@ public abstract class AbstractGrpcClientFactory implements AutoCloseable {
   }
 
   public ManagedChannel createManagedChannel(
-      SdmAgentEndpointConfig endpointConfig, SdmAgentClientAuthConfig authConfig) {
+          AgooraAgentEndpointConfig endpointConfig, AgooraAgentClientAuthConfig authConfig) {
     if (endpointConfig == null) {
       throw new IllegalArgumentException(
           "No Endpoint configuration provided for " + logger.getName());

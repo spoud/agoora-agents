@@ -12,7 +12,7 @@ public class MqttResource implements QuarkusTestResourceLifecycleManager {
   @Override
   public Map<String, String> start() {
     mqtt.start();
-    return Map.of("sdm.mqtt.broker", mqtt.getBroker());
+    return Map.of("agoora.mqtt.broker", mqtt.getBroker());
   }
 
   @Override

@@ -5,7 +5,7 @@ import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.agoora.agents.api.client.MetricsClient;
 import io.spoud.agoora.agents.api.mapper.StandardProtoMapper;
 import io.spoud.agoora.agents.mqtt.Constants;
-import io.spoud.agoora.agents.mqtt.config.data.MqttSdmConfig;
+import io.spoud.agoora.agents.mqtt.config.data.MqttAgooraConfig;
 import io.spoud.agoora.agents.mqtt.data.TopicDescription;
 import io.spoud.agoora.agents.mqtt.repository.DataPortRepository;
 import io.spoud.sdm.global.selection.v1.IdPathRef;
@@ -35,7 +35,7 @@ public class DataService {
   private final DataPortClient dataPortClient;
   private final MetricsClient metricsClient;
 
-  private final MqttSdmConfig config;
+  private final MqttAgooraConfig config;
 
   public void updateStates(TopicDescription topicDescription) {
     try {
@@ -52,7 +52,7 @@ public class DataService {
     StringValue shortName = StandardProtoMapper.stringValue(topicDescription.getDataPortTopic());
 
     Map<String, String> matchingProperties =
-        Map.of(Constants.SDM_MATCHING_TOPIC_NAME, topicDescription.getDataPortTopic());
+        Map.of(Constants.AGOORA_MATCHING_TOPIC_NAME, topicDescription.getDataPortTopic());
     Map<String, String> allProperties = new HashMap<>(matchingProperties);
 
     return dataPortClient.save(
@@ -75,7 +75,7 @@ public class DataService {
                             .setIdPath(
                                 IdPathRef.newBuilder()
                                     .setPath(
-                                        config.getTransport().getSdmPathObject().getResourceGroupPath())
+                                        config.getTransport().getAgooraPathObject().getResourceGroupPath())
                                     .buildPartial())
                             .build())
                     .setProperties(PropertyMap.newBuilder().putAllProperties(allProperties).build())

@@ -7,7 +7,7 @@ import io.grpc.ClientInterceptor;
 import io.grpc.ForwardingClientCall;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
-import io.spoud.agoora.agents.api.config.SdmAgentClientAuthConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentClientAuthConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -44,10 +44,10 @@ public class AuthClientInterceptor implements ClientInterceptor {
   public static final Metadata.Key<String> AUTH_HEADER_KEY =
       Metadata.Key.of(META_AUTH_HEADER, Metadata.ASCII_STRING_MARSHALLER);
 
-  private final SdmAgentClientAuthConfig authConfig;
+  private final AgooraAgentClientAuthConfig authConfig;
   private final Keycloak keycloakClient;
 
-  public AuthClientInterceptor(SdmAgentClientAuthConfig authConfig) {
+  public AuthClientInterceptor(AgooraAgentClientAuthConfig authConfig) {
     this.authConfig = authConfig;
 
     if (authConfig.getUser() == null

@@ -6,7 +6,7 @@ import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.api.mapper.StandardProtoMapper;
 import io.spoud.agoora.agents.openapi.Constants;
 import io.spoud.agoora.agents.openapi.config.data.OpenApiConfig;
-import io.spoud.agoora.agents.openapi.config.data.OpenApiSdmConfig;
+import io.spoud.agoora.agents.openapi.config.data.OpenApiAgooraConfig;
 import io.spoud.agoora.agents.openapi.jsonschema.SchemaUtil;
 import io.spoud.agoora.agents.openapi.repository.DataItemRepository;
 import io.spoud.agoora.agents.openapi.repository.DataPortRepository;
@@ -50,7 +50,7 @@ public class DataService {
   private final DataItemClient dataItemClient;
   private final SchemaClient schemaClient;
 
-  private final OpenApiSdmConfig config;
+  private final OpenApiAgooraConfig config;
 
   public void updateStates() {
     final OpenApiConfig openApiCOnfig = config.getOpenapi();
@@ -87,10 +87,10 @@ public class DataService {
   }
 
   private DataPort uploadDataPort(final SwaggerTag tag) {
-    Map<String, String> matchingProperties = Map.of(Constants.SDM_OPENAPI_TAG, tag.getName());
+    Map<String, String> matchingProperties = Map.of(Constants.AGOORA_OPENAPI_TAG, tag.getName());
     Map<String, String> allProperties = new HashMap<>(matchingProperties);
-    allProperties.put(Constants.SDM_OPENAPI_URL, tag.getUrl());
-    allProperties.put(Constants.SDM_DEEP_DIVE_OPENAPI, config.getOpenapi().getUiUrl());
+    allProperties.put(Constants.AGOORA_OPENAPI_URL, tag.getUrl());
+    allProperties.put(Constants.AGOORA_DEEP_DIVE_OPENAPI, config.getOpenapi().getUiUrl());
 
     LOG.info("Updating data port with tag name {}", tag.getName());
 
@@ -114,7 +114,7 @@ public class DataService {
                             .setIdPath(
                                 IdPathRef.newBuilder()
                                     .setPath(
-                                        config.getTransport().getSdmPathObject().getResourceGroupPath())
+                                        config.getTransport().getAgooraPathObject().getResourceGroupPath())
                                     .buildPartial())
                             .build())
                     .setProperties(PropertyMap.newBuilder().putAllProperties(allProperties).build())
@@ -126,8 +126,8 @@ public class DataService {
   private DataItem uploadDataItem(final SwaggerOperation operation, final DataPort dataPort) {
     Map<String, String> matchingProperties =
         Map.of(
-            Constants.SDM_OPENAPI_METHOD, operation.getMethod(),
-            Constants.SDM_OPENAPI_PATH, operation.getPath());
+            Constants.AGOORA_TRANSPORT_OPENAPI_METHOD, operation.getMethod(),
+            Constants.AGOORA_OPENAPI_PATH, operation.getPath());
     Map<String, String> allProperties = new HashMap<>(matchingProperties);
 
     LOG.info("Updating data item with path {} {}", operation.getMethod(), operation.getPath());
@@ -165,7 +165,7 @@ public class DataService {
               .saveSchema(
                   ResourceEntity.Type.DATA_ITEM,
                   dataItem.getId(),
-                  config.getTransport().getSdmPathObject().getResourceGroupPath(),
+                  config.getTransport().getAgooraPathObject().getResourceGroupPath(),
                   schemaContent,
                   SchemaSource.Type.REGISTRY,
                   SchemaEncoding.Type.JSON) // TODO new Schema encoding ?

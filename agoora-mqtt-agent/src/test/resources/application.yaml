@@ -3,10 +3,10 @@ quarkus:
     test-port: 6580
   log:
     category:
-      "io.spoud.sdm":
+      "io.spoud.agoora":
         level: INFO
 
-sdm:
+agoora:
   scrapper:
     max-samples: 10
     profiling:

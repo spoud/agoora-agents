@@ -1,6 +1,6 @@
 package io.spoud.agoora.agents.api.factory;
 
-import io.spoud.agoora.agents.api.config.SdmAgentConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
 import io.spoud.agoora.agents.api.utils.LazySingletonInstance;
 import io.spoud.sdm.looker.v1alpha1.LookerServiceGrpc;
 import io.spoud.sdm.looker.v1alpha1.MetricsServiceGrpc;
@@ -15,7 +15,7 @@ public class LookerFactory extends AbstractGrpcClientFactory {
   private final LazySingletonInstance<LookerServiceGrpc.LookerServiceBlockingStub>
       lookerServiceStub;
 
-  public LookerFactory(SdmAgentConfig config) {
+  public LookerFactory(AgooraAgentConfig config) {
     super(LOG, config.getLooker(), config.getAuth());
     metricServiceStub =
         new LazySingletonInstance<>(() -> MetricsServiceGrpc.newBlockingStub(channel.getInstance()));

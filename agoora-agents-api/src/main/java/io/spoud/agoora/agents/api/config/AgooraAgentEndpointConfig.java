@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SdmAgentEndpointConfig {
+public class AgooraAgentEndpointConfig {
   private String endpoint;
 
   @Builder.Default private boolean insecure = false;

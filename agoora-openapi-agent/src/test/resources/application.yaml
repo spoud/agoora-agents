@@ -2,7 +2,7 @@ quarkus:
   http:
     test-port: 6580
 
-sdm:
+agoora:
   scrapper:
     samples-size: 500
     hooks-delay: PT1S

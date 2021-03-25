@@ -3,8 +3,8 @@ package io.spoud.agoora.agents.mqtt.service;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
-import io.spoud.agoora.agents.mqtt.config.data.MqttSdmConfig;
-import io.spoud.agoora.agents.mqtt.config.data.SdmScrapperConfig;
+import io.spoud.agoora.agents.mqtt.config.data.MqttAgooraConfig;
+import io.spoud.agoora.agents.mqtt.config.data.ScrapperConfig;
 import io.spoud.agoora.agents.mqtt.mqtt.IterationContext;
 import io.spoud.agoora.agents.mqtt.mqtt.MqttScrapper;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +30,12 @@ public class CronService {
   private final ScheduledExecutorService scheduledExecutorService =
       Executors.newSingleThreadScheduledExecutor();
 
-  private final MqttSdmConfig sdmConfig;
-    private IterationContext lastIterationContext;
+  private final MqttAgooraConfig config;
+  private IterationContext lastIterationContext;
 
-    void onStart(@Observes StartupEvent ev) {
+  void onStart(@Observes StartupEvent ev) {
     if (LaunchMode.current() != LaunchMode.TEST) {
-      final SdmScrapperConfig scrapperConfig = sdmConfig.getScrapper();
+      final ScrapperConfig scrapperConfig = config.getScrapper();
 
       if (scrapperConfig.getPeriod().compareTo(scrapperConfig.getMaxWait()) < 0) {
         LOG.error("Max wait should be smaller than than the period");
@@ -45,7 +45,7 @@ public class CronService {
     }
   }
 
-  private void startCron(SdmScrapperConfig scrapperConfig) {
+  private void startCron(ScrapperConfig scrapperConfig) {
     LOG.info("Staring cron with a period of {}", scrapperConfig.getPeriod());
     AtomicReference<ScheduledFuture<?>> terminationSchedule = new AtomicReference<>(null);
 

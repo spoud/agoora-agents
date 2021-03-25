@@ -46,9 +46,9 @@ class HooksServiceTest {
         Map.of(
             "prop1",
             "value1",
-            Constants.SDM_DATABASE_URL,
+            Constants.AGOORA_DATABASE_URL,
             databaseUrl,
-            Constants.SDM_MATCHING_TABLE_NAME,
+            Constants.AGOORA_MATCHING_TABLE_NAME,
             table);
     return HooksClientMockProvider.generateDataPortLogRecord(action, id, table, path, properties);
   }

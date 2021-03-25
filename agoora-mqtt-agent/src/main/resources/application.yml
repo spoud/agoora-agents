@@ -1,9 +1,9 @@
-sdm-endpoint: local.spoud.io
-sdm-insecure: false
-sdm-cluster: default
-sdm-transport-path: /default/mqtt
+agoora-endpoint: local.spoud.io
+agoora-insecure: false
+agoora-cluster: default
+agoora-transport-path: /default/mqtt
 
-sdm:
+agoora:
   # The scrapper is not on 100% of the time. It start listening every {period} for a maximum of {max-samples} messages and {max-wait}
   scrapper:
     max-samples: 100
@@ -20,34 +20,34 @@ sdm:
     client-id: mqtt-agent
     paths: zigbee2mqtt_bas/bridge/,zigbee2mqtt_bas/bridge/
   transport:
-    sdm-path: ${sdm-transport-path}
+    agoora-path: ${agoora-transport-path}
   auth:
-    server-url: https://${sdm-endpoint}/auth/
-    cluster: ${sdm-cluster}
+    server-url: https://${agoora-endpoint}/auth/
+    cluster: ${agoora-cluster}
     realm: spoud
     user:
       name: to-be-defined
       token: to-be-defined
   logistics:
-    endpoint: ${sdm-endpoint}
-    cluster: ${sdm-cluster}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
   hooks:
-    endpoint: ${sdm-endpoint}
-    cluster: ${sdm-cluster}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
   schema:
-    endpoint: ${sdm-endpoint}
-    cluster: ${sdm-cluster}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
   looker:
-    endpoint: ${sdm-endpoint}
-    cluster: ${sdm-cluster}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
   blob:
-    endpoint: ${sdm-endpoint}
-    cluster: ${sdm-cluster}
-    insecure: ${sdm-insecure}
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
   profiler:
     endpoint: localhost:8089
     insecure: true
@@ -60,7 +60,7 @@ quarkus:
     port: 8280
   log:
     category:
-      "io.spoud.sdm":
+      "io.spoud.agoora":
         level: INFO
   ssl:
     native: true
@@ -71,24 +71,24 @@ quarkus:
       - -H:IncludeResourceBundles=org.eclipse.paho.client.mqttv3.internal.nls.logcat,org.eclipse.paho.client.mqttv3.internal.nls.messages
 
 "%dev":
-  sdm-endpoint: local.spoud.io
-  sdm-insecure: true
-  sdm-cluster: default
-  sdm-transport-path: /default/mqtt/mqtt
-  sdm:
+  agoora-endpoint: local.spoud.io
+  agoora-insecure: true
+  agoora-cluster: default
+  agoora-transport-path: /default/mqtt/mqtt
+  agoora:
     scrapper:
       max-samples: 10
       period: 10M
       max-wait: 5M
     auth:
-      server-url: http://${sdm-endpoint}/auth/
+      server-url: http://${agoora-endpoint}/auth/
       user:
-        name: sdm_t_672923a1-9fd9-4743-92fd-3935fc56d986
+        name: agoora_t_672923a1-9fd9-4743-92fd-3935fc56d986
         token: cmBcp9aOfUtKdH05bSK03kEwFFO89LO6
 
 
   quarkus:
     log:
       category:
-        "io.spoud.sdm":
+        "io.spoud.agoora":
           level: DEBUG

@@ -22,7 +22,7 @@ public class DataPortRepository {
         .filter(
             dataPort -> {
               final String value =
-                  dataPort.getPropertiesMap().get(Constants.SDM_MATCHING_TOPIC_NAME);
+                  dataPort.getPropertiesMap().get(Constants.AGOORA_MATCHING_TOPIC_NAME);
               return value != null && value.equals(description.getDataPortTopic());
             })
         .findAny();

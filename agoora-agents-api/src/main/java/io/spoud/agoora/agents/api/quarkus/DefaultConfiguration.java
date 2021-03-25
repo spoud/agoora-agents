@@ -1,7 +1,7 @@
 package io.spoud.agoora.agents.api.quarkus;
 
 import io.quarkus.arc.DefaultBean;
-import io.spoud.agoora.agents.api.config.SdmAgentConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Default;
@@ -13,7 +13,7 @@ public class DefaultConfiguration {
   @Produces
   @Default
   @DefaultBean
-  public SdmAgentConfig sdmAgentConfig() {
-    return SdmAgentConfig.builder().build();
+  public AgooraAgentConfig agooraAgentConfig() {
+    return AgooraAgentConfig.builder().build();
   }
 }

@@ -9,7 +9,7 @@ import io.spoud.agoora.agents.api.client.LookerClient;
 import io.spoud.agoora.agents.api.client.MetricsClient;
 import io.spoud.agoora.agents.api.client.ProfilerClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
-import io.spoud.agoora.agents.api.config.SdmAgentConfig;
+import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
 import io.spoud.agoora.agents.api.factory.ClientsFactory;
 import io.spoud.agoora.agents.api.factory.ClientsFactoryImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +24,8 @@ public class QuarkusClientsConfiguration {
 
   private final ClientsFactory clientsFactory;
 
-  public QuarkusClientsConfiguration(SdmAgentConfig sdmAgentConfig) {
-    clientsFactory = new ClientsFactoryImpl(sdmAgentConfig);
+  public QuarkusClientsConfiguration(AgooraAgentConfig agooraAgentConfig) {
+    clientsFactory = new ClientsFactoryImpl(agooraAgentConfig);
   }
 
   @Produces
