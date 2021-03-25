@@ -5,23 +5,21 @@ services:
     build:
       context: agoora-pgsql-agent
     environment:
-      - "SDM_PROFILER_ENDPOINT=sdm-profiler-service:8089"
+      - "AGOORA_PROFILER_ENDPOINT=agoora-profiler-service:8089"
 
   openapi-agent:
     image: spoud/agoora-openapi-agent
     build:
       context: agoora-openapi-agent
     environment:
-      - "SDM_PROFILER_ENDPOINT=sdm-profiler-service:8089"
+      - "AGOORA_PROFILER_ENDPOINT=agoora-profiler-service:8089"
 
   mqtt-agent:
     image: spoud/agoora-mqtt-agent
     build:
       context: agoora-mqtt-agent
     environment:
-      - "SDM_PROFILER_ENDPOINT=sdm-profiler-service:8089"
+      - "AGOORA_PROFILER_ENDPOINT=agoora-profiler-service:8089"
 
-  sdm-profiler-service:
+  agoora-profiler-service:
     image: spoud/sdm-profiler-service
-    ports:
-      - '8089:8089'
