@@ -45,8 +45,6 @@ sdm:
     insecure: true
 
 quarkus:
-  oidc:
-    enabled: false
   arc:
     # Needed for the grpc interceptors
     remove-unused-beans: fwk
@@ -63,7 +61,6 @@ quarkus:
       - --allow-incomplete-classpath
       - --report-unsupported-elements-at-runtime
       - -H:+AddAllCharsets
-      - -H:ResourceConfigurationFiles=resources-config.json
 
 "%dev":
   sdm-endpoint: local.spoud.io
