@@ -82,7 +82,7 @@ pipeline {
             axes {
                 axis{
                     name 'AGENT'
-                    values 'agoora-pgsql-agent'
+                    values 'agoora-pgsql-agent', 'agoora-mqtt-agent'
                 }
             }
             stages{
