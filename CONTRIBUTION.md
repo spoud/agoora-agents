@@ -26,7 +26,7 @@ git submodule update --force --init --recursive --remote
 ### Build
 
 ``` bash
-mvn clean package
+mvn clean package -Pnative
 ```
 
 #### Docker
