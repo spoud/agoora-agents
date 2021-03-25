@@ -1,0 +1,15 @@
+quarkus:
+  http:
+    test-port: 6580
+  log:
+    category:
+      "io.spoud.sdm":
+        level: INFO
+
+sdm:
+  scrapper:
+    max-samples: 10
+    profiling:
+      enabled: true
+  mqtt:
+    paths: path1/,path3/sub1

@@ -28,6 +28,7 @@ public class DataPortClientMockProvider {
                   .setName(input.getName().getValue())
                   .setLabel(input.getLabel().getValue())
                   .setEndpointUrl(input.getTransportUrl().getValue())
+                  .putAllProperties(input.getProperties().getPropertiesMap())
                   .build();
             });
   }
