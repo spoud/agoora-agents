@@ -55,5 +55,7 @@ class LastResponseObserverTest {
         .schedule(lastResponseObserver::onCompleted, 1, TimeUnit.SECONDS);
 
     lastResponseObserver.awaitCompletion();
+
+    assertThat(lastResponseObserver.getLastResponse()).isEqualTo("a");
   }
 }
