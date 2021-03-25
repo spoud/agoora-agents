@@ -8,7 +8,7 @@ import javax.enterprise.inject.Default;
 import javax.ws.rs.Produces;
 
 @Dependent
-public class DefaultConfig {
+public class DefaultConfiguration {
 
   @Produces
   @Default

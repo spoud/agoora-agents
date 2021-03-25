@@ -8,6 +8,7 @@ import io.spoud.sdm.logistics.domain.v1.DataPort;
 import lombok.experimental.UtilityClass;
 import org.mockito.stubbing.Answer;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -32,6 +33,11 @@ public class HooksClientMockProvider {
     doAnswer(answer)
         .when(mock)
         .startListening(any(), anyString(), anyBoolean(), anyBoolean(), anyBoolean());
+  }
+
+  public static LogRecord generateDataPortLogRecord(
+      StateChangeAction.Type action, String id, String nameAndLabel, String path) {
+    return generateDataPortLogRecord(action, id, nameAndLabel, path, Collections.emptyMap());
   }
 
   public static LogRecord generateDataPortLogRecord(

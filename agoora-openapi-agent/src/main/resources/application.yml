@@ -1,0 +1,82 @@
+sdm-endpoint: local.spoud.io
+sdm-insecure: false
+sdm-transport-path: /default/openapi
+
+
+sdm:
+  openapi:
+    base-url: https://petstore3.swagger.io
+    url: ${sdm.openapi.base-url}/api/v3/openapi.json
+    ui-url: ${sdm.openapi.base-url}
+  scrapper:
+    samples-size: 500
+    state:
+      enabled: true
+      initial-delay: PT10S
+      interval: PT15M
+    hooks:
+      enabled: true
+      initial-delay: PT1S
+  transport:
+    sdm-path: ${sdm-transport-path}
+  auth:
+    server-url: https://${sdm-endpoint}/auth/
+    realm: spoud
+    user:
+      name: to-be-defined
+      token: to-be-defined
+  logistics:
+    endpoint: ${sdm-endpoint}
+    insecure: ${sdm-insecure}
+  hooks:
+    endpoint: ${sdm-endpoint}
+    insecure: ${sdm-insecure}
+  schema:
+    endpoint: ${sdm-endpoint}
+    insecure: ${sdm-insecure}
+  looker:
+    endpoint: ${sdm-endpoint}
+    insecure: ${sdm-insecure}
+  blob:
+    endpoint: ${sdm-endpoint}
+    insecure: ${sdm-insecure}
+  profiler:
+    endpoint: localhost:8089
+    insecure: true
+
+quarkus:
+  oidc:
+    enabled: false
+  arc:
+    # Needed for the grpc interceptors
+    remove-unused-beans: fwk
+  http:
+    port: 8280
+  log:
+    category:
+      "io.spoud.sdm":
+        level: INFO
+  ssl:
+    native: true
+  native:
+    additional-build-args:
+      - --allow-incomplete-classpath
+      - --report-unsupported-elements-at-runtime
+      - -H:+AddAllCharsets
+      - -H:ResourceConfigurationFiles=resources-config.json
+
+"%dev":
+  sdm-endpoint: local.spoud.io
+  sdm-insecure: true
+  sdm-transport-path: /default/openapi/openpai
+  sdm:
+    scrapper:
+      state:
+        initial-delay: 3s
+      profiling:
+        initial-delay: 5s
+    auth:
+      server-url: http://${sdm-endpoint}/auth/
+      user:
+        name: sdm_t_1e6c4b68-bbff-4085-b4fb-43126150ccf4
+        token: YKmCLNJ3IkELHfYCGmJc7HtegiyJYC8r

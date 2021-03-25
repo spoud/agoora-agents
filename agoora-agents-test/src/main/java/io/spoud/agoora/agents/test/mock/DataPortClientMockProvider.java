@@ -6,6 +6,8 @@ import io.spoud.sdm.logistics.service.v1.DataPortChange;
 import io.spoud.sdm.logistics.service.v1.SaveDataPortRequest;
 import lombok.experimental.UtilityClass;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -13,6 +15,8 @@ import static org.mockito.Mockito.when;
 
 @UtilityClass
 public class DataPortClientMockProvider {
+
+  public static Map<String, UUID> uuidByLabel = new HashMap<>();
 
   public static UUID lastUuid;
 
@@ -23,6 +27,7 @@ public class DataPortClientMockProvider {
               lastUuid = UUID.randomUUID();
               SaveDataPortRequest request = a.getArgument(0, SaveDataPortRequest.class);
               DataPortChange input = request.getInput();
+              uuidByLabel.put(input.getLabel().getValue(), lastUuid);
               return DataPort.newBuilder()
                   .setId(lastUuid.toString())
                   .setName(input.getName().getValue())
