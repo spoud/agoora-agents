@@ -42,10 +42,9 @@ public class MqttConfiguration {
           .ifPresent(options::setPassword);
 
       options.setCleanSession(true);
-      options.setKeepAliveInterval(40);
       options.setAutomaticReconnect(true);
-      options.setConnectionTimeout(10);
-      options.setMaxInflight(100);
+      options.setMaxInflight(1000);
+
 
       client.setCallback(
           new MqttCallback() {
