@@ -1,0 +1,23 @@
+quarkus:
+  http:
+    test-port: 6580
+  log:
+    category:
+      "io.spoud.agoora":
+        level: INFO
+
+agoora:
+  scrapper:
+    max-samples: 10
+    wait-time-before-counting-retained: PT1S
+    profiling:
+      enabled: true
+  mqtt:
+    paths: path1/,path3/sub1
+  registry:
+    confluent:
+      url:
+      api-key:
+      api-secret:
+      public-url: https://my-url/{TOPIC}/ui
+

@@ -49,6 +49,7 @@
     <modules>
         <module>agoora-agents-api</module>
         <module>agoora-agents-test</module>
+        <module>agoora-kafka-agent</module>
         <module>agoora-mqtt-agent</module>
         <module>agoora-openapi-agent</module>
         <module>agoora-pgsql-agent</module>
@@ -138,13 +139,19 @@
                 <version>${test-container.version}</version>
                 <scope>test</scope>
             </dependency>
-                        <dependency>
-                            <groupId>org.jacoco</groupId>
-                            <artifactId>org.jacoco.agent</artifactId>
-                            <classifier>runtime</classifier>
-                            <scope>test</scope>
-                            <version>${jacoco.version}</version>
-                        </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>kafka</artifactId>
+                <version>${test-container.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.agent</artifactId>
+                <classifier>runtime</classifier>
+                <scope>test</scope>
+                <version>${jacoco.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
