@@ -56,7 +56,7 @@ public class MqttScrapper {
               }
             },
             () -> {
-              LOG.debug(
+              LOG.warn(
                   "Topic '{}' was discarded because we couldn't extract a data port name", topic);
             });
   }

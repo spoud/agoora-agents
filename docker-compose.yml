@@ -20,6 +20,19 @@ services:
       context: agoora-mqtt-agent
     environment:
       - "AGOORA_PROFILER_ENDPOINT=agoora-profiler-service:8089"
+      - "AGOORA_ENDPOINT"
+      - "AGOORA_INSECURE"
+      - "AGOORA_TRANSPORT_PATH"
+      - "AGOORA_AUTH_USER_NAME"
+      - "AGOORA_AUTH_USER_TOKEN"
+      - "AGOORA_MQTT_BROKER"
+      - "AGOORA_MQTT_USERNAME"
+      - "AGOORA_MQTT_PASSWORD"
+      - "AGOORA_MQTT_PATHS"
+      - "AGOORA_SCRAPPER_PERIOD=PT2M"
+      - "AGOORA_SCRAPPER_MAX_WAIT=PT1M"
+    extra_hosts:
+      - "local.spoud.io:172.17.0.1"
 
   agoora-profiler-service:
     image: spoud/sdm-profiler-service

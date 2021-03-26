@@ -8,6 +8,7 @@ import io.spoud.agoora.agents.mqtt.Constants;
 import io.spoud.agoora.agents.mqtt.config.data.MqttAgooraConfig;
 import io.spoud.agoora.agents.mqtt.data.TopicDescription;
 import io.spoud.agoora.agents.mqtt.repository.DataPortRepository;
+import io.spoud.agoora.agents.mqtt.repository.MetricsRepository;
 import io.spoud.sdm.global.selection.v1.IdPathRef;
 import io.spoud.sdm.logistics.domain.v1.DataPort;
 import io.spoud.sdm.logistics.mutation.v1.PropertyMap;
@@ -30,6 +31,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DataService {
 
+  private final MetricsRepository metricsRepository;
   private final DataPortRepository dataPortRepository;
   private final ReferenceService referenceService;
   private final DataPortClient dataPortClient;
@@ -75,7 +77,10 @@ public class DataService {
                             .setIdPath(
                                 IdPathRef.newBuilder()
                                     .setPath(
-                                        config.getTransport().getAgooraPathObject().getResourceGroupPath())
+                                        config
+                                            .getTransport()
+                                            .getAgooraPathObject()
+                                            .getResourceGroupPath())
                                     .buildPartial())
                             .build())
                     .setProperties(PropertyMap.newBuilder().putAllProperties(allProperties).build())
@@ -93,21 +98,26 @@ public class DataService {
   }
 
   public void updateMetrics(
-      TopicDescription topicDescription, double msg_per_duration, double bytes_per_duration) {
+      TopicDescription topicDescription, double msgPerDuration, double bytesPerDuration) {
 
     dataPortRepository
         .getDataPortByTopicDescription(topicDescription)
         .ifPresentOrElse(
             dataPort -> {
+              final double messageCounter =
+                  metricsRepository.addMessagesForDurationAndReturnCounter(
+                      dataPort.getId(), msgPerDuration);
+
               uploadMetric(
-                  dataPort.getId(), ResourceMetric.MetricType.DATA_PORT_MESSAGES, msg_per_duration);
+                  dataPort.getId(), ResourceMetric.MetricType.DATA_PORT_MESSAGES, messageCounter);
               uploadMetric(
-                  dataPort.getId(), ResourceMetric.MetricType.DATA_PORT_BYTES, bytes_per_duration);
+                  dataPort.getId(), ResourceMetric.MetricType.DATA_PORT_BYTES, bytesPerDuration);
               LOG.info(
-                  "Metric for topic {} : msg/duration={} bytes/duration={}",
+                  "Metric for topic {} : msg/duration={} msgCounter={} bytes/duration={}",
                   topicDescription.getDataPortTopic(),
-                  msg_per_duration,
-                  bytes_per_duration);
+                  msgPerDuration,
+                  messageCounter,
+                  bytesPerDuration);
             },
             () -> LOG.error("No data port found for topic {}", topicDescription));
   }
