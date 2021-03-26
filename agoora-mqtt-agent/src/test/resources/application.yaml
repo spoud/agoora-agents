@@ -9,6 +9,7 @@ quarkus:
 agoora:
   scrapper:
     max-samples: 10
+    wait-time-before-counting-retained: PT1S
     profiling:
       enabled: true
   mqtt:

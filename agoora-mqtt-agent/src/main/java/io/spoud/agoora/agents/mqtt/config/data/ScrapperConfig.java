@@ -9,6 +9,7 @@ public class ScrapperConfig {
   private Integer maxSamples;
   private Duration period;
   private Duration maxWait;
+  private Duration waitTimeBeforeCountingRetained;
   private ScrapperFeatureConfig profiling;
   private ScrapperFeatureConfig hooks;
 }

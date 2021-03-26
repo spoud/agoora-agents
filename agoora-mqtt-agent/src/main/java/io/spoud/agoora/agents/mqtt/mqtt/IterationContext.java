@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -17,6 +18,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class IterationContext {
 
   private final int maxBuffer;
+  private final Duration waitTimeBeforeCountingRetained;
+  private final Instant startTime = Instant.now();
 
   private final Map<TopicDescription, List<MqttMessage>> messagesBuffer = new ConcurrentHashMap<>();
   private final Map<TopicDescription, Instant> firstMessageInstant = new ConcurrentHashMap<>();
@@ -36,18 +39,6 @@ public class IterationContext {
     return Collections.unmodifiableList(messagesBuffer.get(topic));
   }
 
-  public synchronized int countMessagesForTopic(TopicDescription topic) {
-    return messagesBuffer.get(topic).size();
-  }
-
-  public synchronized long countBytesMessagesForTopic(TopicDescription topic) {
-    return messagesBuffer.get(topic).stream().mapToLong(msg -> msg.getPayload().length).sum();
-  }
-
-  public synchronized Instant getFirstMessageInstant(TopicDescription topic) {
-    return firstMessageInstant.get(topic);
-  }
-
   public synchronized boolean reachedMaxBuffer(TopicDescription topic) {
     final List<MqttMessage> list = messagesBuffer.get(topic);
     return list != null && list.size() >= maxBuffer;
@@ -55,7 +46,9 @@ public class IterationContext {
 
   public synchronized void countMessage(TopicDescription topic, MqttMessage message) {
     countMessage.computeIfAbsent(topic, t -> new MessageCounter());
-    if (!message.isRetained()) {
+    if (!message.isRetained()
+        || Duration.between(startTime, Instant.now()).compareTo(waitTimeBeforeCountingRetained)
+            > 0) {
       countMessage.get(topic).getMessages().incrementAndGet();
       countMessage.get(topic).getBytes().addAndGet(message.getPayload().length);
     }

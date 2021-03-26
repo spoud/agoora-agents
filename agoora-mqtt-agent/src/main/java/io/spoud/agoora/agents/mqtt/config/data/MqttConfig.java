@@ -3,6 +3,7 @@ package io.spoud.agoora.agents.mqtt.config.data;
 import lombok.Data;
 import lombok.ToString;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @Data

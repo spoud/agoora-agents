@@ -62,7 +62,7 @@ public class MqttScrapper {
   }
 
   public IterationContext startIteration() {
-    IterationContext context = new IterationContext(config.getScrapper().getMaxSamples());
+    IterationContext context = new IterationContext(config.getScrapper().getMaxSamples(), config.getScrapper().getWaitTimeBeforeCountingRetained());
     getPaths()
         .forEach(
             path -> {

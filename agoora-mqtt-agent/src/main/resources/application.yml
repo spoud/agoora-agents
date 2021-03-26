@@ -13,6 +13,7 @@ agoora:
       enabled: true
     hooks:
       enabled: true
+    wait-time-before-counting-retained: PT15S
   mqtt:
     broker: tcp://192.168.1.11:1883
     username:
