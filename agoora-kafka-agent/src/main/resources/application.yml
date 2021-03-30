@@ -98,6 +98,9 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
       user:
         name: sdm_t_338908ea-30f7-4b73-aff9-7b2a08ccac7f
         token: utQmxZZWC56aFfTrD8cTZSewPA574uTC
+    registry:
+      confluent:
+        url: http://kafka:8081
 
 
   quarkus:

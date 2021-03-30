@@ -6,6 +6,7 @@ import io.spoud.agoora.agents.kafka.kafka.KafkaAdminScrapper;
 import io.spoud.agoora.agents.kafka.logistics.LogisticsService;
 import io.spoud.agoora.agents.kafka.repository.KafkaConsumerGroupRepository;
 import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
+import io.spoud.agoora.agents.kafka.schema.SchemaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +26,7 @@ public class DataService {
   private final KafkaConsumerGroupRepository kafkaConsumerGroupRepository;
 
   private final LogisticsService logisticsService;
+  private final SchemaService schemaService;
 
   public void updateTopics() {
     Map<String, KafkaTopic> localDataPorts =
@@ -38,7 +40,10 @@ public class DataService {
           if (previous == null) {
             LOG.info("New topic found: {}", topic);
           }
-          logisticsService.updateDataPort(topic).ifPresent(dp -> topic.setDataPortId(dp.getId()));
+          logisticsService.updateDataPort(topic).ifPresent(dp -> {
+              topic.setDataPortId(dp.getId());
+              schemaService.update(topic.getTopicName(), dp.getId());
+          });
           kafkaTopicRepository.save(topic);
         });
 
@@ -51,6 +56,7 @@ public class DataService {
               kafkaTopicRepository.delete(toRemove);
             });
 
+    // TODO schema
     // TODO update metrics
   }
 
