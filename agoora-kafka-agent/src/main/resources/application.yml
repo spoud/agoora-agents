@@ -69,10 +69,6 @@ quarkus:
     remove-unused-beans: fwk
   http:
     port: 8280
-  log:
-    category:
-      "io.spoud.agoora":
-        level: INFO
   ssl:
     native: true
   native:
@@ -80,6 +76,12 @@ quarkus:
       - --allow-incomplete-classpath
       - --report-unsupported-elements-at-runtime
       - -H:IncludeResourceBundles=org.eclipse.paho.client.mqttv3.internal.nls.logcat,org.eclipse.paho.client.mqttv3.internal.nls.messages
+  log:
+    category:
+      "io.spoud.agoora":
+        level: INFO
+      "org.apache.kafka":
+        level: WARN
 
 rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
 
@@ -101,7 +103,6 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
     registry:
       confluent:
         url: http://kafka:8081
-
 
   quarkus:
     log:
