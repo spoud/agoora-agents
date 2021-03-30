@@ -2,6 +2,7 @@ package io.spoud.agoora.agents.kafka.schema.confluent;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.spoud.agoora.agents.kafka.AbstractService;
+import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import io.spoud.sdm.schema.domain.v1alpha.Schema;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -10,9 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 import javax.inject.Inject;
-import javax.ws.rs.WebApplicationException;
 import java.io.IOException;
-import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,7 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ConfluentSchemaRegistryTest extends AbstractService {
 
   @Inject ConfluentSchemaRegistry confluentSchemaRegistry;
-  @RestClient @Inject ConfluentRegistryResource confluentRegistryResource;
+  @RestClient @Inject
+  ConfluentRegistrySubjectResource confluentRegistrySubjectResource;
 
   @BeforeEach
   void setup() {}
@@ -28,10 +29,15 @@ class ConfluentSchemaRegistryTest extends AbstractService {
   @Timeout(10)
   @Test
   void testSchema() throws IOException {
-    addSchemaVersion("my-topic", "registry/confluent/version1.json");
+    addSchemaVersion("my-topic", KafkaStreamPart.VALUE, "registry/confluent/version1.json");
 
-    final List<Schema> schemas = confluentSchemaRegistry.getNewSchemaForTopic("my-topic");
-    assertThat(schemas).isNotEmpty();
+    final Optional<Schema> valueSchema =
+        confluentSchemaRegistry.getLatestSchemaForTopic("my-topic", KafkaStreamPart.VALUE);
+    assertThat(valueSchema).isPresent();
+
+    final Optional<Schema> keySchema =
+        confluentSchemaRegistry.getLatestSchemaForTopic("my-topic", KafkaStreamPart.KEY);
+    assertThat(keySchema).isEmpty();
   }
 
   @Timeout(10)
@@ -42,9 +48,11 @@ class ConfluentSchemaRegistryTest extends AbstractService {
         .hasValue("https://my-url/my-topic/ui");
   }
 
-  private void addSchemaVersion(String topic, String file) throws IOException {
+  private void addSchemaVersion(String topic, KafkaStreamPart part, String file)
+      throws IOException {
     String content =
-        IOUtils.toString(ConfluentSchemaRegistryTest.class.getClassLoader().getResourceAsStream(file), "UTF-8");
-    confluentRegistryResource.addNewSchemaVersion(topic, "value", content);
+        IOUtils.toString(
+            ConfluentSchemaRegistryTest.class.getClassLoader().getResourceAsStream(file), "UTF-8");
+    confluentRegistrySubjectResource.addNewSchemaVersion(topic, part, content);
   }
 }

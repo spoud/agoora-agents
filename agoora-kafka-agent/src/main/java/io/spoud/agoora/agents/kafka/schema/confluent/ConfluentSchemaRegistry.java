@@ -1,6 +1,7 @@
 package io.spoud.agoora.agents.kafka.schema.confluent;
 
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
+import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import io.spoud.agoora.agents.kafka.schema.SchemaRegistryClient;
 import io.spoud.sdm.schema.domain.v1alpha.Schema;
 import io.spoud.sdm.schema.domain.v1alpha.SchemaEncoding;
@@ -11,20 +12,12 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @ApplicationScoped
 public class ConfluentSchemaRegistry implements SchemaRegistryClient {
 
-  // FIXME for the key we have to wait for the support of multiple schemas
-  public static final List<String> SUBJECTS_NAME =
-      Arrays.asList(
-          //    "key",
-          "value");
   public static final String DEEP_DIVE_TOOL_SUBJECT = "value";
 
   // The subject postfix is either "key" or "value"
@@ -38,21 +31,31 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
 
   private final Optional<String> publicUrl;
 
-  @Inject @RestClient ConfluentRegistryResource confluentRegistryResource;
+  @Inject @RestClient ConfluentRegistrySubjectResource confluentRegistrySubjectResource;
+  @Inject @RestClient ConfluentRegistrySchemaResource confluentRegistrySchemaResource;
 
   public ConfluentSchemaRegistry(KafkaAgentConfig config) {
     this.publicUrl = config.getRegistry().getConfluent().getPublicUrl();
   }
 
   @Override
-  public List<Schema> getNewSchemaForTopic(String topic) {
+  public Optional<Schema> getLatestSchemaForTopic(String topic, KafkaStreamPart part) {
     LOG.debug("Searching for schema for topic '{}'", topic);
-    return SUBJECTS_NAME.stream()
-        .map(s -> getSchema(topic, s))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .map(this::mapToSchemaObject)
-        .collect(Collectors.toList());
+    return getSchema(topic, part).map(this::mapToSchemaObject);
+  }
+
+  public Optional<String> getSchemaById(long id) {
+    try {
+      return Optional.of(confluentRegistrySchemaResource.getById(id).getSchema());
+    } catch (WebApplicationException ex) {
+
+      if (ex.getResponse().getStatus() == 404) {
+        // not issue, the schema just doesn't exists
+      } else {
+        LOG.error("Exception when querying schema registry for url", ex);
+      }
+    }
+    return Optional.empty();
   }
 
   @Override
@@ -73,12 +76,12 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
         .build();
   }
 
-  private Optional<String> getSchema(String topic, String type) {
-    LOG.debug("Looking for schema for topic '{}' and type '{}'", topic, type);
+  private Optional<String> getSchema(String topic, KafkaStreamPart part) {
+    LOG.debug("Looking for schema for topic '{}' and type '{}'", topic, part);
 
     try {
       final SchemaRegistrySubject latestSubject =
-          confluentRegistryResource.getLatestSubject(topic, type);
+          confluentRegistrySubjectResource.getLatestSubject(topic, part);
       return Optional.of(latestSubject.getSchema());
     } catch (WebApplicationException ex) {
 
