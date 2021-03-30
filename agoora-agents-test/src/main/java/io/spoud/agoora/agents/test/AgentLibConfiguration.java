@@ -3,6 +3,7 @@ package io.spoud.agoora.agents.test;
 import io.spoud.agoora.agents.api.client.BlobClient;
 import io.spoud.agoora.agents.api.client.DataItemClient;
 import io.spoud.agoora.agents.api.client.DataPortClient;
+import io.spoud.agoora.agents.api.client.DataSubscriptionStateClient;
 import io.spoud.agoora.agents.api.client.HooksClient;
 import io.spoud.agoora.agents.api.client.LookerClient;
 import io.spoud.agoora.agents.api.client.MetricsClient;
@@ -33,6 +34,11 @@ public class AgentLibConfiguration {
   @Produces
   DataItemClient dataItemClient() {
     return clientsFactory.getDataItemClient();
+  }
+
+  @Produces
+  DataSubscriptionStateClient dataSubscriptionStateClient() {
+    return clientsFactory.getDataSubscriptionStateClient();
   }
 
   @Produces

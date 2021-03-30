@@ -2,6 +2,7 @@ package io.spoud.agoora.agents.kafka.schema;
 
 import io.grpc.StatusRuntimeException;
 import io.spoud.agoora.agents.api.client.SchemaClient;
+import io.spoud.agoora.agents.kafka.Constants;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.sdm.global.domain.v1.ResourceEntity;
 import io.spoud.sdm.schema.domain.v1alpha.Schema;
@@ -10,21 +11,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
-//@ApplicationScoped
+@ApplicationScoped
 @RequiredArgsConstructor
 public class SchemaService {
 
-  public static final String PROPETIES_DEEP_DIVE_TOOL_SCHEMA_REGISTRY =
-      "sdm.transport.external.schema-registry.url";
-
   private final KafkaAgentConfig kafkaAgentConfig;
   private final SchemaClient schemaClient;
-  private final List<SchemaRegistryClient> schemaRegistries;
+  private final Instance<SchemaRegistryClient> schemaRegistries;
 
   public Map<String, String> update(String topicName, String dataPortId) {
     Map<String, String> properties = new HashMap<>();
@@ -56,7 +55,7 @@ public class SchemaService {
       if (!schemaForTopic.isEmpty()) {
         schemaRegistry
             .getDeepDiveToolUrl(topicName)
-            .ifPresent(url -> properties.put(PROPETIES_DEEP_DIVE_TOOL_SCHEMA_REGISTRY, url));
+            .ifPresent(url -> properties.put(Constants.PROPETIES_DEEP_DIVE_TOOL_SCHEMA_REGISTRY, url));
       }
     }
     return properties;

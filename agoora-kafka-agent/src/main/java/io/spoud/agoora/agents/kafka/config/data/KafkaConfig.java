@@ -11,6 +11,8 @@ public class KafkaConfig {
   private String consumerGroupFilterRegex;
   private String bootstrapServers;
   private String protocol;
+  private Optional<String> loginKey;
+  private Optional<String> loginSecret;
   private Optional<String> keyStoreLocation;
   private Optional<String> keyStorePassword;
   private Optional<String> trustStoreLocation;

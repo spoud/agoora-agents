@@ -4,7 +4,9 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -20,4 +22,15 @@ public interface ConfluentRegistryResource {
   @Produces("application/vnd.schemaregistry.v1+json")
   SchemaRegistrySubject getLatestSubject(
       @PathParam("topic") String topic, @PathParam("type") String type);
+
+  @POST
+  @Path("versions")
+  @Produces({
+    "application/vnd.schemaregistry.v1+json",
+    "application/vnd.schemaregistry+json",
+    "application/json"
+  })
+  @Consumes("application/json")
+  SchemaRegistrySubject addNewSchemaVersion(
+      @PathParam("topic") String topic, @PathParam("type") String type, String content);
 }

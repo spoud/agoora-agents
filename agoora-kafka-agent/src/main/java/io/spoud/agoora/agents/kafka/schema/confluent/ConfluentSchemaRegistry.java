@@ -1,12 +1,15 @@
 package io.spoud.agoora.agents.kafka.schema.confluent;
 
-import io.spoud.agoora.agents.kafka.config.data.RegistryConfluentConfig;
+import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.agoora.agents.kafka.schema.SchemaRegistryClient;
 import io.spoud.sdm.schema.domain.v1alpha.Schema;
 import io.spoud.sdm.schema.domain.v1alpha.SchemaEncoding;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
+@ApplicationScoped
 public class ConfluentSchemaRegistry implements SchemaRegistryClient {
 
   // FIXME for the key we have to wait for the support of multiple schemas
@@ -32,16 +36,12 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
   // This is the full subject. It's the same as "{TOPIC}-{SUBJECT_POSTFIX}"
   public static final String PUBLIC_URL_SUBJECT_REPLACEMENT = "{SUBJECT}";
 
-  private final RegistryConfluentConfig config;
   private final Optional<String> publicUrl;
-  private final ConfluentRegistryResource confluentRegistryResource;
 
-  public ConfluentSchemaRegistry(
-      ConfluentRegistryResource confluentRegistryResource, RegistryConfluentConfig config) {
-    this.confluentRegistryResource = confluentRegistryResource;
+  @Inject @RestClient ConfluentRegistryResource confluentRegistryResource;
 
-    this.config = config;
-    this.publicUrl = config.getPublicUrl();
+  public ConfluentSchemaRegistry(KafkaAgentConfig config) {
+    this.publicUrl = config.getRegistry().getConfluent().getPublicUrl();
   }
 
   @Override
