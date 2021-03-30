@@ -1,14 +1,13 @@
 agoora-endpoint: local.spoud.io
 agoora-insecure: false
 agoora-cluster: default
-agoora-transport-path: /default/mqtt
+agoora-transport-path: /default/kafka
 
 agoora:
   # The scrapper is not on 100% of the time. It start listening every {period} for a maximum of {max-samples} messages and {max-wait}
   scrapper:
     max-samples: 100
-    period: 1H
-    max-wait: 30M
+    period: PT15M
     profiling:
       enabled: true
     hooks:
@@ -88,7 +87,7 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
   agoora-endpoint: local.spoud.io
   agoora-insecure: true
   agoora-cluster: default
-  agoora-transport-path: /default/mqtt/mqtt
+  agoora-transport-path: /default/kafka/kafka
   agoora:
     scrapper:
       max-samples: 10
@@ -97,8 +96,8 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
     auth:
       server-url: http://${agoora-endpoint}/auth/
       user:
-        name: agoora_t_672923a1-9fd9-4743-92fd-3935fc56d986
-        token: cmBcp9aOfUtKdH05bSK03kEwFFO89LO6
+        name: sdm_t_338908ea-30f7-4b73-aff9-7b2a08ccac7f
+        token: utQmxZZWC56aFfTrD8cTZSewPA574uTC
 
 
   quarkus:

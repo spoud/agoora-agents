@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,20 +30,17 @@ public class CronService {
     if (LaunchMode.current() != LaunchMode.TEST) {
       final ScrapperConfig scrapperConfig = sdmConfig.getScrapper();
 
-      if (scrapperConfig.getPeriod().compareTo(scrapperConfig.getMaxWait()) < 0) {
-        LOG.error("Max wait should be smaller than than the period");
-      } else {
-        startCron(scrapperConfig);
-      }
+      startCron(scrapperConfig);
     }
   }
 
   private void startCron(ScrapperConfig scrapperConfig) {
     LOG.info("Staring cron with a period of {}", scrapperConfig.getPeriod());
-    AtomicBoolean running = new AtomicBoolean(true);
+    AtomicBoolean running = new AtomicBoolean(false);
 
     Multi.createFrom()
         .ticks()
+        .startingAfter(Duration.ofSeconds(5)) // wait for the complete initi
         .every(scrapperConfig.getPeriod())
         .runSubscriptionOn(managedExecutor)
         .subscribe()

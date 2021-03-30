@@ -30,7 +30,7 @@ public class LogisticsRefService {
   }
 
   public IdPathRef getResourceGroupRef() {
-    return transportRef.updateAndGet(
+    return resourceRef.updateAndGet(
         ref -> {
           if (ref == null) {
             ref =

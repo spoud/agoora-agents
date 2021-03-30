@@ -29,18 +29,26 @@ public class KafkaTopicRepository {
   }
 
   public void save(KafkaTopic topic) {
-    statesByDataPortId.put(topic.getDataPortId(), topic);
+    if (topic.getDataPortId() != null) {
+      statesByDataPortId.put(topic.getDataPortId(), topic);
+    }
     statesByDataPortId.put(topic.getInternalId(), topic);
   }
 
   public void delete(KafkaTopic topic) {
-    statesByDataPortId.remove(topic.getDataPortId());
-    statesByInternalId.remove(topic.getInternalId());
+    if (topic.getDataPortId() != null) {
+      statesByDataPortId.remove(topic.getDataPortId());
+    }
+    final KafkaTopic removed = statesByInternalId.remove(topic.getInternalId());
+    if (removed.getDataPortId() != null) {
+      statesByDataPortId.remove(removed.getDataPortId());
+    }
   }
 
   public void onNext(LogRecord logRecord) {
     if (logRecord.getEntityType() == ResourceEntity.Type.DATA_PORT) {
-      if (logRecord.getAction() == StateChangeAction.Type.UPDATED && !logRecord.getDataPort().getDeleted()) {
+      if (logRecord.getAction() == StateChangeAction.Type.UPDATED
+          && !logRecord.getDataPort().getDeleted()) {
         topicMapper
             .create(logRecord.getDataPort())
             .ifPresentOrElse(

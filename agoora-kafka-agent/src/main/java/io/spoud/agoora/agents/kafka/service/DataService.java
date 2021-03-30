@@ -2,10 +2,10 @@ package io.spoud.agoora.agents.kafka.service;
 
 import io.spoud.agoora.agents.kafka.data.KafkaConsumerGroup;
 import io.spoud.agoora.agents.kafka.data.KafkaTopic;
+import io.spoud.agoora.agents.kafka.kafka.KafkaAdminScrapper;
 import io.spoud.agoora.agents.kafka.logistics.LogisticsService;
 import io.spoud.agoora.agents.kafka.repository.KafkaConsumerGroupRepository;
 import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
-import io.spoud.agoora.agents.kafka.kafka.KafkaAdminScrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,7 +70,7 @@ public class DataService {
           }
           logisticsService
               .updateDataSubscriptionState(consumerGroup)
-              .ifPresent(dp -> consumerGroup.setDataPortId(dp.getId()));
+              .ifPresent(dp -> consumerGroup.setDataSubscriptionStateId(dp.getId()));
           kafkaConsumerGroupRepository.save(consumerGroup);
         });
 
@@ -87,6 +87,6 @@ public class DataService {
   }
 
   public void profileData() {
-      LOG.error("Profiling not implemented yet");
+    LOG.error("Profiling not implemented yet");
   }
 }
