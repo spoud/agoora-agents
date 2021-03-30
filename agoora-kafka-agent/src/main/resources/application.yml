@@ -93,8 +93,7 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
   agoora:
     scrapper:
       max-samples: 10
-      period: 10M
-      max-wait: 5M
+      period: 2M
     auth:
       server-url: http://${agoora-endpoint}/auth/
       user:

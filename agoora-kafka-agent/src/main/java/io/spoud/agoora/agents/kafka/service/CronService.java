@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class CronService {
 
   private final DataService dataService;
+  private final ProfilerService profilerService;
   private final MetricsForwarderService metricsForwarderService;
 
   private final ExecutorService managedExecutor = Executors.newSingleThreadExecutor();
@@ -63,7 +64,7 @@ public class CronService {
 
                 if (scrapperConfig.getProfiling().isEnabled()) {
                   LOG.info("Profiling data");
-                  dataService.profileData();
+                  profilerService.profileData();
                 }
 
                 LOG.info("Iteration took {}", Duration.between(start, Instant.now()));

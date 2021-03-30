@@ -1,6 +1,7 @@
 package io.spoud.agoora.agents.kafka.metrics;
 
 import io.spoud.agoora.agents.kafka.kafka.KafkaAdminScrapper;
+import io.spoud.agoora.agents.kafka.kafka.KafkaTopicReader;
 import io.spoud.agoora.agents.kafka.metrics.model.MetricValue;
 import io.spoud.agoora.agents.kafka.repository.KafkaConsumerGroupRepository;
 import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
@@ -21,6 +22,7 @@ public class MetricsForwarderService {
   private final KafkaConsumerGroupRepository kafkaConsumerGroupRepository;
   private final LookerMetricsService lookerService;
   private final KafkaAdminScrapper kafkaService;
+  private final KafkaTopicReader kafkaTopicReader;
 
   public void scrapeMetrics() {
     // TODO to improve metric accuracry we should scrape a topic and then it's consumer groups
@@ -44,7 +46,7 @@ public class MetricsForwarderService {
               String topicName = dataPort.getTopicName();
               HashMap<Integer, MetricValue> topicMetric = new HashMap<>();
               dataPortsMetrics.put(topicName, topicMetric);
-                kafkaService
+                kafkaTopicReader
                     .getEndOffsetByTopic(topicName)
                     .forEach(
                         (topicPartition, offset) -> {

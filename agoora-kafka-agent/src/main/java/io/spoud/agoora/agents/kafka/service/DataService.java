@@ -55,9 +55,6 @@ public class DataService {
               logisticsService.deleteDataPort(toRemove);
               kafkaTopicRepository.delete(toRemove);
             });
-
-    // TODO schema
-    // TODO update metrics
   }
 
   public void updateConsumerGroups() {
@@ -88,11 +85,5 @@ public class DataService {
               logisticsService.deleteDataSubscriptionState(toRemove);
               kafkaConsumerGroupRepository.delete(toRemove);
             });
-
-    // TODO update metrics
-  }
-
-  public void profileData() {
-    LOG.error("Profiling not implemented yet");
   }
 }

@@ -10,14 +10,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ConsumerGroupListing;
-import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
-import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +31,6 @@ public class KafkaAdminScrapper {
   private final KafkaTopicMapper kafkaTopicMapper;
   private final KafkaConsumerGroupMapper kafkaConsumerGroupMapper;
   private AdminClient adminClient;
-  private Consumer<byte[], byte[]> consumer;
   private Pattern t;
   private Pattern consumerGroupFilterRegex;
 
@@ -42,7 +38,6 @@ public class KafkaAdminScrapper {
     t = Pattern.compile(config.getKafka().getTopicFilterRegex());
     consumerGroupFilterRegex = Pattern.compile(config.getKafka().getConsumerGroupFilterRegex());
     adminClient = KafkaFactory.createAdminClient(config);
-    consumer = KafkaFactory.createConsumer(config);
   }
 
   public List<KafkaTopic> getTopics() {
@@ -103,19 +98,5 @@ public class KafkaAdminScrapper {
     } catch (final InterruptedException | ExecutionException e) {
       throw new IllegalStateException(e);
     }
-  }
-
-  public Map<TopicPartition, Long> getEndOffsetByTopic(final String topic) {
-    final List<PartitionInfo> partitions = consumer.partitionsFor(topic);
-    if (partitions == null) {
-      LOG.warn("No partition found for topic {}", topic);
-      return Collections.emptyMap();
-    }
-    final List<TopicPartition> topics =
-        partitions.stream()
-            .map(pi -> new TopicPartition(pi.topic(), pi.partition()))
-            .collect(Collectors.toList());
-
-    return consumer.endOffsets(topics);
   }
 }

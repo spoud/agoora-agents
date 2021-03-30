@@ -11,6 +11,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.BytesDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.utils.Bytes;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class KafkaFactory {
     return props;
   }
 
-  public static Consumer<byte[], byte[]> createConsumer(KafkaAgentConfig kafkaAgentConfig) {
+  public static Consumer<Bytes, Bytes> createConsumer(KafkaAgentConfig kafkaAgentConfig) {
     return new KafkaConsumer(toMap(getConsumerProperties(kafkaAgentConfig)));
   }
 }
