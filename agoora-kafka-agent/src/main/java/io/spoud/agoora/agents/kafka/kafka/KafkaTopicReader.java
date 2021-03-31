@@ -70,10 +70,12 @@ public class KafkaTopicReader {
 
       poll.forEach(
           rec -> {
-            if (rec.offset() >= endOffsets.get(rec.partition())) {
+            final Long endOffset = endOffsets.get(rec.partition());
+            if (rec.offset() >= endOffset) {
               // we reached the end, remove partition
               runningPartitions.remove(rec.partition());
-            } else {
+            }
+            if (rec.offset() <= endOffset) {
               if (rec.value() != null) {
                 samples.add(rec.value().get());
               }
@@ -124,10 +126,10 @@ public class KafkaTopicReader {
             Collectors.toMap(
                 Map.Entry::getKey,
                 endEntry -> {
-                  long start = beginning.getOrDefault(endEntry.getKey(), 0L);
-                  start = Math.max(start, endEntry.getValue() - samplesPerPartitions);
-                  return new Range(
-                      start, endEntry.getValue() - 1); // -1 because kafka give us the next offset
+                  // all the -1 are because kafka give us the next offset
+                  long start = Math.max(beginning.getOrDefault(endEntry.getKey(), 0L) - 1, 0L);
+                  start = Math.max(start, endEntry.getValue() - 1 - samplesPerPartitions);
+                  return new Range(start, endEntry.getValue() - 1);
                 }))
         .entrySet()
         .stream()

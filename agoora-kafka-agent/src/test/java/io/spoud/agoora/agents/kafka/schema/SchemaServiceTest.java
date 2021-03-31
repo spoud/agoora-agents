@@ -18,8 +18,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @QuarkusTest
 class SchemaServiceTest extends AbstractService {
@@ -36,12 +36,12 @@ class SchemaServiceTest extends AbstractService {
   @Test
   void testWithSchema() {
     schemaRegistryUtil.addSchemaVersion(
-        "topic1", KafkaStreamPart.VALUE, "registry/confluent/version1.json");
-    final Map<String, String> properties = schemaService.update("topic1", "abc");
+        "schema-topic1", KafkaStreamPart.VALUE, "registry/confluent/version1.json");
+    final Map<String, String> properties = schemaService.update("schema-topic1", "abc");
 
     assertThat(properties)
         .containsEntry(
-            Constants.PROPETIES_DEEP_DIVE_TOOL_SCHEMA_REGISTRY, "https://my-url/topic1/ui");
+            Constants.PROPETIES_DEEP_DIVE_TOOL_SCHEMA_REGISTRY, "https://my-url/schema-topic1/ui");
 
     verify(schemaClient)
         .saveSchema(
@@ -55,10 +55,10 @@ class SchemaServiceTest extends AbstractService {
 
   @Test
   void testWithoutSchema() {
-    final Map<String, String> properties = schemaService.update("topicX", "abcd");
+    final Map<String, String> properties = schemaService.update("schema-topicX", "abcd");
 
     assertThat(properties).isEmpty();
 
-    verify(schemaClient, times(0));
+    verifyNoMoreInteractions(schemaClient);
   }
 }

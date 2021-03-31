@@ -93,16 +93,16 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
   public void testDecodingEvolutionData() {
     final long v1 =
         schemaRegistryUtil
-            .addSchemaVersion("topic1", KafkaStreamPart.VALUE, "registry/confluent/randomv1.json")
+            .addSchemaVersion("avro-topic1", KafkaStreamPart.VALUE, "registry/confluent/randomv1.json")
             .getId();
     final long v2 =
         schemaRegistryUtil
-            .addSchemaVersion("topic1", KafkaStreamPart.VALUE, "registry/confluent/randomv2.json")
+            .addSchemaVersion("avro-topic1", KafkaStreamPart.VALUE, "registry/confluent/randomv2.json")
             .getId();
 
     byte[] bytes = schemaRegistryUtil.getAvroBytes(v1, "146f6270797068777769788e0428848a3c01");
     Optional<DecodedMessage> decode =
-        sampleDecoderConfluent.decode("topic1", KafkaStreamPart.VALUE, bytes);
+        sampleDecoderConfluent.decode("avro-topic1", KafkaStreamPart.VALUE, bytes);
     assertThat(decode).isPresent();
     assertThat(decode.get().getEncoding()).isEqualTo(DataEncoding.AVRO);
     assertThat(decode.get().getUtf8String())
@@ -111,7 +111,7 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
 
     byte[] bytes2 = schemaRegistryUtil.getAvroBytes(v2, "146f6270797068777769788e0428848a3c0106");
     Optional<DecodedMessage> decode2 =
-        sampleDecoderConfluent.decode("topic1", KafkaStreamPart.VALUE, bytes2);
+        sampleDecoderConfluent.decode("avro-topic1", KafkaStreamPart.VALUE, bytes2);
     assertThat(decode2).isPresent();
     assertThat(decode2.get().getEncoding()).isEqualTo(DataEncoding.AVRO);
     assertThat(decode2.get().getUtf8String())

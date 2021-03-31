@@ -61,13 +61,13 @@ class DataServiceTest extends AbstractService {
   @Test
   @Timeout(30)
   void testDataPorts() {
-    kafkaTopicRepository.save(KafkaTopic.builder().dataPortId("abc").topicName("topicX").build());
+    kafkaTopicRepository.save(KafkaTopic.builder().dataPortId("abc").topicName("data-topicX").build());
 
     adminClient.createTopics(
         Arrays.asList(
-            new NewTopic("topic1", 2, (short) 1),
-            new NewTopic("topic2", 3, (short) 1),
-            new NewTopic("topic3", 4, (short) 1)));
+            new NewTopic("data-topic1", 2, (short) 1),
+            new NewTopic("data-topic2", 3, (short) 1),
+            new NewTopic("data-topic3", 4, (short) 1)));
 
     await()
         .atMost(Duration.ofSeconds(5))
@@ -77,7 +77,7 @@ class DataServiceTest extends AbstractService {
                     .listTopics()
                     .names()
                     .get()
-                    .containsAll(Arrays.asList("topic1", "topic2", "topic3")));
+                    .containsAll(Arrays.asList("data-topic1", "data-topic2", "data-topic3")));
 
     dataService.updateTopics();
 
@@ -89,7 +89,7 @@ class DataServiceTest extends AbstractService {
         .extracting(SaveDataPortRequest::getInput)
         .extracting(DataPortChange::getLabel)
         .extracting(StringValue::getValue)
-        .containsExactlyInAnyOrder("topic1", "topic2", "topic3", "");
+        .containsExactlyInAnyOrder("data-topic1", "data-topic2", "data-topic3", "");
 
     final SaveDataPortRequest topicXRequest =
         requests.stream()
@@ -102,25 +102,25 @@ class DataServiceTest extends AbstractService {
   @Test
   @Timeout(30)
   void testDataSubscriptionState() {
-    kafkaTopicRepository.save(KafkaTopic.builder().dataPortId("abc").topicName("topic1").build());
+    kafkaTopicRepository.save(KafkaTopic.builder().dataPortId("abc").topicName("data-topic1").build());
     kafkaConsumerGroupRepository.save(
         KafkaConsumerGroup.builder()
             .dataSubscriptionStateId("subId")
             .consumerGroupName("groupX")
             .dataPortId("abc")
-            .topicName("topic1")
+            .topicName("data-topic1")
             .build());
 
     adminClient.createTopics(
         Arrays.asList(
-            new NewTopic("topic1", 2, (short) 1),
-            new NewTopic("topic2", 3, (short) 1),
-            new NewTopic("topic3", 4, (short) 1)));
+            new NewTopic("data-topic1", 2, (short) 1),
+            new NewTopic("data-topic2", 3, (short) 1),
+            new NewTopic("data-topic3", 4, (short) 1)));
 
     final byte[] data = "data".getBytes(StandardCharsets.UTF_8);
 
     // produce some data
-    Arrays.asList("topic1", "topic2", "topic3")
+    Arrays.asList("data-topic1", "data-topic2", "data-topic3")
         .forEach(
             topic -> {
               for (int i = 0; i < 10; i++) {
@@ -129,9 +129,9 @@ class DataServiceTest extends AbstractService {
             });
 
     // 2 groups but will result in 3 data subscription state
-    assertThat(kafkaUtils.consume("topic1", "group1", 10, Duration.ofSeconds(10))).hasSize(10);
-    assertThat(kafkaUtils.consume("topic2", "group1", 10, Duration.ofSeconds(10))).hasSize(10);
-    assertThat(kafkaUtils.consume("topic1", "group2", 10, Duration.ofSeconds(10))).hasSize(10);
+    assertThat(kafkaUtils.consume("data-topic1", "group1", 10, Duration.ofSeconds(10))).hasSize(10);
+    assertThat(kafkaUtils.consume("data-topic2", "group1", 10, Duration.ofSeconds(10))).hasSize(10);
+    assertThat(kafkaUtils.consume("data-topic1", "group2", 10, Duration.ofSeconds(10))).hasSize(10);
 
     dataService.updateConsumerGroups();
 
