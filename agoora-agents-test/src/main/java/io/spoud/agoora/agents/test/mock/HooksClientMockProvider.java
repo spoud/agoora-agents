@@ -17,11 +17,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.reset;
 
 @UtilityClass
 public class HooksClientMockProvider {
 
   public static void withLogRecord(HooksClient mock, List<LogRecord> record) {
+    reset(mock);
     final Answer answer =
         a -> {
           final Consumer callback = a.getArgument(0, Consumer.class);

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @UtilityClass
@@ -20,6 +21,7 @@ public class DataItemClientMockProvider {
   public static Map<String, UUID> uuidByTransportUrl = new HashMap<>();
 
   public static void defaultMock(DataItemClient mock) {
+    reset(mock);
     when(mock.save(any()))
         .thenAnswer(
             a -> {

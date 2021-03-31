@@ -6,6 +6,8 @@ quarkus:
       "io.spoud.agoora":
         level: INFO
 
+agoora-transport-path: /default/mqtt
+
 agoora:
   scrapper:
     max-samples: 10
