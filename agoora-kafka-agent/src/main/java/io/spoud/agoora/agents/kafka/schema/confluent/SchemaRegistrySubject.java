@@ -17,6 +17,6 @@ public class SchemaRegistrySubject {
 
   private String subject;
   private Integer version;
-  private Integer id;
+  private Long id;
   private String schema;
 }

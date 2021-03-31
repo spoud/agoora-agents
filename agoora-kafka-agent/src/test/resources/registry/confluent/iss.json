@@ -1,35 +1,4 @@
 {
-  "type": "record",
-  "name": "IssPositionMessage",
-  "namespace": "data.producer.iss",
-  "fields": [
-    {
-      "name": "iss_position",
-      "type": {
-        "type": "record",
-        "name": "IssPosition",
-        "fields": [
-          {
-            "name": "longitude",
-            "type": "string"
-          },
-          {
-            "name": "latitude",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "message",
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    {
-      "name": "timestamp",
-      "type": "long"
-    }
-  ]
+  "schema": "{\n  \"type\": \"record\",\n  \"name\": \"IssPositionMessage\",\n  \"namespace\": \"data.producer.iss\",\n  \"fields\": [\n    {\n      \"name\": \"iss_position\",\n      \"type\": {\n        \"type\": \"record\",\n        \"name\": \"IssPosition\",\n        \"fields\": [\n          {\n            \"name\": \"longitude\",\n            \"type\": \"string\"\n          },\n          {\n            \"name\": \"latitude\",\n            \"type\": \"string\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"message\",\n      \"type\": [\n        \"string\",\n        \"null\"\n      ]\n    },\n    {\n      \"name\": \"timestamp\",\n      \"type\": \"long\"\n    }\n  ]\n}\n",
+  "schemaType": "AVRO"
 }
