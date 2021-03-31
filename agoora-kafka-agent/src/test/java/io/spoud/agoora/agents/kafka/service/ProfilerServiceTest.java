@@ -26,6 +26,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
@@ -33,6 +34,8 @@ import static org.mockito.Mockito.verify;
 class ProfilerServiceTest {
 
   public static final String PROFILE_TOPIC_JSON = "profile-topic-json";
+  public static final String PROFILE_TOPIC_SMALL = "profile-topic-small";
+  public static final String PROFILE_TOPIC_NO_DATA = "profile-topic-no-data";
   public static final String PROFILE_TOPIC_AVRO = "profile-topic-avro";
   public static final byte[] JSON_DATA = "{\"field\":\"hello\"}".getBytes(StandardCharsets.UTF_8);
   public static final String AVRO_DATA = "146f6270797068777769788e0428848a3c01";
@@ -60,7 +63,7 @@ class ProfilerServiceTest {
   void testJsonProfiling() {
     kafkaTopicRepository.save(
         KafkaTopic.builder().topicName(PROFILE_TOPIC_JSON).dataPortId("hij").build());
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 15; i++) {
       kafkaUtils.produce(PROFILE_TOPIC_JSON, JSON_DATA);
     }
 
@@ -94,7 +97,7 @@ class ProfilerServiceTest {
 
     kafkaTopicRepository.save(
         KafkaTopic.builder().topicName(PROFILE_TOPIC_AVRO).dataPortId("def").build());
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 15; i++) {
       kafkaUtils.produce(PROFILE_TOPIC_AVRO, avroBytes);
     }
 
@@ -113,5 +116,45 @@ class ProfilerServiceTest {
             any(),
             eq(SchemaSource.Type.INFERRED),
             eq(SchemaEncoding.Type.JSON));
+  }
+
+  @Test
+  @Timeout(30)
+  void testNotEnoughData() {
+    kafkaTopicRepository.save(
+        KafkaTopic.builder().topicName(PROFILE_TOPIC_SMALL).dataPortId("mno").build());
+    for (int i = 0; i < 2; i++) {
+      kafkaUtils.produce(PROFILE_TOPIC_SMALL, JSON_DATA);
+    }
+
+    profilerService.profileData();
+
+    ArgumentCaptor<List<byte[]>> samplesCaptor = ArgumentCaptor.forClass(List.class);
+    verify(profilerClient).profileData(eq(PROFILE_TOPIC_SMALL), samplesCaptor.capture());
+    assertThat(samplesCaptor.getAllValues()).hasSize(1);
+    assertThat(samplesCaptor.getAllValues().get(0)).hasSize(2);
+
+    verify(schemaClient)
+        .saveSchema(
+            eq(ResourceEntity.Type.DATA_PORT),
+            eq("mno"),
+            eq("/default/"),
+            any(),
+            eq(SchemaSource.Type.INFERRED),
+            eq(SchemaEncoding.Type.JSON));
+  }
+
+  @Test
+  @Timeout(30)
+  void testNoData() {
+    reset(profilerClient);
+    reset(schemaClient);
+    kafkaTopicRepository.save(
+        KafkaTopic.builder().topicName(PROFILE_TOPIC_NO_DATA).dataPortId("klm").build());
+
+    profilerService.profileData();
+
+    verify(schemaClient, never()).saveSchema(any(), eq("klm"), any(), any(), any(), any());
+    verify(profilerClient, never()).profileData(eq(PROFILE_TOPIC_NO_DATA), any());
   }
 }

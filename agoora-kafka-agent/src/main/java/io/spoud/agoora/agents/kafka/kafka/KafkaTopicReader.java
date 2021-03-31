@@ -128,7 +128,7 @@ public class KafkaTopicReader {
                 endEntry -> {
                   // all the -1 are because kafka give us the next offset
                   long start = Math.max(beginning.getOrDefault(endEntry.getKey(), 0L) - 1, 0L);
-                  start = Math.max(start, endEntry.getValue() - 1 - samplesPerPartitions);
+                  start = Math.max(start, endEntry.getValue() - samplesPerPartitions);
                   return new Range(start, endEntry.getValue() - 1);
                 }))
         .entrySet()

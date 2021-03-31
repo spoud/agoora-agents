@@ -88,7 +88,7 @@ public class KafkaAdminScrapper {
           .get()
           .keySet()
           .stream()
-          .map(t -> t.topic())
+          .map(TopicPartition::topic)
           .collect(Collectors.toSet());
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
