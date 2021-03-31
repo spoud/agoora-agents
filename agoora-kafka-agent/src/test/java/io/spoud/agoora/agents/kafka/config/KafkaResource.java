@@ -12,7 +12,7 @@ public class KafkaResource implements QuarkusTestResourceLifecycleManager {
   @Override
   public Map<String, String> start() {
     kafka.start();
-    return Map.of("sdm.kafka.bootstrap-servers", kafka.getBootstrapServers());
+    return Map.of("agoora.kafka.bootstrap-servers", kafka.getBootstrapServers());
   }
 
   @Override
