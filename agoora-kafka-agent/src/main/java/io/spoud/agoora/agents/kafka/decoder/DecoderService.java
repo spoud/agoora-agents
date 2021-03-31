@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +19,10 @@ public class DecoderService {
 
   public DecoderService(Instance<SampleDecoder> sampleDecoders) {
     this.sampleDecoders = sampleDecoders.stream().sorted().collect(Collectors.toList());
+  }
+
+  public DecodedMessage decodeKey(String topic, byte[] data) throws DecoderException {
+    return decode(topic, KafkaStreamPart.KEY, data);
   }
 
   public DecodedMessage decodeValue(String topic, byte[] data) throws DecoderException {

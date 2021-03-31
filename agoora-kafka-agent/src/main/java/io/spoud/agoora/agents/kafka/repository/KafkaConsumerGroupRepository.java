@@ -41,13 +41,22 @@ public class KafkaConsumerGroupRepository {
   }
 
   public void save(KafkaConsumerGroup consumerGroup) {
-    statesByDataSubscriptionStateId.put(consumerGroup.getDataSubscriptionStateId(), consumerGroup);
+    if (consumerGroup.getDataSubscriptionStateId() != null) {
+      statesByDataSubscriptionStateId.put(
+          consumerGroup.getDataSubscriptionStateId(), consumerGroup);
+    }
     statesByInternalId.put(consumerGroup.getInternalId(), consumerGroup);
   }
 
   public void delete(KafkaConsumerGroup consumerGroup) {
-    statesByDataSubscriptionStateId.remove(consumerGroup.getDataSubscriptionStateId());
-    statesByInternalId.remove(consumerGroup.getInternalId());
+    if (consumerGroup.getDataSubscriptionStateId() != null) {
+      statesByDataSubscriptionStateId.remove(consumerGroup.getDataSubscriptionStateId());
+    }
+    final KafkaConsumerGroup removed = statesByInternalId.remove(consumerGroup.getInternalId());
+    if (removed.getDataSubscriptionStateId() != null) {
+      statesByDataSubscriptionStateId.remove(removed.getDataSubscriptionStateId());
+    }
+
   }
 
   public void onNext(LogRecord logRecord) {

@@ -35,5 +35,9 @@ import io.spoud.sdm.logistics.domain.v1.Transport;
       // rest easy dependencies
       org.apache.commons.logging.LogFactory.class,
       org.apache.commons.logging.impl.SimpleLog.class,
+
+      // Kafka
+      org.apache.avro.Schema.class,
+      org.apache.avro.Schema.Parser.class,
     })
 public class Reflection {}

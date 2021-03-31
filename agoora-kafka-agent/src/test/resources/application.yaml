@@ -12,8 +12,6 @@ agoora:
     wait-time-before-counting-retained: PT1S
     profiling:
       enabled: true
-  mqtt:
-    paths: path1/,path3/sub1
   registry:
     confluent:
       url:

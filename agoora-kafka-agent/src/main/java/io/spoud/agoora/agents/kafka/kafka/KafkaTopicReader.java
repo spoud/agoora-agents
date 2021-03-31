@@ -31,11 +31,12 @@ public class KafkaTopicReader {
   private final KafkaAgentConfig config;
   private Consumer<Bytes, Bytes> consumer;
 
-  void postConstruct(@Observes StartupEvent event) {
+  void startup(@Observes StartupEvent event) {
+    LOG.debug("Staring kafka reader");
     consumer = KafkaFactory.createConsumer(config);
   }
 
-  public synchronized List<byte[]> getSamples(String topic) {
+  public List<byte[]> getSamples(String topic) {
     final Instant start = Instant.now();
 
     final Map<TopicPartition, Range> ranges = getRanges(topic);

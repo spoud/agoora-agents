@@ -75,7 +75,6 @@ quarkus:
     additional-build-args:
       - --allow-incomplete-classpath
       - --report-unsupported-elements-at-runtime
-      - -H:IncludeResourceBundles=org.eclipse.paho.client.mqttv3.internal.nls.logcat,org.eclipse.paho.client.mqttv3.internal.nls.messages
   log:
     category:
       "io.spoud.agoora":

@@ -3,9 +3,11 @@ package io.spoud.agoora.agents.kafka.config.data;
 import io.quarkus.arc.config.ConfigProperties;
 import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @ConfigProperties(prefix = "agoora")
+@ToString(callSuper = true)
 public class KafkaAgentConfig extends AgooraAgentConfig {
   private ScrapperConfig scrapper;
   private KafkaConfig kafka;
