@@ -58,7 +58,6 @@ public class DataService {
   }
 
   public void updateConsumerGroups() {
-
     Map<String, KafkaConsumerGroup> localSubscriptionStates =
         kafkaConsumerGroupRepository.getStates().stream()
             .collect(Collectors.toMap(KafkaConsumerGroup::getInternalId, Function.identity()));

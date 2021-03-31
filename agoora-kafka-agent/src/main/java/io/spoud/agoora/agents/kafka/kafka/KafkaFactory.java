@@ -3,44 +3,41 @@ package io.spoud.agoora.agents.kafka.kafka;
 import io.quarkus.runtime.configuration.ProfileManager;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.agoora.agents.kafka.config.data.KafkaConfig;
-import lombok.RequiredArgsConstructor;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.BytesDeserializer;
+import org.apache.kafka.common.serialization.BytesSerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.utils.Bytes;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RequiredArgsConstructor
-@ApplicationScoped
+@UtilityClass
 public class KafkaFactory {
 
   public static final String PROFILE_CONFLUENT_CLOUD = "ccloud"; // TODO remove
   public static final int MAX_POOL_RECORD = 100;
+  public static final String DEFAULT_CONSUMER_GROUP_NAME = "agoora-kafka-agent";
 
   public static AdminClient createAdminClient(KafkaAgentConfig kafkaAgentConfig) {
     return AdminClient.create(getAdminProperties(kafkaAgentConfig));
   }
 
-  private static Map<String, String> toMap(Properties props) {
+  private static Map<String, Object> toMap(Properties props) {
     LOG.debug("Kafka properties:");
     props.forEach((k, v) -> LOG.debug("\t{}='{}'", k, v));
 
     return props.entrySet().stream()
         .collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue().toString()));
   }
-
-  //  public KafkaProducer<String, LogRecord> createProducer() {
-  //    return KafkaProducer.create(vertx, toMap(getProducerProperties()));
-  //  }
 
   private static Map<String, Object> getAdminProperties(KafkaAgentConfig kafkaAgentConfig) {
     return toMap(getCommonProperties(kafkaAgentConfig)).entrySet().stream()
@@ -80,25 +77,36 @@ public class KafkaFactory {
     return props;
   }
 
-  //  private Properties getProducerProperties() {
-  //    final Properties props = getCommonProperties();
-  //    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-  //    props.put(
-  //        ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaProtobufSerializer.class.getName());
-  //    return props;
-  //  }
-
-  private static Properties getConsumerProperties(KafkaAgentConfig kafkaAgentConfig) {
+  private static Properties getConsumerProperties(
+      KafkaAgentConfig kafkaAgentConfig, String consumerGroupName) {
     final Properties props = getCommonProperties(kafkaAgentConfig);
 
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, BytesDeserializer.class.getName());
-    props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, String.valueOf(MAX_POOL_RECORD));
+    props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, MAX_POOL_RECORD);
+    props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroupName);
+    props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
     return props;
   }
 
-  public static Consumer<Bytes, Bytes> createConsumer(KafkaAgentConfig kafkaAgentConfig) {
-    return new KafkaConsumer(toMap(getConsumerProperties(kafkaAgentConfig)));
+  public static KafkaConsumer<Bytes, Bytes> createConsumer(KafkaAgentConfig kafkaAgentConfig) {
+    return createConsumer(kafkaAgentConfig, DEFAULT_CONSUMER_GROUP_NAME);
+  }
+
+  public static KafkaConsumer<Bytes, Bytes> createConsumer(
+      KafkaAgentConfig kafkaAgentConfig, String consumerGroupName) {
+    return new KafkaConsumer<>(toMap(getConsumerProperties(kafkaAgentConfig, consumerGroupName)));
+  }
+
+  private Properties getProducerProperties(KafkaAgentConfig kafkaAgentConfig) {
+    final Properties props = getCommonProperties(kafkaAgentConfig);
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, BytesSerializer.class.getName());
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BytesSerializer.class.getName());
+    return props;
+  }
+
+  public static KafkaProducer<Bytes, Bytes> createProducer(KafkaAgentConfig kafkaAgentConfig) {
+    return new KafkaProducer<>(toMap(getProducerProperties(kafkaAgentConfig)));
   }
 }

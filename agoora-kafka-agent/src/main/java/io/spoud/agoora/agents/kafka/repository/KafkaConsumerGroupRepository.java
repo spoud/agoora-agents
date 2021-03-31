@@ -53,10 +53,9 @@ public class KafkaConsumerGroupRepository {
       statesByDataSubscriptionStateId.remove(consumerGroup.getDataSubscriptionStateId());
     }
     final KafkaConsumerGroup removed = statesByInternalId.remove(consumerGroup.getInternalId());
-    if (removed.getDataSubscriptionStateId() != null) {
+    if (removed != null && removed.getDataSubscriptionStateId() != null) {
       statesByDataSubscriptionStateId.remove(removed.getDataSubscriptionStateId());
     }
-
   }
 
   public void onNext(LogRecord logRecord) {

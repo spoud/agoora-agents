@@ -40,7 +40,7 @@ public class KafkaTopicRepository {
       statesByDataPortId.remove(topic.getDataPortId());
     }
     final KafkaTopic removed = statesByInternalId.remove(topic.getInternalId());
-    if (removed.getDataPortId() != null) {
+    if (removed !=null && removed.getDataPortId() != null) {
       statesByDataPortId.remove(removed.getDataPortId());
     }
   }

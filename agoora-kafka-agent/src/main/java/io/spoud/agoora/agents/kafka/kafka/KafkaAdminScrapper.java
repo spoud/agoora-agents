@@ -44,6 +44,7 @@ public class KafkaAdminScrapper {
     try {
       List<String> topicNames =
           adminClient.listTopics().names().get().stream()
+              .filter(t -> !t.startsWith("_")) // remove internal topics
               .filter(t -> this.t.matcher(t).matches())
               .collect(Collectors.toList());
       return adminClient.describeTopics(topicNames).all().get().values().stream()
@@ -52,7 +53,10 @@ public class KafkaAdminScrapper {
                   kafkaTopicMapper.create(
                       topicDescription.name(), topicDescription.partitions().size()))
           .collect(Collectors.toList());
-    } catch (final InterruptedException | ExecutionException e) {
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new IllegalStateException(e);
+    } catch (ExecutionException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -68,7 +72,10 @@ public class KafkaAdminScrapper {
                   getTopicByConsumerGroup(consumerGroup).stream()
                       .map(topic -> kafkaConsumerGroupMapper.create(consumerGroup, topic)))
           .collect(Collectors.toList());
-    } catch (final InterruptedException | ExecutionException e) {
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new IllegalStateException(e);
+    } catch (ExecutionException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -83,7 +90,10 @@ public class KafkaAdminScrapper {
           .stream()
           .map(t -> t.topic())
           .collect(Collectors.toSet());
-    } catch (final InterruptedException | ExecutionException e) {
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new IllegalStateException(e);
+    } catch (ExecutionException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -95,7 +105,10 @@ public class KafkaAdminScrapper {
           .listConsumerGroupOffsets(consumerGroup)
           .partitionsToOffsetAndMetadata()
           .get();
-    } catch (final InterruptedException | ExecutionException e) {
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new IllegalStateException(e);
+    } catch (ExecutionException e) {
       throw new IllegalStateException(e);
     }
   }

@@ -79,7 +79,7 @@ public class SampleDecoderAvroConfluent implements SampleDecoder {
 
   protected long getSchemaIdFromBytes(byte[] data) {
     ByteBuffer buffer = ByteBuffer.wrap(data);
-    int signedInt = Integer.valueOf(buffer.getInt(1));
+    int signedInt = buffer.getInt(1);
     long unsignedLong = Integer.toUnsignedLong(signedInt);
     return unsignedLong;
   }
