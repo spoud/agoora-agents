@@ -8,6 +8,8 @@ import io.spoud.agoora.agents.api.mapper.StandardProtoMapper;
 import io.spoud.agoora.agents.api.observers.ProfileResponseObserver;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.agoora.agents.kafka.data.KafkaTopic;
+import io.spoud.agoora.agents.kafka.decoder.DecodedMessage;
+import io.spoud.agoora.agents.kafka.decoder.DecoderService;
 import io.spoud.agoora.agents.kafka.kafka.KafkaTopicReader;
 import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
 import io.spoud.sdm.global.domain.v1.ResourceEntity;
@@ -25,6 +27,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @ApplicationScoped
@@ -37,17 +40,33 @@ public class ProfilerService {
   private final LookerClient lookerClient;
   private final SchemaClient schemaClient;
   private final KafkaAgentConfig config;
+  private final DecoderService decoderService;
 
   public void profileData() {
     kafkaTopicRepository.getStates().stream()
         .filter(topic -> topic.getDataPortId() != null)
         .forEach(
             kafkaTopic -> {
-              final List<byte[]> samples = kafkaTopicReader.getSamples(kafkaTopic.getTopicName());
+              try{
+              List<byte[]> samples = kafkaTopicReader.getSamples(kafkaTopic.getTopicName());
               if (!samples.isEmpty()) {
+
+                samples = decodeMessages(kafkaTopic, samples);
+
                 profileSamples(kafkaTopic, samples);
               }
+              }catch (Exception ex){
+                LOG.error("Unable to profile topic '{}', skipping. Enable debug for full stacktrace: {}", kafkaTopic.getTopicName(), ex.getMessage());
+                LOG.error("Unable to profile topic '{}'", kafkaTopic.getTopicName(), ex);
+              }
             });
+  }
+
+  private List<byte[]> decodeMessages(KafkaTopic kafkaTopic, List<byte[]> samples) {
+    return samples.stream()
+        .map(raw -> decoderService.decodeValue(kafkaTopic.getTopicName(), raw))
+        .map(DecodedMessage::getDecodedValue)
+        .collect(Collectors.toList());
   }
 
   private void profileSamples(KafkaTopic kafkaTopic, List<byte[]> samples) {

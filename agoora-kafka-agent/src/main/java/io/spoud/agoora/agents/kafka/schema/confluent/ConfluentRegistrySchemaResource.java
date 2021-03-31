@@ -16,7 +16,7 @@ import javax.ws.rs.Produces;
 public interface ConfluentRegistrySchemaResource {
 
   @GET
-  @Path("/{id}")
+  @Path("/ids/{id}")
   @Produces("application/vnd.schemaregistry.v1+json")
   SchemaRegistrySubject getById(@PathParam("id") long id);
 }

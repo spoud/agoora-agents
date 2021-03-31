@@ -12,7 +12,9 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @ApplicationScoped
@@ -34,6 +36,8 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
   @Inject @RestClient ConfluentRegistrySubjectResource confluentRegistrySubjectResource;
   @Inject @RestClient ConfluentRegistrySchemaResource confluentRegistrySchemaResource;
 
+  private Map<Long, String> schemaByIdCache = new ConcurrentHashMap<>();
+
   public ConfluentSchemaRegistry(KafkaAgentConfig config) {
     this.publicUrl = config.getRegistry().getConfluent().getPublicUrl();
   }
@@ -45,8 +49,14 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
   }
 
   public Optional<String> getSchemaById(long id) {
+    final String cachedValue = schemaByIdCache.get(id);
+    if (cachedValue != null) {
+      return Optional.of(cachedValue);
+    }
     try {
-      return Optional.of(confluentRegistrySchemaResource.getById(id).getSchema());
+      final String schema = confluentRegistrySchemaResource.getById(id).getSchema();
+      schemaByIdCache.put(id, schema);
+      return Optional.of(schema);
     } catch (WebApplicationException ex) {
 
       if (ex.getResponse().getStatus() == 404) {

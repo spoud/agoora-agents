@@ -11,12 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 
 import io.spoud.agoora.agents.kafka.decoder.SampleDecoder;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
+@ApplicationScoped
 public class SampleDecoderJson implements SampleDecoder {
 
   private final ObjectMapper objectMapper;
@@ -41,7 +43,7 @@ public class SampleDecoderJson implements SampleDecoder {
       }
 
       DecodedMessage.DecodedMessageBuilder builder =
-          DecodedMessage.builder().decodedString(decodedString).encoding(DataEncoding.JSON);
+          DecodedMessage.builder().decodedValue(data).encoding(DataEncoding.JSON);
 
       final JsonNode jsonValue = objectMapper.readTree(decodedString);
 
@@ -63,7 +65,7 @@ public class SampleDecoderJson implements SampleDecoder {
       return Optional.of(builder.build());
 
     } catch (IOException ex) {
-      LOG.debug("Unable to decode JSON data", ex);
+      LOG.trace("Unable to decode JSON data", ex);
       return Optional.empty();
     }
   }

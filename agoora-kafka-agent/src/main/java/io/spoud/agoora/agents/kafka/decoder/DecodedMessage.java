@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DecodedMessage {
   private DataEncoding encoding;
-  private String decodedString;
+  private byte[] decodedValue;
   @Builder.Default private boolean rootArray = false;
 }

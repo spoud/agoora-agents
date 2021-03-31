@@ -15,18 +15,11 @@ import java.util.stream.Collectors;
 public class DecoderService {
 
   public static final DecodedMessage NULL_DECODED_MESSAGE =
-      DecodedMessage.builder().decodedString(null).encoding(DataEncoding.UNKNOWN).build();
+      DecodedMessage.builder().decodedValue(null).encoding(DataEncoding.UNKNOWN).build();
   private final List<SampleDecoder> sampleDecoders;
 
   public DecoderService(Instance<SampleDecoder> sampleDecoders) {
-      this.sampleDecoders = sampleDecoders.stream().sorted().collect(Collectors.toList());
-  }
-
-  public String decodeKey(String topic, byte[] data) throws DecoderException {
-    if (data == null) {
-      return null;
-    }
-    return new String(data, StandardCharsets.UTF_8);
+    this.sampleDecoders = sampleDecoders.stream().sorted().collect(Collectors.toList());
   }
 
   public DecodedMessage decodeValue(String topic, byte[] data) throws DecoderException {

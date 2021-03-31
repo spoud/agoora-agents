@@ -1,6 +1,5 @@
 package io.spoud.agoora.agents.kafka.decoder.avro;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.spoud.agoora.agents.kafka.decoder.DataEncoding;
 import io.spoud.agoora.agents.kafka.decoder.DecodedMessage;
 import io.spoud.agoora.agents.kafka.decoder.SampleDecoder;
@@ -17,19 +16,21 @@ import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.commons.codec.binary.Hex;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
-public class SampleDecoderConfluent implements SampleDecoder {
+@ApplicationScoped
+public class SampleDecoderAvroConfluent implements SampleDecoder {
 
   // https://docs.confluent.io/current/schema-registry/serializer-formatter.html#wire-format
   private static final int CONFLUENT_WRAPPER_SIZE = 5;
   private static final byte CONFLUENT_MAGIC_BYTE = 0;
 
-  private final ObjectMapper objectMapper;
   private final ConfluentSchemaRegistry confluentSchemaRegistry;
 
   @Override
@@ -40,11 +41,11 @@ public class SampleDecoderConfluent implements SampleDecoder {
   @Override
   public Optional<DecodedMessage> decode(String topic, KafkaStreamPart part, byte[] data) {
     if (data.length < CONFLUENT_WRAPPER_SIZE) {
-      LOG.debug("Wrong avro content. Payload must be at least {} bytes", CONFLUENT_WRAPPER_SIZE);
+      LOG.trace("Wrong avro content. Payload must be at least {} bytes", CONFLUENT_WRAPPER_SIZE);
       return Optional.empty();
     }
     if (data[0] != CONFLUENT_MAGIC_BYTE) {
-      LOG.debug("Wrong magic byte for topic '{}' and part '{}'", topic, part);
+      LOG.trace("Wrong magic byte for topic '{}' and part '{}'", topic, part);
       return Optional.empty();
     }
     long schemaId = getSchemaIdFromBytes(data);
@@ -55,13 +56,10 @@ public class SampleDecoderConfluent implements SampleDecoder {
         .map(schema -> decode(data, schema))
         .map(
             decoded ->
-                DecodedMessage.builder()
-                    .decodedString(decoded)
-                    .encoding(DataEncoding.AVRO)
-                    .build());
+                DecodedMessage.builder().decodedValue(decoded).encoding(DataEncoding.AVRO).build());
   }
 
-  protected String decode(byte[] data, Schema schema) {
+  protected byte[] decode(byte[] data, Schema schema) {
     try {
       DatumReader datumReader = new GenericDatumReader(schema);
       Decoder decoder =
@@ -69,12 +67,12 @@ public class SampleDecoderConfluent implements SampleDecoder {
               .binaryDecoder(
                   data, CONFLUENT_WRAPPER_SIZE, data.length - CONFLUENT_WRAPPER_SIZE, null);
       Object avroDatum = datumReader.read(null, decoder);
-      return avroDatum.toString();
+      return avroDatum.toString().getBytes(StandardCharsets.UTF_8);
     } catch (AvroRuntimeException ex) {
       LOG.error("Unable to decode avro message, enable DEBUG to see the message", ex);
       LOG.debug("Unable to decode avro message: '{}'", Hex.encodeHexString(data));
     } catch (IOException e) {
-      LOG.error("Unable to deserialize object ", e);
+      LOG.error("Unable to deserialize object", e);
     }
     return null;
   }
