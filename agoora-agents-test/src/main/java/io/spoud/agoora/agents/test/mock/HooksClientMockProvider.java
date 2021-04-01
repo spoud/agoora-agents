@@ -1,10 +1,12 @@
 package io.spoud.agoora.agents.test.mock;
 
 import io.spoud.agoora.agents.api.client.HooksClient;
+import io.spoud.sdm.global.domain.v1.IdReference;
 import io.spoud.sdm.global.domain.v1.ResourceEntity;
 import io.spoud.sdm.hooks.domain.v1.LogRecord;
 import io.spoud.sdm.hooks.domain.v1.StateChangeAction;
 import io.spoud.sdm.logistics.domain.v1.DataPort;
+import io.spoud.sdm.logistics.domain.v1.DataSubscriptionState;
 import lombok.experimental.UtilityClass;
 import org.mockito.stubbing.Answer;
 
@@ -59,6 +61,29 @@ public class HooksClientMockProvider {
                 .setEndpointUrl(nameAndLabel)
                 .setLabel(nameAndLabel)
                 .setName(nameAndLabel)
+                .putAllProperties(properties)
+                .build())
+        .build();
+  }
+
+  public static LogRecord generateDataSubscriptionStateLogRecord(
+      StateChangeAction.Type action,
+      String id,
+      String dataPortId,
+      String nameAndLabel,
+      String path,
+      Map<String, String> properties) {
+    return LogRecord.newBuilder()
+        .setAction(action)
+        .setEntityType(ResourceEntity.Type.DATA_SUBSCRIPTION_STATE)
+        .setEntityUuid(id)
+        .setPath(path)
+        .setDataSubscriptionState(
+            DataSubscriptionState.newBuilder()
+                .setId(id)
+                .setLabel(nameAndLabel)
+                .setName(nameAndLabel)
+                .setDataPort(IdReference.newBuilder().setId(dataPortId).build())
                 .putAllProperties(properties)
                 .build())
         .build();

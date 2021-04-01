@@ -31,6 +31,7 @@
         <sonar.coverage.exclusions>
             **/*Reflection.*,
             **/*Configuration.*,
+            **/*CronService.*,
         </sonar.coverage.exclusions>
 
         <lombok.version>1.18.18</lombok.version>

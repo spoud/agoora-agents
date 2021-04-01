@@ -56,6 +56,7 @@ class ProfilerServiceTest {
   @AfterEach
   void tearDown() {
     kafkaTopicRepository.getStates().forEach(kafkaTopicRepository::delete);
+    kafkaTopicRepository.clear();
   }
 
   @Test

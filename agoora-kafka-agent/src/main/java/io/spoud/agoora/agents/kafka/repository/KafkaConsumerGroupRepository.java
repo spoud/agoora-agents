@@ -3,7 +3,6 @@ package io.spoud.agoora.agents.kafka.repository;
 import io.spoud.agoora.agents.kafka.data.KafkaConsumerGroup;
 import io.spoud.agoora.agents.kafka.data.KafkaConsumerGroupMapper;
 import io.spoud.agoora.agents.kafka.data.KafkaTopic;
-import io.spoud.sdm.global.domain.v1.ResourceEntity;
 import io.spoud.sdm.hooks.domain.v1.LogRecord;
 import io.spoud.sdm.hooks.domain.v1.StateChangeAction;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class KafkaConsumerGroupRepository {
             .collect(Collectors.toSet());
 
     return Collections.unmodifiableCollection(
-        statesByDataSubscriptionStateId.values().stream()
+        statesByInternalId.values().stream()
             .filter(kafkaConsumerGroup -> dataPortIds.contains(kafkaConsumerGroup.getDataPortId()))
             .collect(Collectors.toSet()));
   }
@@ -59,39 +58,37 @@ public class KafkaConsumerGroupRepository {
   }
 
   public void onNext(LogRecord logRecord) {
-    if (logRecord.getEntityType() == ResourceEntity.Type.DATA_SUBSCRIPTION_STATE) {
-      if (logRecord.getAction() == StateChangeAction.Type.UPDATED
-          && !logRecord.getDataSubscriptionState().getDeleted()) {
+    if (logRecord.getAction() == StateChangeAction.Type.UPDATED
+        && !logRecord.getDataSubscriptionState().getDeleted()) {
 
-        consumerGroupMapper
-            .create(logRecord.getDataSubscriptionState())
-            .ifPresentOrElse(
-                kafkaConsumerGroup -> {
-                  LOG.info(
-                      "Got update for DataSubscriptionState '{}/{}' from Logistics. Mapped to KafkaConsumerGroup '{}/{}'.",
+      consumerGroupMapper
+          .create(logRecord.getDataSubscriptionState())
+          .ifPresentOrElse(
+              kafkaConsumerGroup -> {
+                LOG.info(
+                    "Got update for DataSubscriptionState '{}/{}' from Logistics. Mapped to KafkaConsumerGroup '{}/{}'.",
+                    logRecord.getEntityUuid(),
+                    logRecord.getDataSubscriptionState().getName(),
+                    kafkaConsumerGroup.getTopicName(),
+                    kafkaConsumerGroup.getConsumerGroupName());
+                save(kafkaConsumerGroup);
+              },
+              () ->
+                  LOG.warn(
+                      "Could not map DataSubscriptionState '{}/{}' from Logistics because of missing properties to match against a topic/consumerGroup. Got properties: {}.",
                       logRecord.getEntityUuid(),
                       logRecord.getDataSubscriptionState().getName(),
-                      kafkaConsumerGroup.getTopicName(),
-                      kafkaConsumerGroup.getConsumerGroupName());
-                  statesByDataSubscriptionStateId.put(
-                      logRecord.getEntityUuid(), kafkaConsumerGroup);
-                  statesByInternalId.put(kafkaConsumerGroup.getInternalId(), kafkaConsumerGroup);
-                },
-                () ->
-                    LOG.warn(
-                        "Could not map DataSubscriptionState '{}/{}' from Logistics because of missing properties to match against a topic/consumerGroup. Got properties: {}.",
-                        logRecord.getEntityUuid(),
-                        logRecord.getDataSubscriptionState().getName(),
-                        logRecord.getDataSubscriptionState().getPropertiesMap()));
+                      logRecord.getDataSubscriptionState().getPropertiesMap()));
 
-      } else if (logRecord.getAction() == StateChangeAction.Type.DELETED) {
-        KafkaConsumerGroup kafkaConsumerGroup =
-            statesByDataSubscriptionStateId.get(logRecord.getEntityUuid());
-        if (kafkaConsumerGroup != null) {
-          statesByInternalId.remove(kafkaConsumerGroup.getInternalId());
-        }
-        statesByDataSubscriptionStateId.remove(logRecord.getEntityUuid());
-      }
+    } else if (logRecord.getAction() == StateChangeAction.Type.DELETED) {
+      KafkaConsumerGroup kafkaConsumerGroup =
+          statesByDataSubscriptionStateId.get(logRecord.getEntityUuid());
+      delete(kafkaConsumerGroup);
     }
+  }
+
+  public void clear(){
+    statesByInternalId.clear();
+    statesByDataSubscriptionStateId.clear();
   }
 }

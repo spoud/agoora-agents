@@ -56,6 +56,8 @@ class DataServiceTest extends AbstractService {
   @AfterEach
   void tearDown() {
     kafkaUtils.cleanup();
+    kafkaTopicRepository.clear();
+    kafkaConsumerGroupRepository.clear();
   }
 
   @Test

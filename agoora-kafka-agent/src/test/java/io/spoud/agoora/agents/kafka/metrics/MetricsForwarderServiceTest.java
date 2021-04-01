@@ -45,8 +45,8 @@ class MetricsForwarderServiceTest {
 
   @AfterEach
   void tearDown() {
-    kafkaTopicRepository.getStates().forEach(kafkaTopicRepository::delete);
-    kafkaConsumerGroupRepository.getStates().forEach(kafkaConsumerGroupRepository::delete);
+    kafkaTopicRepository.clear();
+    kafkaConsumerGroupRepository.clear();
   }
 
   @Test
