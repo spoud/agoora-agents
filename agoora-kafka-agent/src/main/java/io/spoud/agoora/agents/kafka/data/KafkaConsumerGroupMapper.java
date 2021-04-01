@@ -20,7 +20,7 @@ public class KafkaConsumerGroupMapper {
   }
 
   public static Optional<String> getConsumerGroupName(Map<String, String> properties) {
-    return Optional.ofNullable(properties.get(Constants.SDM_PROPERTIES_KAFKA_CONSUMER_GROUP));
+    return Optional.ofNullable(properties.get(Constants.AGOORA_PROPERTIES_KAFKA_CONSUMER_GROUP));
   }
 
   public KafkaConsumerGroup create(final String consumerGroupName, final String topicName) {
@@ -36,9 +36,9 @@ public class KafkaConsumerGroupMapper {
                 + consumerGroupName)
         .properties(
             Map.of(
-                Constants.SDM_PROPERTIES_KAFKA_TOPIC,
+                Constants.AGOORA_PROPERTIES_KAFKA_TOPIC,
                 topicName,
-                Constants.SDM_PROPERTIES_KAFKA_CONSUMER_GROUP,
+                Constants.AGOORA_PROPERTIES_KAFKA_CONSUMER_GROUP,
                 consumerGroupName))
         .build();
   }

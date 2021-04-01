@@ -55,7 +55,7 @@ public class LogisticsService {
                                                   .setIdPath(logisticsRefService.getTransportRef())
                                                   .build())
                                           .putProperties(
-                                              Constants.SDM_PROPERTIES_KAFKA_TOPIC,
+                                              Constants.AGOORA_PROPERTIES_KAFKA_TOPIC,
                                               dataPort.getTopicName())
                                           .build())
                                   .build())
@@ -108,10 +108,10 @@ public class LogisticsService {
                                                   .setIdPath(logisticsRefService.getTransportRef())
                                                   .build())
                                           .putProperties(
-                                              Constants.SDM_PROPERTIES_KAFKA_TOPIC,
+                                              Constants.AGOORA_PROPERTIES_KAFKA_TOPIC,
                                               dataSubscriptionState.getTopicName())
                                           .putProperties(
-                                              Constants.SDM_PROPERTIES_KAFKA_CONSUMER_GROUP,
+                                              Constants.AGOORA_PROPERTIES_KAFKA_CONSUMER_GROUP,
                                               dataSubscriptionState.getConsumerGroupName())
                                           .build())
                                   .build())
@@ -135,7 +135,7 @@ public class LogisticsService {
                                                   .setIdPath(logisticsRefService.getTransportRef())
                                                   .build())
                                           .putProperties(
-                                              Constants.SDM_PROPERTIES_KAFKA_TOPIC,
+                                              Constants.AGOORA_PROPERTIES_KAFKA_TOPIC,
                                               dataSubscriptionState.getTopicName()))
                                   .build())
                           .setProperties(

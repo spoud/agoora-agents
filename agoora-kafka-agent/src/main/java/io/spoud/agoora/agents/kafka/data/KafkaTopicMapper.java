@@ -21,7 +21,7 @@ public class KafkaTopicMapper {
 
   public static Optional<String> getTopicName(Map<String, String> properties) {
     return Optional.ofNullable(
-        properties.get(Constants.SDM_PROPERTIES_KAFKA_TOPIC));
+        properties.get(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC));
   }
 
   public KafkaTopic create(final String topicName, int partitionCount) {
@@ -30,9 +30,9 @@ public class KafkaTopicMapper {
         .transportUrl("kafka://" + bootstrapServers + "?topic=" + topicName)
         .properties(
             Map.of(
-                    Constants.SDM_PROPERTIES_KAFKA_TOPIC,
+                    Constants.AGOORA_PROPERTIES_KAFKA_TOPIC,
                 topicName,
-                    Constants.SDM_PROPERTIES_KAFKA_TOPIC_PARTITON_COUNT,
+                    Constants.AGOORA_PROPERTIES_KAFKA_TOPIC_PARTITON_COUNT,
                 String.valueOf(partitionCount)))
         .build();
   }

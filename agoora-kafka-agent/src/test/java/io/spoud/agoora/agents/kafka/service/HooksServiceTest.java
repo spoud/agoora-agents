@@ -55,13 +55,13 @@ class HooksServiceTest {
                 port1,
                 "port1",
                 "/path/",
-                Map.of(Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic1")),
+                Map.of(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic1")),
             HooksClientMockProvider.generateDataPortLogRecord(
                 StateChangeAction.Type.UPDATED,
                 port2,
                 "port2",
                 "/path/",
-                Map.of(Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic2")),
+                Map.of(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic2")),
             HooksClientMockProvider.generateDataSubscriptionStateLogRecord(
                 StateChangeAction.Type.UPDATED,
                 sub1,
@@ -69,8 +69,8 @@ class HooksServiceTest {
                 "sub1",
                 "/path/",
                 Map.of(
-                    Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic2",
-                    Constants.SDM_PROPERTIES_KAFKA_CONSUMER_GROUP, "group1")),
+                    Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic2",
+                    Constants.AGOORA_PROPERTIES_KAFKA_CONSUMER_GROUP, "group1")),
             HooksClientMockProvider.generateDataSubscriptionStateLogRecord(
                 StateChangeAction.Type.UPDATED,
                 sub2,
@@ -78,8 +78,8 @@ class HooksServiceTest {
                 "sub2",
                 "/path/",
                 Map.of(
-                    Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic2",
-                    Constants.SDM_PROPERTIES_KAFKA_CONSUMER_GROUP, "group2")),
+                    Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic2",
+                    Constants.AGOORA_PROPERTIES_KAFKA_CONSUMER_GROUP, "group2")),
             HooksClientMockProvider.generateDataSubscriptionStateLogRecord(
                 StateChangeAction.Type.DELETED,
                 sub2,
@@ -87,26 +87,26 @@ class HooksServiceTest {
                 "sub2",
                 "/path/",
                 Map.of(
-                    Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic2",
-                    Constants.SDM_PROPERTIES_KAFKA_CONSUMER_GROUP, "group2")),
+                    Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic2",
+                    Constants.AGOORA_PROPERTIES_KAFKA_CONSUMER_GROUP, "group2")),
             HooksClientMockProvider.generateDataPortLogRecord(
                 StateChangeAction.Type.UPDATED,
                 port2,
                 "port2-edited",
                 "/path/",
-                Map.of(Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic2")),
+                Map.of(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic2")),
             HooksClientMockProvider.generateDataPortLogRecord(
                 StateChangeAction.Type.DELETED,
                 port1,
                 "port1",
                 "/path/",
-                Map.of(Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic1")),
+                Map.of(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic1")),
             HooksClientMockProvider.generateDataPortLogRecord(
                 StateChangeAction.Type.UPDATED,
                 port3,
                 "port3",
                 "/path/",
-                Map.of(Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic3")));
+                Map.of(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic3")));
     HooksClientMockProvider.withLogRecord(hooksClient, records);
     hooksService.startListeningToHooks();
 
@@ -136,7 +136,7 @@ class HooksServiceTest {
                 UUID.randomUUID().toString(),
                 "port1",
                 "/path/",
-                Map.of(Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic1")),
+                Map.of(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic1")),
             HooksClientMockProvider.generateDataPortLogRecord(
                 StateChangeAction.Type.UPDATED, UUID.randomUUID().toString(), "port2", "/path/"));
     HooksClientMockProvider.withLogRecord(hooksClient, records);
@@ -161,15 +161,15 @@ class HooksServiceTest {
                 "sub1",
                 "/path/",
                 Map.of(
-                    Constants.SDM_PROPERTIES_KAFKA_CONSUMER_GROUP, "group1",
-                    Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic1")),
+                    Constants.AGOORA_PROPERTIES_KAFKA_CONSUMER_GROUP, "group1",
+                    Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic1")),
             HooksClientMockProvider.generateDataSubscriptionStateLogRecord(
                 StateChangeAction.Type.UPDATED,
                 UUID.randomUUID().toString(),
                 dataPortId,
                 "port2",
                 "/path/",
-                Map.of(Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic1")));
+                Map.of(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic1")));
     HooksClientMockProvider.withLogRecord(hooksClient, records);
     hooksService.startListeningToHooks();
 
@@ -186,7 +186,7 @@ class HooksServiceTest {
                 dataPortId,
                 "port1",
                 "/path/",
-                Map.of(Constants.SDM_PROPERTIES_KAFKA_TOPIC, "topic1")),
+                Map.of(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "topic1")),
             HooksClientMockProvider.generateDataSubscriptionStateLogRecord(
                 StateChangeAction.Type.UPDATED,
                 UUID.randomUUID().toString(),
@@ -194,9 +194,9 @@ class HooksServiceTest {
                 "port2",
                 "/path/",
                 Map.of(
-                    Constants.SDM_PROPERTIES_KAFKA_CONSUMER_GROUP,
+                    Constants.AGOORA_PROPERTIES_KAFKA_CONSUMER_GROUP,
                     "group1",
-                    Constants.SDM_PROPERTIES_KAFKA_TOPIC,
+                    Constants.AGOORA_PROPERTIES_KAFKA_TOPIC,
                     "topic1")),
             LogRecord.newBuilder().setEntityType(ResourceEntity.Type.CHECKPOINT).build(),
             LogRecord.newBuilder().setEntityType(ResourceEntity.Type.DATA_ITEM).build(),
