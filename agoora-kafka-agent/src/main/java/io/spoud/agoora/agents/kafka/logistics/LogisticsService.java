@@ -196,6 +196,10 @@ public class LogisticsService {
 
   public Optional<DataSubscriptionState> deleteDataSubscriptionState(
       final KafkaConsumerGroup dataSubscriptionState) {
+    if (dataSubscriptionState.getDataSubscriptionStateId() == null) {
+      throw new IllegalStateException(
+          "Got a KafkaConsumerGroup without a dataSubscriptionStateId.");
+    }
     LOG.debug(
         "Inactivating data subscription state name {}",
         dataSubscriptionState.getConsumerGroupName());

@@ -47,17 +47,29 @@ public class ProfilerService {
         .filter(topic -> topic.getDataPortId() != null)
         .forEach(
             kafkaTopic -> {
-              try{
-              List<byte[]> samples = kafkaTopicReader.getSamples(kafkaTopic.getTopicName());
-              if (!samples.isEmpty()) {
+              try {
+                List<byte[]> samples = kafkaTopicReader.getSamples(kafkaTopic.getTopicName());
 
                 samples = decodeMessages(kafkaTopic, samples);
 
                 profileSamples(kafkaTopic, samples);
-              }
-              }catch (Exception ex){
-                LOG.error("Unable to profile topic '{}', skipping. Enable debug for full stacktrace: {}", kafkaTopic.getTopicName(), ex.getMessage());
+              } catch (Exception ex) {
+                LOG.error(
+                    "Unable to profile topic '{}', skipping. Enable debug for full stacktrace: {}",
+                    kafkaTopic.getTopicName(),
+                    ex.getMessage());
                 LOG.error("Unable to profile topic '{}'", kafkaTopic.getTopicName(), ex);
+
+                lookerClient.addDataProfile(
+                    AddDataProfileRequest.newBuilder()
+                        .setEntityRef(getEntityRef(kafkaTopic))
+                        .setReportTimestamp(StandardProtoMapper.timestamp(Instant.now()))
+                        .setError(
+                            DataProfilingError.newBuilder()
+                                .setType(DataProfilingError.Type.UNKNOWN_ENCODING)
+                                .setMessage(ex.getMessage())
+                                .build())
+                        .build());
               }
             });
   }
@@ -79,11 +91,7 @@ public class ProfilerService {
           AddDataProfileRequest.newBuilder()
               .setDataSamplesCount(samples.size())
               .setReportTimestamp(StandardProtoMapper.timestamp(start))
-              .setEntityRef(
-                  EntityRef.newBuilder()
-                      .setEntityType(ResourceEntity.Type.DATA_PORT)
-                      .setId(kafkaTopic.getDataPortId())
-                      .build());
+              .setEntityRef(getEntityRef(kafkaTopic));
 
       if (samples.isEmpty()) {
         LOG.warn("No data for topic {}", kafkaTopic);
@@ -138,14 +146,16 @@ public class ProfilerService {
         Duration.between(start, Instant.now()));
   }
 
-  private void uploadSchema(
+  private EntityRef getEntityRef(KafkaTopic kafkaTopic) {
+    return EntityRef.newBuilder()
+        .setEntityType(ResourceEntity.Type.DATA_PORT)
+        .setId(kafkaTopic.getDataPortId())
+        .build();
+  }
+
+  protected void uploadSchema(
       KafkaTopic kafkaTopic, ProfileResponseObserver.ProfilerResponse profileResponse) {
-    String schemaContent = null;
-    if (profileResponse.getSchema() != null) {
-      schemaContent = profileResponse.getSchema();
-    } else if (profileResponse.getMeta() != null && profileResponse.getMeta().getSchema() != null) {
-      schemaContent = profileResponse.getMeta().getSchema();
-    }
+    String schemaContent = profileResponse.getSchema();
     if (schemaContent != null) {
       try {
         String schemaId =

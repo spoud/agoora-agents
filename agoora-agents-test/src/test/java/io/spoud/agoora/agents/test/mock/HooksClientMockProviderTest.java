@@ -24,12 +24,19 @@ class HooksClientMockProviderTest {
 
   @Test
   void testClient() {
-
-    final String resourceId = UUID.randomUUID().toString();
+    final String dataPortId = UUID.randomUUID().toString();
+    final String dataSubscriptionStateId = UUID.randomUUID().toString();
     List<LogRecord> initialList =
         Arrays.asList(
             HooksClientMockProvider.generateDataPortLogRecord(
-                StateChangeAction.Type.UPDATED, resourceId, "name", "/path/", Map.of()));
+                StateChangeAction.Type.UPDATED, dataPortId, "name", "/path/", Map.of()),
+            HooksClientMockProvider.generateDataSubscriptionStateLogRecord(
+                StateChangeAction.Type.UPDATED,
+                dataSubscriptionStateId,
+                dataPortId,
+                "name",
+                "/path/",
+                Map.of()));
 
     List<LogRecord> consumerRecord = new ArrayList<>();
     final Consumer<LogRecord> consumer = consumerRecord::add;
@@ -48,6 +55,6 @@ class HooksClientMockProviderTest {
     assertThat(hooksClient.startListening(consumer, filter)).isNotNull();
 
     // we register 3 times, we got 3 times the messages
-    assertThat(consumerRecord).hasSize(3).containsOnly(initialList.toArray(new LogRecord[0]));
+    assertThat(consumerRecord).hasSize(6).containsOnly(initialList.toArray(new LogRecord[0]));
   }
 }
