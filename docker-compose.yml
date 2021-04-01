@@ -14,6 +14,23 @@ services:
     environment:
       - "AGOORA_PROFILER_ENDPOINT=agoora-profiler-service:8089"
 
+  kafka-agent:
+    image: spoud/agoora-kafka-agent
+    build:
+      context: agoora-kafka-agent
+    environment:
+      - "AGOORA_PROFILER_ENDPOINT=agoora-profiler-service:8089"
+      - "AGOORA_ENDPOINT"
+      - "AGOORA_INSECURE"
+      - "AGOORA_TRANSPORT_PATH"
+      - "AGOORA_AUTH_USER_NAME"
+      - "AGOORA_AUTH_USER_TOKEN"
+      - "AGOORA_KAFKA_BOOTSTRAP_SERVERS"
+      - "AGOORA_SCRAPPER_PERIOD=PT2M"
+    extra_hosts:
+      - "local.spoud.io:172.17.0.1"
+      - "kafka:172.17.0.1"
+
   mqtt-agent:
     image: spoud/agoora-mqtt-agent
     build:
