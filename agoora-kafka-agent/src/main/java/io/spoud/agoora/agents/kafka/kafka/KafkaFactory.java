@@ -66,9 +66,9 @@ public class KafkaFactory {
       props.put(
           "sasl.jaas.config",
           "org.apache.kafka.common.security.plain.PlainLoginModule   required username=\""
-              + kafkaConfig.getLoginKey().orElse("")
+              + kafkaConfig.getKey().orElse("")
               + "\"   password=\""
-              + kafkaConfig.getLoginSecret().orElse("")
+              + kafkaConfig.getSecret().orElse("")
               + "\";");
       props.put("ssl.endpoint.identification.algorithm", "https");
       props.put("sasl.mechanism", "PLAIN");
