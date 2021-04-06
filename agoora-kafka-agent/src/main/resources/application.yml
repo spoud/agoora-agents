@@ -64,6 +64,9 @@ agoora:
     insecure: true
 
 quarkus:
+  reactive-messaging:
+    health:
+      enabled: false
   arc:
     # Needed for the grpc interceptors
     remove-unused-beans: fwk
@@ -107,3 +110,26 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
       category:
         "io.spoud.agoora":
           level: DEBUG
+
+"%ccloud":
+  agoora:
+    registry:
+      confluent:
+        url: https://XXXXX.europe-west3.gcp.confluent.cloud
+        api-key: schema-registry-user
+        api-secret: schema-registry-password
+    kafka:
+      bootstrap-servers: XXXXXX.europe-west3.gcp.confluent.cloud:9092
+      key: kafka-key
+      secret: kafka-secret
+
+      security:
+        protocol: SASL_SSL
+      sasl:
+        mechanism: PLAIN
+        jaas:
+          config: org.apache.kafka.common.security.plain.PlainLoginModule   required username="${sdm.kafka.key}"   password="${sdm.kafka.secret}";
+      ssl:
+        endpoint:
+          identification:
+            algorithm: https
