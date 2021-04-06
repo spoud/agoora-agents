@@ -22,8 +22,8 @@
 
         <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <quarkus-plugin.version>1.12.2.Final</quarkus-plugin.version>
-        <quarkus.platform.version>1.12.2.Final</quarkus.platform.version>
+        <quarkus-plugin.version>1.13.0.Final</quarkus-plugin.version>
+        <quarkus.platform.version>1.13.0.Final</quarkus.platform.version>
 
         <sonar.projectKey>spoud_${project.artifactId}</sonar.projectKey>
         <sonar.organization>spoud</sonar.organization>
@@ -31,6 +31,7 @@
         <sonar.coverage.exclusions>
             **/*Reflection.*,
             **/*Configuration.*,
+            **/*CronService.*,
         </sonar.coverage.exclusions>
 
         <lombok.version>1.18.18</lombok.version>
@@ -49,6 +50,7 @@
     <modules>
         <module>agoora-agents-api</module>
         <module>agoora-agents-test</module>
+        <module>agoora-kafka-agent</module>
         <module>agoora-mqtt-agent</module>
         <module>agoora-openapi-agent</module>
         <module>agoora-pgsql-agent</module>
@@ -138,13 +140,19 @@
                 <version>${test-container.version}</version>
                 <scope>test</scope>
             </dependency>
-                        <dependency>
-                            <groupId>org.jacoco</groupId>
-                            <artifactId>org.jacoco.agent</artifactId>
-                            <classifier>runtime</classifier>
-                            <scope>test</scope>
-                            <version>${jacoco.version}</version>
-                        </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>kafka</artifactId>
+                <version>${test-container.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.agent</artifactId>
+                <classifier>runtime</classifier>
+                <scope>test</scope>
+                <version>${jacoco.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -278,7 +286,6 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 

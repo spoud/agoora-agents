@@ -13,12 +13,14 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @UtilityClass
 public class SchemaClientMockProvider {
 
   public static void defaultMock(SchemaClient mock) {
+    reset(mock);
     when(mock.saveSchema(any(), any(), any(), any(), any(), any()))
         .thenAnswer(
             a -> {

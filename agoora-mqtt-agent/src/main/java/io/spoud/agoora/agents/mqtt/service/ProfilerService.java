@@ -32,7 +32,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-
 @Slf4j
 @ApplicationScoped
 @RequiredArgsConstructor
@@ -89,13 +88,13 @@ public class ProfilerService {
                       .build());
 
       if (sampleBytes.isEmpty()) {
-        LOG.warn("No data for table {}", topicName);
+        LOG.warn("No data for topic {}", topicName);
         dataProfileRequest.setError(
             DataProfilingError.newBuilder()
                 .setType(DataProfilingError.Type.NO_DATA)
                 .buildPartial());
       } else {
-        LOG.debug("Profiling some samples of table {}: {}", topicName, sampleBytes.size());
+        LOG.debug("Profiling some samples of topic {}: {}", topicName, sampleBytes.size());
 
         final ProfileResponseObserver.ProfilerResponse profilerResponse =
             profilerClient.profileData(requestId, sampleBytes);
@@ -118,7 +117,7 @@ public class ProfilerService {
           // take care of profiler result
           String html = profilerResponse.getHtml();
 
-          LOG.debug("Profile received for table {}: {}bytes", topicName, html.length());
+          LOG.debug("Profile received for topic {}: {}bytes", topicName, html.length());
           String htmlId =
               blobClient.uploadBlobUtf8(
                   html,
@@ -131,7 +130,7 @@ public class ProfilerService {
       }
       lookerClient.addDataProfile(dataProfileRequest.build());
     } catch (Exception ex) {
-      LOG.error("Unable to send samples for table {}", topicName, ex);
+      LOG.error("Unable to send samples for topic {}", topicName, ex);
     }
     LOG.info(
         "Processing of data port {} for topic {} with {} samples took {}",

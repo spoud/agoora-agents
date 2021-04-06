@@ -1,0 +1,4 @@
+{
+  "schema": "{\n  \"type\": \"record\",\n  \"name\": \"IssPositionMessage\",\n  \"namespace\": \"data.producer.iss\",\n  \"fields\": [\n    {\n      \"name\": \"iss_position\",\n      \"type\": {\n        \"type\": \"record\",\n        \"name\": \"IssPosition\",\n        \"fields\": [\n          {\n            \"name\": \"longitude\",\n            \"type\": \"string\"\n          },\n          {\n            \"name\": \"latitude\",\n            \"type\": \"string\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"message\",\n      \"type\": [\n        \"string\",\n        \"null\"\n      ]\n    },\n    {\n      \"name\": \"timestamp\",\n      \"type\": \"long\"\n    }\n  ]\n}\n",
+  "schemaType": "AVRO"
+}

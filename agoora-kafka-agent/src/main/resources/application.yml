@@ -1,0 +1,112 @@
+agoora-endpoint: local.spoud.io
+agoora-insecure: false
+agoora-cluster: default
+agoora-transport-path: /default/kafka
+
+agoora:
+  # The scrapper is not on 100% of the time. It start listening every {period} for a maximum of {max-samples} messages and {max-wait}
+  scrapper:
+    max-samples: 100
+    period: PT15M
+    profiling:
+      enabled: true
+    hooks:
+      enabled: true
+  kafka:
+    topic-filter-regex: .+
+    consumer-group-filter-regex: .+
+    bootstrap-servers: kafka:9092
+    protocol: PLAINTEXT
+    key-store-location:
+    key-store-password:
+    trust-store-location:
+    trust-store-password:
+  registry:
+    confluent:
+      url:
+      api-key:
+      api-secret:
+      public-url:
+  property-templates:
+    kafka-topic:
+    kafka-consumer-group:
+  transport:
+    agoora-path: ${agoora-transport-path}
+  auth:
+    server-url: https://${agoora-endpoint}/auth/
+    cluster: ${agoora-cluster}
+    realm: spoud
+    user:
+      name: to-be-defined
+      token: to-be-defined
+  logistics:
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
+  hooks:
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
+  schema:
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
+  looker:
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
+  blob:
+    endpoint: ${agoora-endpoint}
+    cluster: ${agoora-cluster}
+    insecure: ${agoora-insecure}
+  profiler:
+    endpoint: localhost:8089
+    insecure: true
+
+quarkus:
+  reactive-messaging:
+    health:
+      enabled: false
+  arc:
+    # Needed for the grpc interceptors
+    remove-unused-beans: fwk
+  http:
+    port: 8280
+  ssl:
+    native: true
+  native:
+    additional-build-args:
+      - --allow-incomplete-classpath
+      - --report-unsupported-elements-at-runtime
+  log:
+    category:
+      "io.spoud.agoora":
+        level: INFO
+      "org.apache.kafka":
+        level: WARN
+
+rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
+
+"%dev":
+  agoora-endpoint: local.spoud.io
+  agoora-insecure: true
+  agoora-cluster: default
+  agoora-transport-path: /default/kafka/kafka
+  agoora:
+    scrapper:
+      max-samples: 10
+      period: 2M
+    auth:
+      server-url: http://${agoora-endpoint}/auth/
+      user:
+        name: sdm_t_338908ea-30f7-4b73-aff9-7b2a08ccac7f
+        token: utQmxZZWC56aFfTrD8cTZSewPA574uTC
+    registry:
+      confluent:
+        url: http://kafka:8081
+
+  quarkus:
+    log:
+      category:
+        "io.spoud.agoora":
+          level: DEBUG

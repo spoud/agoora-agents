@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @UtilityClass
@@ -16,6 +17,7 @@ public class ProfilerClientMockProvider {
   public static final String SCHEMA = "Whatever";
 
   public static void defaultMock(ProfilerClient mock) {
+    reset(mock);
     when(mock.profileData(any(), any()))
         .thenReturn(
             ProfileResponseObserver.ProfilerResponse.builder()

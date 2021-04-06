@@ -1,0 +1,7 @@
+{
+  "schema": "{\n  \"type\": \"record\",\n  \"name\": \"RandomData\",\n  \"namespace\": \"data.producer.random\",\n  \"fields\": [\n    {\n      \"name\": \"random_string\",\n      \"type\": \"string\"\n    },\n    {\n      \"name\": \"random_integer\",\n      \"type\": \"int\"\n    },\n    {\n      \"name\": \"random_float\",\n      \"type\": \"float\"\n    },\n    {\n      \"name\": \"random_boolean\",\n      \"type\": \"boolean\"\n    }\n  ]\n}",
+  "schemaType": "AVRO"
+}
+
+
+
