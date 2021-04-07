@@ -7,6 +7,7 @@ import io.spoud.agoora.agents.api.client.DataSubscriptionStateClient;
 import io.spoud.agoora.agents.kafka.Constants;
 import io.spoud.agoora.agents.kafka.data.KafkaConsumerGroup;
 import io.spoud.agoora.agents.kafka.data.KafkaTopic;
+import io.spoud.agoora.agents.kafka.service.PropertyTemplateService;
 import io.spoud.sdm.global.selection.v1.BaseRef;
 import io.spoud.sdm.global.selection.v1.IdPathRef;
 import io.spoud.sdm.logistics.domain.v1.DataPort;
@@ -25,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -35,10 +38,16 @@ public class LogisticsService {
   private final DataPortClient dataPortClient;
   private final DataSubscriptionStateClient dataSubscriptionStateClient;
   private final LogisticsRefService logisticsRefService;
+  private final PropertyTemplateService propertyTemplateService;
 
   public Optional<DataPort> updateDataPort(final KafkaTopic dataPort) {
     String topicName = dataPort.getTopicName();
     LOG.debug("Updating data offer state with topic name {}", topicName);
+
+    Map<String, String> properties = new HashMap<>();
+    properties.putAll(dataPort.getProperties());
+    properties.putAll(propertyTemplateService.mapExternalPropertiesForTopic(dataPort));
+
     final DataPort saved;
     try {
       saved =
@@ -68,7 +77,7 @@ public class LogisticsService {
                                   .setIdPath(logisticsRefService.getResourceGroupRef())
                                   .build())
                           .setProperties(
-                              PropertyMap.newBuilder().putAllProperties(dataPort.getProperties()))
+                              PropertyMap.newBuilder().putAllProperties(properties))
                           .setState(StateChange.AVAILABLE)
                           .build())
                   .build());
@@ -86,12 +95,19 @@ public class LogisticsService {
 
   public Optional<DataSubscriptionState> updateDataSubscriptionState(
       final KafkaConsumerGroup dataSubscriptionState) {
+
     String topicName = dataSubscriptionState.getTopicName();
     String consumerGroupName = dataSubscriptionState.getConsumerGroupName();
     LOG.debug(
         "Updating data subscription state for consumer group {} and topic name {}.",
         consumerGroupName,
         topicName);
+
+    Map<String, String> properties = new HashMap<>();
+    properties.putAll(dataSubscriptionState.getProperties());
+    properties.putAll(
+        propertyTemplateService.mapExternalPropertiesForConsumerGroup(dataSubscriptionState));
+
     final DataSubscriptionState saved;
     try {
       saved =
@@ -138,9 +154,7 @@ public class LogisticsService {
                                               Constants.AGOORA_PROPERTIES_KAFKA_TOPIC,
                                               dataSubscriptionState.getTopicName()))
                                   .build())
-                          .setProperties(
-                              PropertyMap.newBuilder()
-                                  .putAllProperties(dataSubscriptionState.getProperties()))
+                          .setProperties(PropertyMap.newBuilder().putAllProperties(properties))
                           .setState(StateChange.AVAILABLE)
                           .build())
                   .build());

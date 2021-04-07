@@ -1,6 +1,9 @@
 package io.spoud.agoora.agents.kafka.service;
 
 import io.quarkus.runtime.StartupEvent;
+import io.spoud.agoora.agents.kafka.Constants;
+import io.spoud.agoora.agents.kafka.data.KafkaConsumerGroup;
+import io.spoud.agoora.agents.kafka.data.KafkaTopic;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.Config;
@@ -10,6 +13,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -22,8 +26,8 @@ public class PropertyTemplateService {
   public static final String AGOORA_PROPERTY_TEMPLATES_KAFKA_CONSUMER_GROUP =
       "agoora.property-templates.kafka-consumer-group";
 
-  @Getter private Map<String, String> kafkaTopic = new HashMap<>();
-  @Getter private Map<String, String> kafkaConsumerGroup = new HashMap<>();
+  @Getter private Map<String, String> kafkaTopicProperties = new HashMap<>();
+  @Getter private Map<String, String> kafkaConsumerGroupProperties = new HashMap<>();
 
   public static Map<String, String> getMapFromConfig(String prefix) {
     final Config config = ConfigProvider.getConfig();
@@ -45,9 +49,46 @@ public class PropertyTemplateService {
   }
 
   void onStartup(@Observes StartupEvent event) {
-    kafkaTopic = getMapFromConfig(AGOORA_PROPERTY_TEMPLATES_KAFKA_TOPIC);
-    kafkaConsumerGroup = getMapFromConfig(AGOORA_PROPERTY_TEMPLATES_KAFKA_CONSUMER_GROUP);
+    kafkaTopicProperties = getMapFromConfig(AGOORA_PROPERTY_TEMPLATES_KAFKA_TOPIC);
+    kafkaConsumerGroupProperties = getMapFromConfig(AGOORA_PROPERTY_TEMPLATES_KAFKA_CONSUMER_GROUP);
 
-    LOG.info("Properties: {} \n {}", kafkaTopic, kafkaConsumerGroup);
+    LOG.info("Properties: {} \n {}", kafkaTopicProperties, kafkaConsumerGroupProperties);
+  }
+
+  public Map<String, String> mapExternalPropertiesForTopic(KafkaTopic kafkaTopic) {
+    Map<String, String> properties = new HashMap<>();
+    kafkaTopicProperties.forEach(
+        (k, v) -> {
+          String value =
+              v.replaceAll(
+                      Pattern.quote(Constants.SDM_TEMPLATE_KAFKA_TOPIC), kafkaTopic.getTopicName())
+                  .replaceAll(
+                      Pattern.quote(Constants.SDM_TEMPLATE_RESOURCE_ID),
+                      kafkaTopic.getDataPortId() != null ? kafkaTopic.getDataPortId() : "");
+          properties.put(Constants.AGOORA_EXTERNAL_PROPERTIES_PREFIX + k, value);
+        });
+    return properties;
+  }
+
+  public Map<String, String> mapExternalPropertiesForConsumerGroup(
+      KafkaConsumerGroup kafkaConsumerGroup) {
+    var properties = new HashMap<String, String>();
+    kafkaConsumerGroupProperties.forEach(
+        (k, v) -> {
+          String value =
+              v.replaceAll(
+                      Pattern.quote(Constants.SDM_TEMPLATE_KAFKA_TOPIC),
+                      kafkaConsumerGroup.getTopicName())
+                  .replaceAll(
+                      Pattern.quote(Constants.SDM_TEMPLATE_KAFKA_CONSUMER_GROUP),
+                      kafkaConsumerGroup.getConsumerGroupName())
+                  .replaceAll(
+                      Pattern.quote(Constants.SDM_TEMPLATE_RESOURCE_ID),
+                      kafkaConsumerGroup.getDataSubscriptionStateId() != null
+                          ? kafkaConsumerGroup.getDataSubscriptionStateId()
+                          : "");
+          properties.put(Constants.AGOORA_EXTERNAL_PROPERTIES_PREFIX + k, value);
+        });
+    return properties;
   }
 }
