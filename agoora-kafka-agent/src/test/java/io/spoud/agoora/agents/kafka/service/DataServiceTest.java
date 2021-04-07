@@ -30,6 +30,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -63,7 +65,8 @@ class DataServiceTest extends AbstractService {
   @Test
   @Timeout(30)
   void testDataPorts() {
-    kafkaTopicRepository.save(KafkaTopic.builder().dataPortId("abc").topicName("data-topicX").build());
+    kafkaTopicRepository.save(
+        KafkaTopic.builder().dataPortId("to-remove-abc").topicName("data-topicX").build());
 
     adminClient.createTopics(
         Arrays.asList(
@@ -95,7 +98,7 @@ class DataServiceTest extends AbstractService {
 
     final SaveDataPortRequest topicXRequest =
         requests.stream()
-            .filter(r -> r.getInput().getLabel().getValue().equals(""))
+            .filter(r -> r.getInput().getSelf().getIdPath().getId().equals("to-remove-abc"))
             .findAny()
             .get();
     assertThat(topicXRequest.getInput().getState()).isEqualTo(StateChange.DELETED);
@@ -104,10 +107,11 @@ class DataServiceTest extends AbstractService {
   @Test
   @Timeout(30)
   void testDataSubscriptionState() {
-    kafkaTopicRepository.save(KafkaTopic.builder().dataPortId("abc").topicName("data-topic1").build());
+    kafkaTopicRepository.save(
+        KafkaTopic.builder().dataPortId("abc").topicName("data-topic1").build());
     kafkaConsumerGroupRepository.save(
         KafkaConsumerGroup.builder()
-            .dataSubscriptionStateId("subId")
+            .dataSubscriptionStateId("to-delete-subId")
             .consumerGroupName("groupX")
             .dataPortId("abc")
             .topicName("data-topic1")
@@ -131,25 +135,35 @@ class DataServiceTest extends AbstractService {
             });
 
     // 2 groups but will result in 3 data subscription state
-    assertThat(kafkaUtils.consume("data-topic1", "group1", 10, Duration.ofSeconds(10))).hasSize(10);
-    assertThat(kafkaUtils.consume("data-topic2", "group1", 10, Duration.ofSeconds(10))).hasSize(10);
-    assertThat(kafkaUtils.consume("data-topic1", "group2", 10, Duration.ofSeconds(10))).hasSize(10);
+    assertThat(kafkaUtils.consume("data-topic1", "data-group1", 10, Duration.ofSeconds(10)))
+        .hasSize(10);
+    assertThat(kafkaUtils.consume("data-topic2", "data-group1", 10, Duration.ofSeconds(10)))
+        .hasSize(10);
+    assertThat(kafkaUtils.consume("data-topic1", "data-group2", 10, Duration.ofSeconds(10)))
+        .hasSize(10);
 
     dataService.updateConsumerGroups();
 
     ArgumentCaptor<SaveDataSubscriptionStateRequest> captor =
         ArgumentCaptor.forClass(SaveDataSubscriptionStateRequest.class);
-    verify(dataSubscriptionStateClient, timeout(5000).times(4)).save(captor.capture());
+    verify(dataSubscriptionStateClient, timeout(5000).atLeast(4)).save(captor.capture());
 
-    final List<SaveDataSubscriptionStateRequest> requests = captor.getAllValues();
+    final List<SaveDataSubscriptionStateRequest> requests =
+        captor.getAllValues().stream()
+            .filter(req -> req.getInput().getLabel().getValue().startsWith("data-group"))
+            .collect(Collectors.toList());
     assertThat(requests)
         .extracting(SaveDataSubscriptionStateRequest::getInput)
         .extracting(DataSubscriptionStateChange::getLabel)
         .extracting(StringValue::getValue)
-        .containsExactlyInAnyOrder("group1", "group1", "group2", "");
+        .containsExactlyInAnyOrder("data-group1", "data-group1", "data-group2");
 
-    final SaveDataSubscriptionStateRequest groupXRequest =
-        requests.stream().filter(r -> r.getInput().getLabel().getValue().equals("")).findAny().get();
-    assertThat(groupXRequest.getInput().getState()).isEqualTo(StateChange.DELETED);
+    // check deleted entities
+    final Optional<SaveDataSubscriptionStateRequest> deleted =
+        captor.getAllValues().stream()
+            .filter(v -> v.getInput().getState() == StateChange.DELETED)
+            .findFirst();
+    assertThat(deleted).isPresent();
+    assertThat(deleted.get().getInput().getSelf().getIdPath().getId()).isEqualTo("to-delete-subId");
   }
 }
