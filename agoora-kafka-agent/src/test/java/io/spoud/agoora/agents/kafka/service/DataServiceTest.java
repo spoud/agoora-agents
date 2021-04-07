@@ -12,6 +12,8 @@ import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
 import io.spoud.agoora.agents.kafka.utils.KafkaUtils;
 import io.spoud.agoora.agents.test.mock.DataPortClientMockProvider;
 import io.spoud.agoora.agents.test.mock.DataSubscriptionStateClientMockProvider;
+import io.spoud.sdm.logistics.domain.v1.DataPort;
+import io.spoud.sdm.logistics.domain.v1.DataSubscriptionState;
 import io.spoud.sdm.logistics.mutation.v1.StateChange;
 import io.spoud.sdm.logistics.service.v1.DataPortChange;
 import io.spoud.sdm.logistics.service.v1.DataSubscriptionStateChange;
@@ -30,9 +32,11 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
@@ -58,6 +62,7 @@ class DataServiceTest extends AbstractService {
     kafkaUtils.cleanup();
     kafkaTopicRepository.clear();
     kafkaConsumerGroupRepository.clear();
+    reset(dataSubscriptionStateClient);
   }
 
   @Test
@@ -99,11 +104,19 @@ class DataServiceTest extends AbstractService {
             .findAny()
             .get();
     assertThat(topicXRequest.getInput().getState()).isEqualTo(StateChange.DELETED);
+
+    assertThat(captor.getAllValues().get(0).getInput().getProperties().getPropertiesMap())
+            .containsAllEntriesOf(
+                    Map.of(
+                            "sdm.transport.external.kafka.manager.url",
+                            "https://km.sdm.spoud.io/clusters/sdm/topics/data-topic1",
+                            "sdm.transport.external.agoora.url", "https://blabla/"));
   }
 
   @Test
   @Timeout(30)
   void testDataSubscriptionState() {
+
     kafkaTopicRepository.save(KafkaTopic.builder().dataPortId("abc").topicName("data-topic1").build());
     kafkaConsumerGroupRepository.save(
         KafkaConsumerGroup.builder()
@@ -151,5 +164,14 @@ class DataServiceTest extends AbstractService {
     final SaveDataSubscriptionStateRequest groupXRequest =
         requests.stream().filter(r -> r.getInput().getLabel().getValue().equals("")).findAny().get();
     assertThat(groupXRequest.getInput().getState()).isEqualTo(StateChange.DELETED);
+
+
+    assertThat(captor.getAllValues().get(0).getInput().getProperties().getPropertiesMap())
+            .containsAllEntriesOf(
+                    Map.of(
+                            "sdm.transport.external.kafka.manager.url",
+                            "https://km.sdm.spoud.io/clusters/sdm/consumer-group/group2/data-topic1",
+                            "sdm.transport.external.agoora.url", "https://blabla/"));
+
   }
 }
