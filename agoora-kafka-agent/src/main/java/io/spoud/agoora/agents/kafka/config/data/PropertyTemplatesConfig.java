@@ -7,7 +7,6 @@ import java.util.Map;
 
 @Data
 public class PropertyTemplatesConfig {
-
 //  private Map<String, String> kafkaTopic = new HashMap<>();
 //  private Map<String, String> kafkaConsumerGroup = new HashMap<>();
 }

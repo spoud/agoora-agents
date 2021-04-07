@@ -29,6 +29,8 @@ agoora:
       public-url:
   property-templates:
     kafka-topic:
+      "kafka.manager.url": https://km.sdm.spoud.io/clusters/sdm/topics/{TOPIC_NAME}
+      "confluent.url": https://cloud.confluent/topics/{TOPIC_NAME}
     kafka-consumer-group:
   transport:
     agoora-path: ${agoora-transport-path}
@@ -93,6 +95,9 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
   agoora-cluster: default
   agoora-transport-path: /default/kafka/kafka
   agoora:
+    propertyTemplates:
+      kafkaTopic:
+        "kafka.manager.url": https://km.sdm.spoud.io/clusters/sdm/topics/{TOPIC_NAME}
     scrapper:
       max-samples: 10
       period: 2M
