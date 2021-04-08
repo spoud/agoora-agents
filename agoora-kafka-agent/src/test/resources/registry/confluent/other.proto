@@ -1,6 +1,0 @@
-syntax = "proto3";
-package com.acme;
-
-message OtherRecord {
-    int32 other_id = 1;
-}

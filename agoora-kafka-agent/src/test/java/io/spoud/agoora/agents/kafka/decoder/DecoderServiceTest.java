@@ -23,9 +23,9 @@ class DecoderServiceTest {
   public static final String ISS_JSON_VALUE =
       "{\"iss_position\": {\"longitude\": \"-113.0217\", \"latitude\": \"47.4961\"}, \"message\": \"success\", \"timestamp\": 1584691915}";
 
-  @Inject private DecoderService decoderService;
+  @Inject DecoderService decoderService;
 
-  @Inject private SchemaRegistryUtil schemaRegistryUtil;
+  @Inject SchemaRegistryUtil schemaRegistryUtil;
 
   @Test
   void testDecoderOrder() {

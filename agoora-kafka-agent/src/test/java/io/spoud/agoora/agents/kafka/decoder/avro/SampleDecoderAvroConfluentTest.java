@@ -29,9 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @QuarkusTest
 class SampleDecoderAvroConfluentTest extends AbstractService {
 
-  @Inject private SampleDecoderAvroConfluent sampleDecoderConfluent;
+  @Inject SampleDecoderAvroConfluent sampleDecoderConfluent;
 
-  @Inject private SchemaRegistryUtil schemaRegistryUtil;
+  @Inject SchemaRegistryUtil schemaRegistryUtil;
 
   @Test
   public void decodeSchemaId() {
@@ -58,7 +58,7 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
   }
 
   @Test
-  public void testEncodingAndDecoding() throws IOException {
+  public void testEncodingAndDecodingAvro() throws IOException {
     Schema schema = schemaRegistryUtil.getSchemaFromFile("registry/confluent/randomv1.json");
     DatumWriter writer = new GenericDatumWriter<>(schema);
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -77,7 +77,7 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
   }
 
   @Test
-  public void testDecodingReadData() throws DecoderException {
+  public void testDecodingReadDataAvro() throws DecoderException {
     Schema schema = schemaRegistryUtil.getSchemaFromFile("registry/confluent/randomv1.json");
     String hexData = "0000000001146f6270797068777769788e0428848a3c01";
     byte[] bytes = Hex.decodeHex(hexData);
@@ -94,11 +94,13 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
   public void testDecodingEvolutionData() {
     final long v1 =
         schemaRegistryUtil
-            .addSchemaVersion("avro-topic1", KafkaStreamPart.VALUE, "registry/confluent/randomv1.json")
+            .addSchemaVersion(
+                "avro-topic1", KafkaStreamPart.VALUE, "registry/confluent/randomv1.json")
             .getId();
     final long v2 =
         schemaRegistryUtil
-            .addSchemaVersion("avro-topic1", KafkaStreamPart.VALUE, "registry/confluent/randomv2.json")
+            .addSchemaVersion(
+                "avro-topic1", KafkaStreamPart.VALUE, "registry/confluent/randomv2.json")
             .getId();
 
     byte[] bytes = schemaRegistryUtil.getAvroBytes(v1, "146f6270797068777769788e0428848a3c01");
@@ -122,7 +124,7 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
 
   @Test
   void testParseWrongSchema() {
-    assertThat(sampleDecoderConfluent.parseSchema("blababa")).isEmpty();
+    assertThat(sampleDecoderConfluent.parseAvroSchema("blababa")).isEmpty();
   }
 
   @Test
@@ -130,6 +132,20 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
     final Schema schema = schemaRegistryUtil.getSchemaFromFile("registry/confluent/randomv1.json");
     final byte[] bytes = schemaRegistryUtil.getAvroBytes(1, "4654654986416544");
     assertThat(sampleDecoderConfluent.decodeAvro(bytes, schema)).isNull();
+  }
+
+  @Test
+  void testDecodingProtobuf() {
+    schemaRegistryUtil.addSchemaVersion("other.proto", null, "registry/confluent/proto-other.json");
+    schemaRegistryUtil.addSchemaVersion(
+        "protobuf-topic1", KafkaStreamPart.VALUE, "registry/confluent/proto-record.json");
+
+    final byte[] bytes = schemaRegistryUtil.getAvroBytes(1, "4654654986416544");
+
+    final Optional<DecodedMessages> decode =
+        sampleDecoderConfluent.decode(
+            "protobuf-topic1", KafkaStreamPart.VALUE, Arrays.asList(bytes));
+    assertThat(decode).isEmpty();
   }
 
   public GenericRecord getRandomRecord(Schema schema) {

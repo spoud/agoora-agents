@@ -19,4 +19,5 @@ public class SchemaRegistrySubject {
   private Integer version;
   private Long id;
   private String schema;
+  private String schemaType;
 }

@@ -12,19 +12,31 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 @ApplicationScoped
 public class SchemaRegistryUtil {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
-  @Inject @RestClient private ConfluentRegistrySubjectResource confluentRegistrySubjectResource;
+  @Inject @RestClient ConfluentRegistrySubjectResource confluentRegistrySubjectResource;
 
   @SneakyThrows
   public SchemaRegistrySubject addSchemaVersion(String topic, KafkaStreamPart part, String file) {
-    String content =
-        IOUtils.toString(
-            SchemaRegistryUtil.class.getClassLoader().getResourceAsStream(file), "UTF-8");
-    return confluentRegistrySubjectResource.addNewSchemaVersion(topic, part, content);
+    try {
+
+      String subject = part != null ? topic + "-" + part.getSubjectPostfix() : topic;
+      String content =
+          IOUtils.toString(
+              SchemaRegistryUtil.class.getClassLoader().getResourceAsStream(file), "UTF-8");
+      return confluentRegistrySubjectResource.addNewSchemaVersion(subject, content);
+    } catch (WebApplicationException ex) {
+      final ByteArrayInputStream entity = (ByteArrayInputStream) ex.getResponse().getEntity();
+      final String message = IOUtils.toString(entity, StandardCharsets.UTF_8);
+      throw new IllegalStateException(
+          "Unable to process schema from file " + file + ". Reason: " + message, ex);
+    }
   }
 
   @SneakyThrows

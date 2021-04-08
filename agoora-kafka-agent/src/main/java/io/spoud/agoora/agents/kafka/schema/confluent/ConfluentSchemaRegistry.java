@@ -36,7 +36,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
   @Inject @RestClient ConfluentRegistrySubjectResource confluentRegistrySubjectResource;
   @Inject @RestClient ConfluentRegistrySchemaResource confluentRegistrySchemaResource;
 
-  private Map<Long, String> schemaByIdCache = new ConcurrentHashMap<>();
+  private Map<Long, SchemaRegistrySubject> schemaByIdCache = new ConcurrentHashMap<>();
 
   public ConfluentSchemaRegistry(KafkaAgentConfig config) {
     this.publicUrl = config.getRegistry().getConfluent().getPublicUrl();
@@ -48,13 +48,13 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
     return getSchema(topic, part).map(this::mapToSchemaObject);
   }
 
-  public Optional<String> getSchemaById(long id) {
-    final String cachedValue = schemaByIdCache.get(id);
+  public Optional<SchemaRegistrySubject> getSchemaById(long id) {
+    final SchemaRegistrySubject cachedValue = schemaByIdCache.get(id);
     if (cachedValue != null) {
       return Optional.of(cachedValue);
     }
     try {
-      final String schema = confluentRegistrySchemaResource.getById(id).getSchema();
+      final SchemaRegistrySubject schema = confluentRegistrySchemaResource.getById(id);
       schemaByIdCache.put(id, schema);
       return Optional.of(schema);
     } catch (WebApplicationException ex) {
@@ -92,7 +92,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
 
     try {
       final SchemaRegistrySubject latestSubject =
-          confluentRegistrySubjectResource.getLatestSubject(topic, part);
+          confluentRegistrySubjectResource.getLatestSubject(topic + "-" + part.getSubjectPostfix());
       return Optional.of(latestSubject.getSchema());
     } catch (WebApplicationException ex) {
 

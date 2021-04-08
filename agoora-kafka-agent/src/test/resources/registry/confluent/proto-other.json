@@ -1,0 +1,4 @@
+{
+    "schema": "syntax = \"proto3\";\npackage com.acme;\n\nmessage OtherRecord {\n    int32 other_id = 1;\n}",
+    "schemaType": "PROTOBUF"
+}

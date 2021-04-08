@@ -33,8 +33,8 @@ public class SampleDecoderJson implements SampleDecoder {
   public Optional<DecodedMessages> decode(
       String topic, KafkaStreamPart part, List<byte[]> dataList) {
 
-    if (!elligible(dataList)) {
-      LOG.trace("topic '{}' and part '{}' not elligible", topic, part);
+    if (!eligible(dataList)) {
+      LOG.trace("topic '{}' and part '{}' not eligible", topic, part);
       return Optional.empty();
     }
 
@@ -80,7 +80,7 @@ public class SampleDecoderJson implements SampleDecoder {
     }
   }
 
-  public boolean elligible(List<byte[]> list) {
+  public boolean eligible(List<byte[]> list) {
     return list.stream().allMatch(data -> data.length > 0 && (data[0] == '[' || data[0] == '{'));
   }
 }
