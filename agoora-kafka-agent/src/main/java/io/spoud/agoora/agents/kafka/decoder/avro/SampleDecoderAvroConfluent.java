@@ -1,7 +1,7 @@
 package io.spoud.agoora.agents.kafka.decoder.avro;
 
 import io.spoud.agoora.agents.kafka.decoder.DataEncoding;
-import io.spoud.agoora.agents.kafka.decoder.DecodedMessage;
+import io.spoud.agoora.agents.kafka.decoder.DecodedMessages;
 import io.spoud.agoora.agents.kafka.decoder.SampleDecoder;
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import io.spoud.agoora.agents.kafka.schema.confluent.ConfluentSchemaRegistry;
@@ -20,7 +20,9 @@ import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,27 +41,38 @@ public class SampleDecoderAvroConfluent implements SampleDecoder {
   }
 
   @Override
-  public Optional<DecodedMessage> decode(String topic, KafkaStreamPart part, byte[] data) {
-    if (data.length < CONFLUENT_WRAPPER_SIZE) {
-      LOG.trace("Wrong avro content. Payload must be at least {} bytes", CONFLUENT_WRAPPER_SIZE);
+  public Optional<DecodedMessages> decode(
+      String topic, KafkaStreamPart part, List<byte[]> dataList) {
+    if (!elligible(dataList)) {
+      LOG.trace("topic '{}' and part '{}' not elligible", topic, part);
       return Optional.empty();
     }
-    if (data[0] != CONFLUENT_MAGIC_BYTE) {
-      LOG.trace("Wrong magic byte for topic '{}' and part '{}'", topic, part);
-      return Optional.empty();
-    }
-    long schemaId = getSchemaIdFromBytes(data);
 
-    return confluentSchemaRegistry
-        .getSchemaById(schemaId)
-        .flatMap(this::parseSchema)
-        .map(schema -> decode(data, schema))
-        .map(
-            decoded ->
-                DecodedMessage.builder().decodedValue(decoded).encoding(DataEncoding.AVRO).build());
+    // TODO check topic subject
+
+    final DataEncoding dataEncoding = DataEncoding.AVRO;
+
+    return Optional.of(
+            DecodedMessages.builder()
+                .encoding(dataEncoding) // TODO
+                .messages(
+                    dataList.stream()
+                        .map(
+                            data -> {
+                              long schemaId = getSchemaIdFromBytes(data);
+                              return confluentSchemaRegistry
+                                  .getSchemaById(schemaId)
+                                  .flatMap(this::parseSchema)
+                                  .map(schema -> decodeAvro(data, schema));
+                            })
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList()))
+                .build())
+        .filter(msgs -> !msgs.getMessages().isEmpty());
   }
 
-  protected byte[] decode(byte[] data, Schema schema) {
+  protected byte[] decodeAvro(byte[] data, Schema schema) {
     try {
       DatumReader datumReader = new GenericDatumReader(schema);
       Decoder decoder =
@@ -91,5 +104,11 @@ public class SampleDecoderAvroConfluent implements SampleDecoder {
       LOG.error("Unable to parse schema: '{}'", schemaStr, ex);
     }
     return Optional.empty();
+  }
+
+  private boolean elligible(List<byte[]> data) {
+    // must start with the magic byte + have the minimum header
+    return data.stream()
+        .allMatch(d -> d.length >= CONFLUENT_WRAPPER_SIZE && d[0] == CONFLUENT_MAGIC_BYTE);
   }
 }

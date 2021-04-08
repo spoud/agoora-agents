@@ -86,6 +86,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
         .build();
   }
 
+  // TODO cache, but timed
   private Optional<String> getSchema(String topic, KafkaStreamPart part) {
     LOG.debug("Looking for schema for topic '{}' and type '{}'", topic, part);
 

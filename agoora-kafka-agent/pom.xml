@@ -15,6 +15,7 @@
 
     <properties>
         <avro.version>1.10.2</avro.version>
+        <jackson-xml.version>2.12.2</jackson-xml.version>
     </properties>
 
     <dependencies>
@@ -66,6 +67,11 @@
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
             <version>${avro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${jackson-xml.version}</version>
         </dependency>
 
 

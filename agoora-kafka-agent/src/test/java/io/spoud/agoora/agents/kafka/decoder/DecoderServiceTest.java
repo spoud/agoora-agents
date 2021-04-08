@@ -1,14 +1,17 @@
 package io.spoud.agoora.agents.kafka.decoder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.test.junit.QuarkusTest;
+import io.spoud.agoora.agents.kafka.decoder.avro.SampleDecoderAvroConfluent;
+import io.spoud.agoora.agents.kafka.decoder.json.SampleDecoderJson;
+import io.spoud.agoora.agents.kafka.decoder.xml.SampleDecoderXml;
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import io.spoud.agoora.agents.kafka.utils.SchemaRegistryUtil;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,51 +23,52 @@ class DecoderServiceTest {
   public static final String ISS_JSON_VALUE =
       "{\"iss_position\": {\"longitude\": \"-113.0217\", \"latitude\": \"47.4961\"}, \"message\": \"success\", \"timestamp\": 1584691915}";
 
-  private ObjectMapper objectMapper = new ObjectMapper();
-
   @Inject private DecoderService decoderService;
 
   @Inject private SchemaRegistryUtil schemaRegistryUtil;
 
   @Test
-  public void testJson() {
+  void testDecoderOrder() {
+    final List<SampleDecoder> decoders = decoderService.getSampleDecoders();
+    assertThat(decoders).hasSize(3);
+    assertThat(decoders.get(0)).isInstanceOf(SampleDecoderAvroConfluent.class);
+    assertThat(decoders.get(1)).isInstanceOf(SampleDecoderXml.class);
+    assertThat(decoders.get(2)).isInstanceOf(SampleDecoderJson.class);
+  }
 
-    DecodedMessage decodedKey = decoderService.decodeKey(ISS_TOPIC_JSON, null);
-    DecodedMessage decodedValue = decoderService.decodeValue(ISS_TOPIC_JSON, getJsonValue());
+  @Test
+  void testJson() {
+
+    DecodedMessages decodedKey = decoderService.decodeKey(ISS_TOPIC_JSON, null);
+    DecodedMessages decodedValue =
+        decoderService.decodeValue(ISS_TOPIC_JSON, Arrays.asList(getJsonValue()));
 
     assertThat(decodedKey.getEncoding()).isEqualTo(DataEncoding.UNKNOWN);
 
     assertThat(decodedValue.getEncoding()).isEqualTo(DataEncoding.JSON);
-    assertThat(decodedValue.getUtf8String()).isEqualTo(ISS_JSON_VALUE);
+    assertThat(decodedValue.getUtf8String().get(0)).isEqualTo(ISS_JSON_VALUE);
   }
 
   @Test
-  public void testAvro() throws org.apache.commons.codec.DecoderException, IOException {
+  void testAvro() {
     final long id =
         schemaRegistryUtil
             .addSchemaVersion(ISS_TOPIC_AVRO, KafkaStreamPart.VALUE, "registry/confluent/iss.json")
             .getId();
 
-    DecodedMessage decodedKey = decoderService.decodeKey(ISS_TOPIC_AVRO, null);
-    DecodedMessage decodedValue =
+    DecodedMessages decodedKey = decoderService.decodeKey(ISS_TOPIC_AVRO, null);
+    DecodedMessages decodedValue =
         decoderService.decodeValue(
             ISS_TOPIC_AVRO,
-            schemaRegistryUtil.getAvroBytes(
-                id, "122d3131332e303231370e34372e34393631000e7375636365737396eba3e70b"));
+            Arrays.asList(
+                schemaRegistryUtil.getAvroBytes(
+                    id, "122d3131332e303231370e34372e34393631000e7375636365737396eba3e70b")));
 
     assertThat(decodedKey.getEncoding()).isEqualTo(DataEncoding.UNKNOWN);
 
     assertThat(decodedValue.getEncoding()).isEqualTo(DataEncoding.AVRO);
-    assertThat(decodedValue.getUtf8String()).isEqualTo(ISS_JSON_VALUE);
+    assertThat(decodedValue.getUtf8String().get(0)).isEqualTo(ISS_JSON_VALUE);
   }
-
-  //  private byte[] getIssAvroValue(int id) throws org.apache.commons.codec.DecoderException {
-  //    String hex =
-  //        "00"
-  //            + String.format("%08d", id)
-  //            + ;
-  //    return Hex.decodeHex(hex);
-  //  }
 
   private byte[] getJsonValue() {
     return ISS_JSON_VALUE.getBytes(StandardCharsets.UTF_8);
