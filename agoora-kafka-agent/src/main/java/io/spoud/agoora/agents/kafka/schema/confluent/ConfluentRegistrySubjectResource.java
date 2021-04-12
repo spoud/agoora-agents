@@ -1,7 +1,6 @@
 package io.spoud.agoora.agents.kafka.schema.confluent;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
@@ -14,7 +13,7 @@ import javax.ws.rs.Produces;
 
 @RegisterForReflection
 @RegisterRestClient(configKey = "rest-confluent-registry")
-@Path("/subjects/{topic}-{type}")
+@Path("/subjects/{subject}")
 @RegisterClientHeaders(ConfluentAuthHeader.class)
 public interface ConfluentRegistrySubjectResource {
 
@@ -22,7 +21,7 @@ public interface ConfluentRegistrySubjectResource {
   @Path("/versions/latest")
   @Produces("application/vnd.schemaregistry.v1+json")
   SchemaRegistrySubject getLatestSubject(
-      @PathParam("topic") String topic, @PathParam("type") KafkaStreamPart type);
+      @PathParam("subject") String topic);
 
   @POST
   @Path("versions")
@@ -33,5 +32,5 @@ public interface ConfluentRegistrySubjectResource {
   })
   @Consumes("application/json")
   SchemaRegistrySubject addNewSchemaVersion(
-          @PathParam("topic") String topic, @PathParam("type") KafkaStreamPart type, String content);
+          @PathParam("subject") String topic, String content);
 }

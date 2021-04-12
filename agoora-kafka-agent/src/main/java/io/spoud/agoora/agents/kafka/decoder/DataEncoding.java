@@ -11,6 +11,8 @@ public enum DataEncoding {
   UNKNOWN(false, DataSample.Encoding.UNKNOWN, SchemaEncoding.Type.UNKNOWN),
   UNRECOGNIZED(false, DataSample.Encoding.UNRECOGNIZED, SchemaEncoding.Type.UNRECOGNIZED),
   JSON(true, DataSample.Encoding.JSON, SchemaEncoding.Type.JSON),
+  XML(true, DataSample.Encoding.XML, SchemaEncoding.Type.JSON),
+  PROTOBUF(true, DataSample.Encoding.XML, SchemaEncoding.Type.JSON),
   AVRO(true, DataSample.Encoding.AVRO, SchemaEncoding.Type.AVRO);
 
   private final boolean valid;

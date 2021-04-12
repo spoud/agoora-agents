@@ -15,6 +15,8 @@
 
     <properties>
         <avro.version>1.10.2</avro.version>
+        <jackson-xml.version>2.12.2</jackson-xml.version>
+        <protobuf-java.version>3.15.7</protobuf-java.version>
     </properties>
 
     <dependencies>
@@ -47,6 +49,10 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-cache</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -67,7 +73,11 @@
             <artifactId>avro</artifactId>
             <version>${avro.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${jackson-xml.version}</version>
+        </dependency>
 
         <!-- Tests -->
         <dependency>

@@ -1,0 +1,11 @@
+{
+    "schema": "syntax = \"proto3\";\npackage com.acme;\n\nimport \"other.proto\";\n\nmessage MyRecord {\n    string f1 = 1;\n    OtherRecord f2 = 2;\n}",
+    "schemaType": "PROTOBUF",
+    "references": [
+        {
+            "name": "other.proto",
+            "subject":  "other.proto",
+            "version": 1
+        }
+    ]
+}
