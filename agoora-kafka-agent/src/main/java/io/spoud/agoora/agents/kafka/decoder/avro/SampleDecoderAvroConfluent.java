@@ -1,7 +1,9 @@
 package io.spoud.agoora.agents.kafka.decoder.avro;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import io.spoud.agoora.agents.kafka.decoder.DataEncoding;
-import io.spoud.agoora.agents.kafka.decoder.DecodedMessage;
+import io.spoud.agoora.agents.kafka.decoder.DecodedMessages;
 import io.spoud.agoora.agents.kafka.decoder.SampleDecoder;
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import io.spoud.agoora.agents.kafka.schema.confluent.ConfluentSchemaRegistry;
@@ -20,7 +22,10 @@ import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,6 +37,8 @@ public class SampleDecoderAvroConfluent implements SampleDecoder {
   private static final byte CONFLUENT_MAGIC_BYTE = 0;
 
   private final ConfluentSchemaRegistry confluentSchemaRegistry;
+  private final Cache<Long, Schema> schemaCacheById =
+      Caffeine.newBuilder().maximumSize(1000).expireAfterWrite(Duration.ofHours(1)).build();
 
   @Override
   public int getPriority() {
@@ -39,27 +46,34 @@ public class SampleDecoderAvroConfluent implements SampleDecoder {
   }
 
   @Override
-  public Optional<DecodedMessage> decode(String topic, KafkaStreamPart part, byte[] data) {
-    if (data.length < CONFLUENT_WRAPPER_SIZE) {
-      LOG.trace("Wrong avro content. Payload must be at least {} bytes", CONFLUENT_WRAPPER_SIZE);
+  public Optional<DecodedMessages> decode(
+      String topic, KafkaStreamPart part, List<byte[]> dataList) {
+    if (!eligible(dataList)) {
+      LOG.trace("topic '{}' and part '{}' not eligible", topic, part);
       return Optional.empty();
     }
-    if (data[0] != CONFLUENT_MAGIC_BYTE) {
-      LOG.trace("Wrong magic byte for topic '{}' and part '{}'", topic, part);
-      return Optional.empty();
-    }
-    long schemaId = getSchemaIdFromBytes(data);
 
-    return confluentSchemaRegistry
-        .getSchemaById(schemaId)
-        .flatMap(this::parseSchema)
-        .map(schema -> decode(data, schema))
-        .map(
-            decoded ->
-                DecodedMessage.builder().decodedValue(decoded).encoding(DataEncoding.AVRO).build());
+    final DataEncoding dataEncoding = DataEncoding.AVRO;
+
+    return Optional.of(
+            DecodedMessages.builder()
+                .encoding(dataEncoding)
+                .messages(
+                    dataList.stream()
+                        .map(
+                            data -> {
+                              long schemaId = getSchemaIdFromBytes(data);
+                              return getCachedSchema(schemaId, topic, part)
+                                  .map(raw -> decodeAvro(data, raw));
+                            })
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList()))
+                .build())
+        .filter(msgs -> !msgs.getMessages().isEmpty());
   }
 
-  protected byte[] decode(byte[] data, Schema schema) {
+  protected byte[] decodeAvro(byte[] data, Schema schema) {
     try {
       DatumReader datumReader = new GenericDatumReader(schema);
       Decoder decoder =
@@ -84,12 +98,42 @@ public class SampleDecoderAvroConfluent implements SampleDecoder {
     return unsignedLong;
   }
 
-  protected Optional<Schema> parseSchema(String schemaStr) {
+  protected Optional<Schema> parseAvroSchema(String schemaStr) {
     try {
       return Optional.of(new Schema.Parser().parse(schemaStr));
     } catch (SchemaParseException ex) {
-      LOG.error("Unable to parse schema: '{}'", schemaStr, ex);
+      LOG.error("Unable to parse avro schema: '{}'", schemaStr, ex);
     }
     return Optional.empty();
+  }
+
+  private boolean eligible(List<byte[]> data) {
+    // must start with the magic byte + have the minimum header
+    return data.stream()
+        .allMatch(d -> d.length >= CONFLUENT_WRAPPER_SIZE && d[0] == CONFLUENT_MAGIC_BYTE);
+  }
+
+  private Optional<Schema> getCachedSchema(long schemaId, String topic, KafkaStreamPart part) {
+    return Optional.ofNullable(
+        schemaCacheById.get(
+            schemaId,
+            id ->
+                confluentSchemaRegistry
+                    .getSchemaById(schemaId)
+                    .flatMap(
+                        schema -> {
+                          if (schema.getSchemaType() == null
+                              || schema.getSchemaType().equals("AVRO")) {
+                            return parseAvroSchema(schema.getSchema());
+                          } else {
+                            LOG.warn(
+                                "Unsupported schema type '{}' for topic {} and part {}",
+                                schema.getSchemaType(),
+                                topic,
+                                part);
+                            return Optional.empty();
+                          }
+                        })
+                    .orElse(null)));
   }
 }

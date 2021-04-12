@@ -1,4 +1,4 @@
-package io.spoud.agoora.agents.kafka.decoder.json;
+package io.spoud.agoora.agents.kafka.decoder.xml;
 
 import io.spoud.agoora.agents.kafka.decoder.DataEncoding;
 import io.spoud.agoora.agents.kafka.decoder.DecodedMessages;
@@ -12,19 +12,18 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SampleDecoderJsonTest {
-
-  private SampleDecoderJson sampleDecoderJson;
+class SampleDecoderXmlTest {
+  private SampleDecoderXml sampleDecoderXml;
 
   @BeforeEach
   void setup() {
-    sampleDecoderJson = new SampleDecoderJson();
+    sampleDecoderXml = new SampleDecoderXml();
   }
 
   @Test
   void decodeNull() {
     assertThat(
-            sampleDecoderJson.decode(
+            sampleDecoderXml.decode(
                 "topic",
                 KafkaStreamPart.VALUE,
                 Arrays.asList("null".getBytes(StandardCharsets.UTF_8))))
@@ -34,7 +33,7 @@ class SampleDecoderJsonTest {
   @Test
   void decodeEmpty() {
     assertThat(
-            sampleDecoderJson.decode(
+            sampleDecoderXml.decode(
                 "topic", KafkaStreamPart.VALUE, Arrays.asList("".getBytes(StandardCharsets.UTF_8))))
         .isEmpty();
   }
@@ -42,37 +41,23 @@ class SampleDecoderJsonTest {
   @Test
   void decodeEmptyObject() {
     assertThat(
-            sampleDecoderJson.decode(
+            sampleDecoderXml.decode(
                 "topic",
                 KafkaStreamPart.VALUE,
-                Arrays.asList("{}".getBytes(StandardCharsets.UTF_8))))
+                Arrays.asList("<object />".getBytes(StandardCharsets.UTF_8))))
         .isEmpty();
   }
 
   @Test
-  void decodeEmptyArray() {
+  void decodeNonXML() {
     assertThat(
-            sampleDecoderJson.decode(
-                "topic",
-                KafkaStreamPart.VALUE,
-                Arrays.asList("[]".getBytes(StandardCharsets.UTF_8))))
-        .isEmpty();
-  }
-
-  @Test
-  void decodeString() {
-    assertThat(
-            sampleDecoderJson.decode(
+            sampleDecoderXml.decode(
                 "topic",
                 KafkaStreamPart.VALUE,
                 Arrays.asList("\"hello\"".getBytes(StandardCharsets.UTF_8))))
         .isEmpty();
-  }
-
-  @Test
-  void decodeNumber() {
     assertThat(
-            sampleDecoderJson.decode(
+            sampleDecoderXml.decode(
                 "topic",
                 KafkaStreamPart.VALUE,
                 Arrays.asList("1".getBytes(StandardCharsets.UTF_8))))
@@ -80,38 +65,38 @@ class SampleDecoderJsonTest {
   }
 
   @Test
-  void decodeArray() {
-    String content = "[{\"field\":1},{\"field\":2}]";
-    Optional<DecodedMessages> message =
-        sampleDecoderJson.decode(
-            "topic",
-            KafkaStreamPart.VALUE,
-            Arrays.asList(content.getBytes(StandardCharsets.UTF_8)));
-    assertThat(message).isPresent();
-    assertThat(message.get().getEncoding()).isEqualTo(DataEncoding.JSON);
-    assertThat(message.get().getUtf8String().get(0)).isEqualTo(content);
-  }
-
-  @Test
   void decodeObject() {
-    String content = "{\"field\":1}";
+    String content = "<whatever><field>1</field></whatever>";
     Optional<DecodedMessages> message =
-        sampleDecoderJson.decode(
+        sampleDecoderXml.decode(
             "topic",
             KafkaStreamPart.VALUE,
             Arrays.asList(content.getBytes(StandardCharsets.UTF_8)));
     assertThat(message).isPresent();
-    assertThat(message.get().getEncoding()).isEqualTo(DataEncoding.JSON);
-    assertThat(message.get().getUtf8String().get(0)).isEqualTo(content);
+    assertThat(message.get().getEncoding()).isEqualTo(DataEncoding.XML);
+    assertThat(message.get().getUtf8String().get(0)).isEqualTo("{\"field\":\"1\"}");
   }
 
   @Test
-  void decodeNonJson() {
+  void decodeObjectAttribute() {
+    String content = "<whatever field=\"1\"></whatever>";
     Optional<DecodedMessages> message =
-        sampleDecoderJson.decode(
+        sampleDecoderXml.decode(
             "topic",
             KafkaStreamPart.VALUE,
-            Arrays.asList("{abcd}".getBytes(StandardCharsets.UTF_8)));
+            Arrays.asList(content.getBytes(StandardCharsets.UTF_8)));
+    assertThat(message).isPresent();
+    assertThat(message.get().getEncoding()).isEqualTo(DataEncoding.XML);
+    assertThat(message.get().getUtf8String().get(0)).isEqualTo("{\"field\":\"1\"}");
+  }
+
+  @Test
+  void decodeNonXml() {
+    Optional<DecodedMessages> message =
+        sampleDecoderXml.decode(
+            "topic",
+            KafkaStreamPart.VALUE,
+            Arrays.asList("{\"field\":\"abcd\"}".getBytes(StandardCharsets.UTF_8)));
     assertThat(message).isEmpty();
   }
 }

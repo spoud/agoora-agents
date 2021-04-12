@@ -1,43 +1,63 @@
 package io.spoud.agoora.agents.kafka.decoder;
 
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Orders:
+ *
+ * <p>
+ *
+ * <ul>
+ *   <li>json (10)
+ *   <li>xml (12)
+ *   <li>avro (20)
+ *   <li>protobuf (30)
+ * </ul>
+ */
 @Slf4j
 @ApplicationScoped
 public class DecoderService {
 
-  public static final DecodedMessage NULL_DECODED_MESSAGE =
-      DecodedMessage.builder().decodedValue(null).encoding(DataEncoding.UNKNOWN).build();
+  public static final DecodedMessages NULL_DECODED_MESSAGE =
+      DecodedMessages.builder()
+          .messages(Collections.emptyList())
+          .encoding(DataEncoding.UNKNOWN)
+          .build();
+
+  @Getter(AccessLevel.PROTECTED)
   private final List<SampleDecoder> sampleDecoders;
 
   public DecoderService(Instance<SampleDecoder> sampleDecoders) {
     this.sampleDecoders = sampleDecoders.stream().sorted().collect(Collectors.toList());
   }
 
-  public DecodedMessage decodeKey(String topic, byte[] data) throws DecoderException {
+  public DecodedMessages decodeKey(String topic, List<byte[]> data) throws DecoderException {
     return decode(topic, KafkaStreamPart.KEY, data);
   }
 
-  public DecodedMessage decodeValue(String topic, byte[] data) throws DecoderException {
+  public DecodedMessages decodeValue(String topic, List<byte[]> data) throws DecoderException {
     return decode(topic, KafkaStreamPart.VALUE, data);
   }
 
-  public DecodedMessage decode(String topic, KafkaStreamPart part, byte[] data)
+  public DecodedMessages decode(String topic, KafkaStreamPart part, List<byte[]> data)
       throws DecoderException {
-    if (data == null) {
+    if (data == null || data.isEmpty()) {
       return NULL_DECODED_MESSAGE;
     }
     return sampleDecoders.stream()
         .map(
             decoder -> {
-              Optional<DecodedMessage> ret = Optional.empty();
+              Optional<DecodedMessages> ret = Optional.empty();
               try {
                 ret = decoder.decode(topic, part, data);
               } catch (DecoderException ex) {

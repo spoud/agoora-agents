@@ -9,7 +9,7 @@ It implements all transport related management responsibilities for SDM:
 ## Configuration
 
 ```
---8<-- "components/agoora-agents/agoora-kafka-agent/src/main/resources/application.properties"
+--8<-- "components/agoora-agents/agoora-kafka-agent/src/main/resources/application.yml"
 ```
 
 ### SSL

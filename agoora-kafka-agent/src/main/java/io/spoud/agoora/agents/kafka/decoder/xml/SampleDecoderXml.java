@@ -1,10 +1,11 @@
-package io.spoud.agoora.agents.kafka.decoder.json;
+package io.spoud.agoora.agents.kafka.decoder.xml;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.spoud.agoora.agents.kafka.decoder.DataEncoding;
 import io.spoud.agoora.agents.kafka.decoder.DecodedMessages;
+import io.spoud.agoora.agents.kafka.decoder.DecoderException;
 import io.spoud.agoora.agents.kafka.decoder.SampleDecoder;
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +22,15 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @ApplicationScoped
-public class SampleDecoderJson implements SampleDecoder {
+public class SampleDecoderXml implements SampleDecoder {
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  public static final Charset CHARSET = StandardCharsets.UTF_8;
+  private final XmlMapper xmlMapper = new XmlMapper();
+  private final ObjectMapper jsonMapper = new ObjectMapper();
 
   @Override
   public int getPriority() {
-    return 10;
+    return 12;
   }
 
   @Override
@@ -43,44 +47,39 @@ public class SampleDecoderJson implements SampleDecoder {
     dataList.forEach(
         data -> {
           try {
-            String decodedString = new String(data, StandardCharsets.UTF_8);
+            String decodedString = new String(data, CHARSET);
 
             if (decodedString.equalsIgnoreCase("null")) {
               LOG.warn("Value is null");
             } else if (decodedString.isBlank()) {
               LOG.warn("Value is empty");
             } else {
+              final JsonNode xmlValue = xmlMapper.readTree(decodedString);
 
-              final JsonNode jsonValue = objectMapper.readTree(decodedString);
-
-              if (jsonValue.getNodeType() == JsonNodeType.ARRAY
-                  || jsonValue.getNodeType() == JsonNodeType.OBJECT) {
-
-                if (jsonValue.size() == 0) {
-                  // empty object or array
-                  LOG.warn("JSON is empty");
-                } else {
-                  messages.add(data);
-                }
+              if (xmlValue.size() == 0) {
+                // empty object or array
+                LOG.warn("Xml value is empty");
               } else {
-                // all the rest is unknown
-                LOG.warn("Unable to decode json value of type {}", jsonValue.getNodeType());
+                try {
+                  messages.add(jsonMapper.writeValueAsString(xmlValue).getBytes(CHARSET));
+                } catch (Exception ex) {
+                  throw new DecoderException(DecoderException.DecoderExceptionType.NOT_SUPPORTED);
+                }
               }
             }
-
           } catch (IOException ex) {
-            LOG.trace("Unable to decode JSON data", ex);
+            LOG.trace("Unable to decode XML data", ex);
           }
         });
     if (messages.isEmpty()) {
       return Optional.empty();
     } else {
       return Optional.of(
-          DecodedMessages.builder().encoding(DataEncoding.JSON).messages(messages).build());
+          DecodedMessages.builder().encoding(DataEncoding.XML).messages(messages).build());
     }
   }
 
   public boolean eligible(List<byte[]> list) {
-    return list.stream().allMatch(data -> data.length > 0 && (data[0] == '[' || data[0] == '{'));
+    return list.stream().allMatch(data -> data.length > 0 && (data[0] == '<'));
   }
 }
