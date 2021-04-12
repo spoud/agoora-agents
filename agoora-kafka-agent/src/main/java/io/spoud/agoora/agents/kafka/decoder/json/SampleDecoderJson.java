@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import io.spoud.agoora.agents.kafka.decoder.DataEncoding;
 import io.spoud.agoora.agents.kafka.decoder.DecodedMessages;
+import io.spoud.agoora.agents.kafka.decoder.DecoderUtil;
 import io.spoud.agoora.agents.kafka.decoder.SampleDecoder;
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +82,6 @@ public class SampleDecoderJson implements SampleDecoder {
   }
 
   public boolean eligible(List<byte[]> list) {
-    return list.stream().allMatch(data -> data.length > 0 && (data[0] == '[' || data[0] == '{'));
+    return DecoderUtil.checkEachFirstPrintableCharacter(list, c -> c == '[' || c == '{');
   }
 }

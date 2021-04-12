@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <parkdata updated="12.04.2021 13:20:40">
     <parking name="P01" state="1" spacecount="612" spacefree="289" open="00:00" close="00:00"/>
     <parking name="P03" state="1" spacecount="560" spacefree="433" open="00:00" close="00:00"/>
