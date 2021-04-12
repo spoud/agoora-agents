@@ -1,13 +1,14 @@
 package io.spoud.agoora.agents.kafka.config.data;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
+@Slf4j
 @Data
 public class PropertyTemplatesConfig {
 
-//  private Map<String, String> kafkaTopic = new HashMap<>();
-//  private Map<String, String> kafkaConsumerGroup = new HashMap<>();
+  private Optional<String> kafkaTopic;
+  private Optional<String> kafkaConsumerGroup;
 }

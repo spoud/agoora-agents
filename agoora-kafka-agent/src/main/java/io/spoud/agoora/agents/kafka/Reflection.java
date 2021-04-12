@@ -17,6 +17,12 @@ import io.spoud.sdm.logistics.domain.v1.Transport;
  * example only by reflexion). This is needed to compile the native binary
  */
 @RegisterForReflection(
+        classNames = {
+                // See https://github.com/quarkusio/quarkus/issues/10420#issuecomment-705520582
+                "com.github.benmanes.caffeine.cache.SSMSW",
+                "com.github.benmanes.caffeine.cache.PSWMW",
+                "com.github.benmanes.caffeine.cache.PSWMS"
+        },
     targets = {
       // Entities
       LogRecord.class,

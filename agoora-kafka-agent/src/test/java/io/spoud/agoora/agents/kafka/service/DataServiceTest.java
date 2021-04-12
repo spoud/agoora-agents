@@ -30,11 +30,13 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
@@ -60,6 +62,7 @@ class DataServiceTest extends AbstractService {
     kafkaUtils.cleanup();
     kafkaTopicRepository.clear();
     kafkaConsumerGroupRepository.clear();
+    reset(dataSubscriptionStateClient);
   }
 
   @Test
@@ -102,6 +105,14 @@ class DataServiceTest extends AbstractService {
             .findAny()
             .get();
     assertThat(topicXRequest.getInput().getState()).isEqualTo(StateChange.DELETED);
+
+    assertThat(captor.getAllValues().get(0).getInput().getProperties().getPropertiesMap())
+        .containsAllEntriesOf(
+            Map.of(
+                "sdm.transport.external.kafka.manager.url",
+                "https://km.sdm.spoud.io/clusters/sdm/topics/data-topic1",
+                "sdm.transport.external.agoora.url",
+                "https://blabla/"));
   }
 
   @Test
@@ -165,5 +176,13 @@ class DataServiceTest extends AbstractService {
             .findFirst();
     assertThat(deleted).isPresent();
     assertThat(deleted.get().getInput().getSelf().getIdPath().getId()).isEqualTo("to-delete-subId");
+
+    assertThat(captor.getAllValues().get(0).getInput().getProperties().getPropertiesMap())
+        .containsAllEntriesOf(
+            Map.of(
+                "sdm.transport.external.kafka.manager.url",
+                "https://km.sdm.spoud.io/clusters/sdm/consumer-group/data-group1/data-topic1",
+                "sdm.transport.external.agoora.url",
+                "https://blabla/"));
   }
 }

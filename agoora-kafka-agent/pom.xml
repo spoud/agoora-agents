@@ -124,6 +124,12 @@
             <classifier>runtime</classifier>
             <scope>test</scope>
         </dependency>
+<!--        TODO put in parent pom-->
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-lambda</artifactId>
+            <version>1.2.0</version>
+        </dependency>
     </dependencies>
 
     <build>

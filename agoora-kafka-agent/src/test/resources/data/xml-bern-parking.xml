@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parkdata updated="12.04.2021 13:20:40">
+    <parking name="P01" state="1" spacecount="612" spacefree="289" open="00:00" close="00:00"/>
+    <parking name="P03" state="1" spacecount="560" spacefree="433" open="00:00" close="00:00"/>
+    <parking name="P02" state="1" spacecount="425" spacefree="151" open="00:00" close="00:00"/>
+    <parking name="P05" state="1" spacecount="90" spacefree="47" open="00:00" close="00:00"/>
+    <parking name="P04" state="1" spacecount="430" spacefree="135" open="00:00" close="00:00"/>
+    <parking name="P+R" state="1" spacecount="600" spacefree="264" open="00:00" close="00:00"/>
+    <parking name="P06" state="1" spacecount="481" spacefree="177" open="00:00" close="00:00"/>
+    <parking name="P08" state="1" spacecount="666" spacefree="662" open="00:00" close="00:00"/>
+    <parking name="P10" state="1" spacecount="257" spacefree="153" open="00:00" close="00:00"/>
+    <parking name="P09" state="1" spacecount="470" spacefree="469" open="00:00" close="00:00"/>
+</parkdata>

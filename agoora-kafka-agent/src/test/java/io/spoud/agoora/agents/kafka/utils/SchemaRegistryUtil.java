@@ -42,9 +42,7 @@ public class SchemaRegistryUtil {
   @SneakyThrows
   public Schema getSchemaFromFile(String file) {
     final SchemaRegistrySubject subject =
-        objectMapper.readValue(
-            SchemaRegistryUtil.class.getClassLoader().getResourceAsStream(file),
-            SchemaRegistrySubject.class);
+        objectMapper.readValue(ResourceUtil.getFile(file), SchemaRegistrySubject.class);
     return new Schema.Parser().parse(subject.getSchema());
   }
 

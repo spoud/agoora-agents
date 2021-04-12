@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.spoud.agoora.agents.kafka.decoder.DataEncoding;
 import io.spoud.agoora.agents.kafka.decoder.DecodedMessages;
 import io.spoud.agoora.agents.kafka.decoder.DecoderException;
+import io.spoud.agoora.agents.kafka.decoder.DecoderUtil;
 import io.spoud.agoora.agents.kafka.decoder.SampleDecoder;
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import lombok.RequiredArgsConstructor;
@@ -80,6 +81,6 @@ public class SampleDecoderXml implements SampleDecoder {
   }
 
   public boolean eligible(List<byte[]> list) {
-    return list.stream().allMatch(data -> data.length > 0 && (data[0] == '<'));
+    return DecoderUtil.checkEachFirstPrintableCharacter(list, c -> c == '<');
   }
 }
