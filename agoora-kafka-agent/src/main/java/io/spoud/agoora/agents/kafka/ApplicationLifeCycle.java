@@ -5,13 +5,9 @@ import io.quarkus.runtime.configuration.ProfileManager;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.microprofile.config.ConfigProvider;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Slf4j
 @ApplicationScoped
