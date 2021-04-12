@@ -1,10 +1,11 @@
 # Kafka Agent
 
-It implements all transport related management responsibilities for SDM:
-
-- Synchronisation of Kafka Topics between Logistics and Kafka
+This agents target Kafka. It will:
+- Synchronisation of Kafka Topics
+- Synchronisation of Kafka Consumer groups
 - Scrape schema registries for schemas
 - Forwarding of metrics to SDM
+- Profile data (if enabled)
 
 ## Configuration
 
@@ -14,19 +15,15 @@ It implements all transport related management responsibilities for SDM:
 
 ### SSL
 
-If you want to use SSL with kafka, use those environment variable:
+If you want to use SSL with kafka, use those environment variables:
 
 ```bash
-SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-SPRING_KAFKA_PROPERTIES_PROTOCOL=SSL
-SPRING_KAFKA_ADMIN_SSL_KEY_STORE_LOCATION=/data/keys/...
-SPRING_KAFKA_ADMIN_SSL_KEY_STORE_PASSWORD=123456
-SPRING_KAFKA_ADMIN_SSL_TRUST_STORE_LOCATION=/data/keys...
-SPRING_KAFKA_ADMIN_SSL_TRUST_STORE_PASSWORD=123456
-SPRING_KAFKA_CONSUMER_SSL_KEY_STORE_LOCATION=/data/keys/...
-SPRING_KAFKA_CONSUMER_SSL_KEY_STORE_PASSWORD=123456
-SPRING_KAFKA_CONSUMER_SSL_TRUST_STORE_LOCATION=/data/keys...
-SPRING_KAFKA_CONSUMER_SSL_TRUST_STORE_PASSWORD=123456
+AGOORA_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+AGOORA_KAFKA_PROTOCOL=SSL
+AGOORA_KAFKA_KEY-STORE_LOCATION=/data/keys/...
+AGOORA_KAFKA_KEY-STORE_PASSWORD=123456
+AGOORA_KAFKA_TRUST-STORE_LOCATION=/data/keys/...
+AGOORA_KAFKA_TRUST-STORE_PASSWORD=123456
 ```
 
 ## Kafka Permission Requirements
