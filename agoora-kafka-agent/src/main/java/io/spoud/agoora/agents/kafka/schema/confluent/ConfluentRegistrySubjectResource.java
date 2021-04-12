@@ -1,7 +1,6 @@
 package io.spoud.agoora.agents.kafka.schema.confluent;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 

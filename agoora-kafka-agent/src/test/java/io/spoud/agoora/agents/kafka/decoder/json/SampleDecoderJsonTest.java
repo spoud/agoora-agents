@@ -17,12 +17,12 @@ class SampleDecoderJsonTest {
   private SampleDecoderJson sampleDecoderJson;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     sampleDecoderJson = new SampleDecoderJson();
   }
 
   @Test
-  public void decodeNull() {
+  void decodeNull() {
     assertThat(
             sampleDecoderJson.decode(
                 "topic",
@@ -32,7 +32,7 @@ class SampleDecoderJsonTest {
   }
 
   @Test
-  public void decodeEmpty() {
+  void decodeEmpty() {
     assertThat(
             sampleDecoderJson.decode(
                 "topic", KafkaStreamPart.VALUE, Arrays.asList("".getBytes(StandardCharsets.UTF_8))))
@@ -40,7 +40,7 @@ class SampleDecoderJsonTest {
   }
 
   @Test
-  public void decodeEmptyObject() {
+  void decodeEmptyObject() {
     assertThat(
             sampleDecoderJson.decode(
                 "topic",
@@ -50,7 +50,7 @@ class SampleDecoderJsonTest {
   }
 
   @Test
-  public void decodeEmptyArray() {
+  void decodeEmptyArray() {
     assertThat(
             sampleDecoderJson.decode(
                 "topic",
@@ -60,7 +60,7 @@ class SampleDecoderJsonTest {
   }
 
   @Test
-  public void decodeString() {
+  void decodeString() {
     assertThat(
             sampleDecoderJson.decode(
                 "topic",
@@ -70,7 +70,7 @@ class SampleDecoderJsonTest {
   }
 
   @Test
-  public void decodeNumber() {
+  void decodeNumber() {
     assertThat(
             sampleDecoderJson.decode(
                 "topic",
@@ -80,7 +80,7 @@ class SampleDecoderJsonTest {
   }
 
   @Test
-  public void decodeArray() {
+  void decodeArray() {
     String content = "[{\"field\":1},{\"field\":2}]";
     Optional<DecodedMessages> message =
         sampleDecoderJson.decode(
@@ -93,7 +93,7 @@ class SampleDecoderJsonTest {
   }
 
   @Test
-  public void decodeObject() {
+  void decodeObject() {
     String content = "{\"field\":1}";
     Optional<DecodedMessages> message =
         sampleDecoderJson.decode(
@@ -106,7 +106,7 @@ class SampleDecoderJsonTest {
   }
 
   @Test
-  public void decodeNonJson() {
+  void decodeNonJson() {
     Optional<DecodedMessages> message =
         sampleDecoderJson.decode(
             "topic",

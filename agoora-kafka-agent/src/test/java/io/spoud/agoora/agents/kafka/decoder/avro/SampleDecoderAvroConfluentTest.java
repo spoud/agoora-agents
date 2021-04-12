@@ -34,7 +34,7 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
   @Inject SchemaRegistryUtil schemaRegistryUtil;
 
   @Test
-  public void decodeSchemaId() {
+  void decodeSchemaId() {
     assertThat(sampleDecoderConfluent.getSchemaIdFromBytes(new byte[] {0x0, 0x0, 0x0, 0x0, 0x0}))
         .isEqualTo(0L);
     assertThat(
@@ -58,7 +58,7 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
   }
 
   @Test
-  public void testEncodingAndDecodingAvro() throws IOException {
+  void testEncodingAndDecodingAvro() throws IOException {
     Schema schema = schemaRegistryUtil.getSchemaFromFile("registry/confluent/randomv1.json");
     DatumWriter writer = new GenericDatumWriter<>(schema);
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -77,7 +77,7 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
   }
 
   @Test
-  public void testDecodingReadDataAvro() throws DecoderException {
+  void testDecodingReadDataAvro() throws DecoderException {
     Schema schema = schemaRegistryUtil.getSchemaFromFile("registry/confluent/randomv1.json");
     String hexData = "0000000001146f6270797068777769788e0428848a3c01";
     byte[] bytes = Hex.decodeHex(hexData);
@@ -91,7 +91,7 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
   }
 
   @Test
-  public void testDecodingEvolutionData() {
+  void testDecodingEvolutionData() {
     final long v1 =
         schemaRegistryUtil
             .addSchemaVersion(
@@ -148,7 +148,7 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
     assertThat(decode).isEmpty();
   }
 
-  public GenericRecord getRandomRecord(Schema schema) {
+  GenericRecord getRandomRecord(Schema schema) {
     GenericRecord record = new GenericData.Record(schema);
     record.put("random_string", "hello");
     record.put("random_integer", 1);

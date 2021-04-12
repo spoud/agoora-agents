@@ -16,12 +16,12 @@ class SampleDecoderXmlTest {
   private SampleDecoderXml sampleDecoderXml;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     sampleDecoderXml = new SampleDecoderXml();
   }
 
   @Test
-  public void decodeNull() {
+  void decodeNull() {
     assertThat(
             sampleDecoderXml.decode(
                 "topic",
@@ -31,7 +31,7 @@ class SampleDecoderXmlTest {
   }
 
   @Test
-  public void decodeEmpty() {
+  void decodeEmpty() {
     assertThat(
             sampleDecoderXml.decode(
                 "topic", KafkaStreamPart.VALUE, Arrays.asList("".getBytes(StandardCharsets.UTF_8))))
@@ -39,7 +39,7 @@ class SampleDecoderXmlTest {
   }
 
   @Test
-  public void decodeEmptyObject() {
+  void decodeEmptyObject() {
     assertThat(
             sampleDecoderXml.decode(
                 "topic",
@@ -49,7 +49,7 @@ class SampleDecoderXmlTest {
   }
 
   @Test
-  public void decodeNonXML() {
+  void decodeNonXML() {
     assertThat(
             sampleDecoderXml.decode(
                 "topic",
@@ -65,7 +65,7 @@ class SampleDecoderXmlTest {
   }
 
   @Test
-  public void decodeObject() {
+  void decodeObject() {
     String content = "<whatever><field>1</field></whatever>";
     Optional<DecodedMessages> message =
         sampleDecoderXml.decode(
@@ -78,7 +78,7 @@ class SampleDecoderXmlTest {
   }
 
   @Test
-  public void decodeObjectAttribute() {
+  void decodeObjectAttribute() {
     String content = "<whatever field=\"1\"></whatever>";
     Optional<DecodedMessages> message =
         sampleDecoderXml.decode(
@@ -91,7 +91,7 @@ class SampleDecoderXmlTest {
   }
 
   @Test
-  public void decodeNonXml() {
+  void decodeNonXml() {
     Optional<DecodedMessages> message =
         sampleDecoderXml.decode(
             "topic",
