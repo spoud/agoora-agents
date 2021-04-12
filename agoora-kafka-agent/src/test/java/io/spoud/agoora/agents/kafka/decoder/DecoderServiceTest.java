@@ -1,10 +1,13 @@
 package io.spoud.agoora.agents.kafka.decoder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.test.junit.QuarkusTest;
 import io.spoud.agoora.agents.kafka.decoder.avro.SampleDecoderAvroConfluent;
 import io.spoud.agoora.agents.kafka.decoder.json.SampleDecoderJson;
 import io.spoud.agoora.agents.kafka.decoder.xml.SampleDecoderXml;
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
+import io.spoud.agoora.agents.kafka.utils.ResourceUtil;
 import io.spoud.agoora.agents.kafka.utils.SchemaRegistryUtil;
 import org.junit.jupiter.api.Test;
 
@@ -20,11 +23,10 @@ class DecoderServiceTest {
 
   public static final String ISS_TOPIC_AVRO = "iss-topic-avro";
   public static final String ISS_TOPIC_JSON = "iss-topic-json";
-  public static final String ISS_JSON_VALUE =
-      "{\"iss_position\": {\"longitude\": \"-113.0217\", \"latitude\": \"47.4961\"}, \"message\": \"success\", \"timestamp\": 1584691915}";
+  public static final String BERN_PARKING_TOPIC_XML = "bern-parking-topic-xml";
 
   @Inject DecoderService decoderService;
-
+  @Inject ObjectMapper objectMapper;
   @Inject SchemaRegistryUtil schemaRegistryUtil;
 
   @Test
@@ -39,18 +41,38 @@ class DecoderServiceTest {
   @Test
   void testJson() {
 
+    String jsonValue = ResourceUtil.getFile("data/json-iss.json");
+
     DecodedMessages decodedKey = decoderService.decodeKey(ISS_TOPIC_JSON, null);
     DecodedMessages decodedValue =
-        decoderService.decodeValue(ISS_TOPIC_JSON, Arrays.asList(getJsonValue()));
+        decoderService.decodeValue(
+            ISS_TOPIC_JSON, Arrays.asList(jsonValue.getBytes(StandardCharsets.UTF_8)));
 
     assertThat(decodedKey.getEncoding()).isEqualTo(DataEncoding.UNKNOWN);
 
     assertThat(decodedValue.getEncoding()).isEqualTo(DataEncoding.JSON);
-    assertThat(decodedValue.getUtf8String().get(0)).isEqualTo(ISS_JSON_VALUE);
+    assertThat(decodedValue.getUtf8String().get(0)).isEqualTo(jsonValue);
   }
 
   @Test
-  void testAvro() {
+  void testXml() throws JsonProcessingException {
+    String xmlValue = ResourceUtil.getFile("data/xml-bern-parking.xml");
+    String xmlToJsonValue = ResourceUtil.getFile("data/xml-bern-parking.json");
+    DecodedMessages decodedKey = decoderService.decodeKey(BERN_PARKING_TOPIC_XML, null);
+    DecodedMessages decodedValue =
+        decoderService.decodeValue(
+            BERN_PARKING_TOPIC_XML, Arrays.asList(xmlValue.getBytes(StandardCharsets.UTF_8)));
+
+    assertThat(decodedKey.getEncoding()).isEqualTo(DataEncoding.UNKNOWN);
+
+    assertThat(decodedValue.getEncoding()).isEqualTo(DataEncoding.XML);
+    assertThat(objectMapper.readTree(decodedValue.getUtf8String().get(0))).isEqualTo(objectMapper.readTree(xmlToJsonValue));
+  }
+
+  @Test
+  void testAvro() throws JsonProcessingException {
+    String avroToJsonValue = ResourceUtil.getFile("data/avro-iss.json");
+
     final long id =
         schemaRegistryUtil
             .addSchemaVersion(ISS_TOPIC_AVRO, KafkaStreamPart.VALUE, "registry/confluent/iss.json")
@@ -67,10 +89,7 @@ class DecoderServiceTest {
     assertThat(decodedKey.getEncoding()).isEqualTo(DataEncoding.UNKNOWN);
 
     assertThat(decodedValue.getEncoding()).isEqualTo(DataEncoding.AVRO);
-    assertThat(decodedValue.getUtf8String().get(0)).isEqualTo(ISS_JSON_VALUE);
-  }
-
-  private byte[] getJsonValue() {
-    return ISS_JSON_VALUE.getBytes(StandardCharsets.UTF_8);
+    assertThat(objectMapper.readTree(decodedValue.getUtf8String().get(0)))
+        .isEqualTo(objectMapper.readTree(avroToJsonValue));
   }
 }

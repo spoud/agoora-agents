@@ -3,6 +3,7 @@ package io.spoud.agoora.agents.kafka.decoder.xml;
 import io.spoud.agoora.agents.kafka.decoder.DataEncoding;
 import io.spoud.agoora.agents.kafka.decoder.DecodedMessages;
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
+import io.spoud.agoora.agents.kafka.utils.ResourceUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -98,5 +99,15 @@ class SampleDecoderXmlTest {
             KafkaStreamPart.VALUE,
             Arrays.asList("{\"field\":\"abcd\"}".getBytes(StandardCharsets.UTF_8)));
     assertThat(message).isEmpty();
+  }
+
+  @Test
+  void decodeRealXml() {
+    String xml = ResourceUtil.getFile("data/xml-bern-parking.xml");
+
+    Optional<DecodedMessages> message =
+        sampleDecoderXml.decode(
+            "topic", KafkaStreamPart.VALUE, Arrays.asList(xml.getBytes(StandardCharsets.UTF_8)));
+    assertThat(message).isPresent();
   }
 }
