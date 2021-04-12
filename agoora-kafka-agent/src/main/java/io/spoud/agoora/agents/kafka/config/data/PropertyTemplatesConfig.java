@@ -1,6 +1,5 @@
 package io.spoud.agoora.agents.kafka.config.data;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
