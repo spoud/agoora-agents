@@ -18,4 +18,5 @@ public class KafkaAgentConfig extends AgooraAgentConfig {
   private ScrapperConfig scrapper;
   private KafkaConfig kafka;
   private RegistryConfig registry;
+  private PropertyTemplatesConfig propertyTemplates = new PropertyTemplatesConfig();
 }

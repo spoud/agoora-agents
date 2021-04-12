@@ -29,9 +29,7 @@ agoora:
       public-url:
   property-templates:
     kafka-topic:
-      "kafka.manager.url": https://km.sdm.spoud.io/clusters/sdm/topics/{TOPIC_NAME}
     kafka-consumer-group:
-      "kafka.manager.url": https://km.sdm.spoud.io/clusters/sdm/consumer-group/{CONSUMER_GROUP_NAME}
   transport:
     agoora-path: ${agoora-transport-path}
   auth:
