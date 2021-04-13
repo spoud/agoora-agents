@@ -177,7 +177,14 @@ class DataServiceTest extends AbstractService {
     assertThat(deleted).isPresent();
     assertThat(deleted.get().getInput().getSelf().getIdPath().getId()).isEqualTo("to-delete-subId");
 
-    assertThat(captor.getAllValues().get(0).getInput().getProperties().getPropertiesMap())
+    assertThat(
+            captor.getAllValues().stream()
+                .filter(v -> v.getInput().getLabel().getValue().startsWith("data-group"))
+                .findFirst()
+                .get()
+                .getInput()
+                .getProperties()
+                .getPropertiesMap())
         .containsAllEntriesOf(
             Map.of(
                 "sdm.transport.external.kafka.manager.url",
