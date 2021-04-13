@@ -1,6 +1,5 @@
 agoora-endpoint: local.spoud.io
 agoora-insecure: false
-agoora-cluster: default
 agoora-transport-path: /default/kafka
 
 agoora:
@@ -13,6 +12,8 @@ agoora:
     hooks:
       enabled: true
   kafka:
+    key:
+    secret:
     topic-filter-regex: .+
     consumer-group-filter-regex: .+
     bootstrap-servers: kafka:9092
@@ -34,30 +35,24 @@ agoora:
     agoora-path: ${agoora-transport-path}
   auth:
     server-url: https://${agoora-endpoint}/auth/
-    cluster: ${agoora-cluster}
     realm: spoud
     user:
       name: to-be-defined
       token: to-be-defined
   logistics:
     endpoint: ${agoora-endpoint}
-    cluster: ${agoora-cluster}
     insecure: ${agoora-insecure}
   hooks:
     endpoint: ${agoora-endpoint}
-    cluster: ${agoora-cluster}
     insecure: ${agoora-insecure}
   schema:
     endpoint: ${agoora-endpoint}
-    cluster: ${agoora-cluster}
     insecure: ${agoora-insecure}
   looker:
     endpoint: ${agoora-endpoint}
-    cluster: ${agoora-cluster}
     insecure: ${agoora-insecure}
   blob:
     endpoint: ${agoora-endpoint}
-    cluster: ${agoora-cluster}
     insecure: ${agoora-insecure}
   profiler:
     endpoint: localhost:8089
@@ -78,6 +73,7 @@ quarkus:
     additional-build-args:
       - --allow-incomplete-classpath
       - --report-unsupported-elements-at-runtime
+      - -H:IncludeResourceBundles=com.sun.org.apache.xerces.internal.impl.msg.XMLMessages
   log:
     category:
       "io.spoud.agoora":
@@ -90,7 +86,6 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
 "%dev":
   agoora-endpoint: local.spoud.io
   agoora-insecure: true
-  agoora-cluster: default
   agoora-transport-path: /default/kafka/kafka
   agoora:
     propertyTemplates:

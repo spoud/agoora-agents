@@ -40,6 +40,13 @@ ccloud kafka acl create --allow --service-account-id <account-id> --operation de
 ccloud kafka acl create --allow --service-account-id <account-id> --operation describe --consumer-group '*'
 ```
 
+Configuration:
+```
+AGOORA_KAFKA_PROTOCOL=SASL_SSL
+AGOORA_KAFKA_KEY=
+AGOORA_KAFKA_SECRET=
+```
+
 ### Kafka ACLs (`bin/kafka-acls.sh`)
 
 ```bash

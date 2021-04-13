@@ -1,5 +1,6 @@
 package io.spoud.agoora.agents.kafka.decoder.xml;
 
+import com.ctc.wstx.stax.WstxInputFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -26,7 +27,7 @@ import java.util.Optional;
 public class SampleDecoderXml implements SampleDecoder {
 
   public static final Charset CHARSET = StandardCharsets.UTF_8;
-  private final XmlMapper xmlMapper = new XmlMapper();
+  private final XmlMapper xmlMapper = new XmlMapper(new WstxInputFactory());
   private final ObjectMapper jsonMapper = new ObjectMapper();
 
   @Override
@@ -69,7 +70,7 @@ public class SampleDecoderXml implements SampleDecoder {
               }
             }
           } catch (IOException ex) {
-            LOG.trace("Unable to decode XML data", ex);
+            LOG.warn("Unable to decode XML data", ex);
           }
         });
     if (messages.isEmpty()) {

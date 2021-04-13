@@ -17,12 +17,12 @@ import io.spoud.sdm.logistics.domain.v1.Transport;
  * example only by reflexion). This is needed to compile the native binary
  */
 @RegisterForReflection(
-        classNames = {
-                // See https://github.com/quarkusio/quarkus/issues/10420#issuecomment-705520582
-                "com.github.benmanes.caffeine.cache.SSMSW",
-                "com.github.benmanes.caffeine.cache.PSWMW",
-                "com.github.benmanes.caffeine.cache.PSWMS"
-        },
+    classNames = {
+      // See https://github.com/quarkusio/quarkus/issues/10420#issuecomment-705520582
+      "com.github.benmanes.caffeine.cache.SSMSW",
+      "com.github.benmanes.caffeine.cache.PSWMW",
+      "com.github.benmanes.caffeine.cache.PSWMS"
+    },
     targets = {
       // Entities
       LogRecord.class,
@@ -45,5 +45,9 @@ import io.spoud.sdm.logistics.domain.v1.Transport;
       // Kafka
       org.apache.avro.Schema.class,
       org.apache.avro.Schema.Parser.class,
+
+      // XML
+      com.ctc.wstx.sr.ValidatingStreamReader.class,
+      com.ctc.wstx.stax.WstxInputFactory.class,
     })
 public class Reflection {}

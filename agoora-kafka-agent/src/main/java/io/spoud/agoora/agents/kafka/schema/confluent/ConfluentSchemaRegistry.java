@@ -7,9 +7,11 @@ import io.spoud.sdm.schema.domain.v1alpha.Schema;
 import io.spoud.sdm.schema.domain.v1alpha.SchemaEncoding;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import java.util.Map;
@@ -33,8 +35,11 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
 
   private final Optional<String> publicUrl;
 
-  @Inject @RestClient ConfluentRegistrySubjectResource confluentRegistrySubjectResource;
-  @Inject @RestClient ConfluentRegistrySchemaResource confluentRegistrySchemaResource;
+  @Inject @RestClient Instance<ConfluentRegistrySubjectResource> confluentRegistrySubjectResource;
+  @Inject @RestClient Instance<ConfluentRegistrySchemaResource> confluentRegistrySchemaResource;
+
+  @ConfigProperty(name = "rest-confluent-registry/mp-rest/url")
+  Optional<String> registryUrl;
 
   private Map<Long, SchemaRegistrySubject> schemaByIdCache = new ConcurrentHashMap<>();
 
@@ -42,19 +47,33 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
     this.publicUrl = config.getRegistry().getConfluent().getPublicUrl();
   }
 
+  private boolean registryDefined() {
+    if (registryUrl.filter(StringUtils::isNotBlank).isPresent()) {
+      return true;
+    }
+    LOG.trace("No schema registry url defined");
+    return false;
+  }
+
   @Override
   public Optional<Schema> getLatestSchemaForTopic(String topic, KafkaStreamPart part) {
+    if (!registryDefined()) {
+      return Optional.empty();
+    }
     LOG.debug("Searching for schema for topic '{}'", topic);
     return getSchema(topic, part).map(this::mapToSchemaObject);
   }
 
   public Optional<SchemaRegistrySubject> getSchemaById(long id) {
+    if (!registryDefined()) {
+      return Optional.empty();
+    }
     final SchemaRegistrySubject cachedValue = schemaByIdCache.get(id);
     if (cachedValue != null) {
       return Optional.of(cachedValue);
     }
     try {
-      final SchemaRegistrySubject schema = confluentRegistrySchemaResource.getById(id);
+      final SchemaRegistrySubject schema = confluentRegistrySchemaResource.get().getById(id);
       schemaByIdCache.put(id, schema);
       return Optional.of(schema);
     } catch (WebApplicationException ex) {
@@ -92,10 +111,11 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
 
     try {
       final SchemaRegistrySubject latestSubject =
-          confluentRegistrySubjectResource.getLatestSubject(topic + "-" + part.getSubjectPostfix());
+          confluentRegistrySubjectResource
+              .get()
+              .getLatestSubject(topic + "-" + part.getSubjectPostfix());
       return Optional.of(latestSubject.getSchema());
     } catch (WebApplicationException ex) {
-
       if (ex.getResponse().getStatus() == 404) {
         // not issue, the schema just doesn't exists
       } else {

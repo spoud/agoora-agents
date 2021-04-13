@@ -1,6 +1,5 @@
 package io.spoud.agoora.agents.kafka.kafka;
 
-import io.quarkus.runtime.configuration.ProfileManager;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.agoora.agents.kafka.config.data.KafkaConfig;
 import lombok.experimental.UtilityClass;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class KafkaFactory {
 
-  public static final String PROFILE_CONFLUENT_CLOUD = "ccloud"; // TODO remove
   public static final int MAX_POOL_RECORD = 100;
   public static final String DEFAULT_CONSUMER_GROUP_NAME = "agoora-kafka-agent";
 
@@ -55,12 +53,8 @@ public class KafkaFactory {
     kafkaConfig.getKeyStoreLocation().ifPresent(v -> props.put("ssl.keystore.location", v));
     kafkaConfig.getKeyStorePassword().ifPresent(v -> props.put("ssl.keystore.password", v));
 
-    // TODO more generic
-    // TODO remove ccloud
-    // TODO add truststore and keystore
-
-    if (PROFILE_CONFLUENT_CLOUD.equals(ProfileManager.getActiveProfile())) {
-      LOG.debug("Use confluent configuration");
+    if (kafkaConfig.getProtocol().equals("SASL_SSL")) {
+      LOG.debug("Using SASL_SSL");
       // confluent cloud specific
       props.put("security.protocol", "SASL_SSL");
       props.put(
