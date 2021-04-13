@@ -49,6 +49,24 @@ bin/kafka-acls.sh --add --allow-principal <principal> --operation Describe --gro
 
 ## Monitoring
 
- * `/actuator` => shows every actuator endpoint
- * `/actuator/kafka` => shows every topic and consumer group available
- * `/actuator/prometheus` => shows metrics in the prometheus format
+ * `host:8082/q/health` => Global health endpoint
+ * `host:8082/q/health/live` => liveness probe
+ * `host:8082/q/health/ready` => readiness
+
+## Additional properties (deep dive tools)
+
+You have the possibility to add properties to the Data Port and Data Subscription State. For this you have to use
+a JSON value. There is some variable that you can use. The variables are:
+
+| Variable | Description | 
+| --- | --- |
+| TOPIC | Topic name |
+| TOPIC | Topic name |
+| RESOURCE_ID | Data port id or Data subscription state id |
+
+Examples:
+
+```
+AGOORA_PROPERTY_TEMPLATES_KAFKA_TOPIC={"data.quality.dashboard":"https://grafana-dev.sdm.spoud.io/d/Zs9TGX7Mk/data-quality-detail?orgId=1&resourceId={RESOURCE_ID}&var-resourceId={RESOURCE_ID}","kafka.manager.url":"https://km.sdm.spoud.io/clusters/sdm/topics/{TOPIC_NAME}","prometheus.url" : "https://prometheus.sdm.spoud.io/graph?g0.range_input=1w&g0.expr=kafka_topic_highwater%7Btopic%3D%22{TOPIC_NAME}%22%7D&g0.tab=0"}
+AGOORA_PROPERTY_TEMPLATES_KAFKA_CONSUMER_GROUP={"kafka.manager.url":"https://km.sdm.spoud.io/clusters/sdm/consumers/{CONSUMER_GROUP_NAME}/topic/{TOPIC_NAME}/type/KF"}
+```
