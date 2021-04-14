@@ -35,7 +35,7 @@ One can also set `SAMPLES_HEAD=5`. The rule is simply a concatenation of the key
 The defaults are set like this:
 
 ```yaml
---8<-- "components/agoora-profiler-service/config/pandas_config_defaults.yaml"
+--8<-- "components/agoora-agents/agoora-profiler-service/config/pandas_config_defaults.yaml"
 ```
  
 Reference pandas profiling for more details on configuration. 
@@ -46,7 +46,7 @@ Reference pandas profiling for more details on configuration.
 See proto files:
 
 ```yaml
---8<-- "components/agoora-profiler-service/proto/profiler/service/v1alpha1/profiler.proto"
+--8<-- "components/agoora-agents/agoora-profiler-service/proto/profiler/service/v1alpha1/profiler.proto"
 ```
 
 ## Test connectivity by GRPCC request
