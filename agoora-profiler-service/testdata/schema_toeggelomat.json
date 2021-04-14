@@ -1,0 +1,363 @@
+{
+    "type": "record",
+    "name": "ToeggelomatGame",
+    "namespace": "data.producer.toeggelomat",
+    "fields": [
+        {
+            "name": "matchUuid",
+            "type": "string",
+            "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        },
+        {
+            "name": "matchTime",
+            "type": "string",
+            "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+        },
+        {
+            "name": "redScore",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 8
+        },
+        {
+            "name": "blueScore",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 8
+        },
+        {
+            "name": "points",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 41
+        },
+        {
+            "name": "blueDeffenseBefore",
+            "type": {
+                "type": "record",
+                "name": "BlueDefenseBefore",
+                "fields": [
+                    {
+                        "name": "uuid",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+                    },
+                    {
+                        "name": "nickName",
+                        "type": "string",
+                        "pattern": "[0-9a-zA-Z]+"
+                    },
+                    {
+                        "name": "email",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+                    },
+                    {
+                        "name": "defensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "offensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "lastMatchTime",
+                        "type": "string",
+                        "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "blueOffenseBefore",
+            "type": {
+                "type": "record",
+                "name": "BlueOffenseBefore",
+                "fields": [
+                    {
+                        "name": "uuid",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+                    },
+                    {
+                        "name": "nickName",
+                        "type": "string",
+                        "pattern": "[0-9a-zA-Z]+"
+                    },
+                    {
+                        "name": "email",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+                    },
+                    {
+                        "name": "defensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "offensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "lastMatchTime",
+                        "type": "string",
+                        "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "redDeffenseBefore",
+            "type": {
+                "type": "record",
+                "name": "RedDeffenseBefore",
+                "fields": [
+                    {
+                        "name": "uuid",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+                    },
+                    {
+                        "name": "nickName",
+                        "type": "string",
+                        "pattern": "[0-9a-zA-Z]+"
+                    },
+                    {
+                        "name": "email",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+                    },
+                    {
+                        "name": "defensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "offensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "lastMatchTime",
+                        "type": "string",
+                        "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "redOffenseBefore",
+            "type": {
+                "type": "record",
+                "name": "RedOffenseBefore",
+                "fields": [
+                    {
+                        "name": "uuid",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+                    },
+                    {
+                        "name": "nickName",
+                        "type": "string",
+                        "pattern": "[0-9a-zA-Z]+"
+                    },
+                    {
+                        "name": "email",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+                    },
+                    {
+                        "name": "defensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "offensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "lastMatchTime",
+                        "type": "string",
+                        "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+                    }
+                ]
+            }
+        },
+         {
+            "name": "blueDeffenseAfter",
+            "type": {
+                "type": "record",
+                "name": "BlueDefenseAfter",
+                "fields": [
+                    {
+                        "name": "uuid",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+                    },
+                    {
+                        "name": "nickName",
+                        "type": "string",
+                        "pattern": "[0-9a-zA-Z]+"
+                    },
+                    {
+                        "name": "email",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+                    },
+                    {
+                        "name": "defensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "offensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "lastMatchTime",
+                        "type": "string",
+                        "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "blueOffenseAfter",
+            "type": {
+                "type": "record",
+                "name": "BlueOffenseAfter",
+                "fields": [
+                    {
+                        "name": "uuid",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+                    },
+                    {
+                        "name": "nickName",
+                        "type": "string",
+                        "pattern": "[0-9a-zA-Z]+"
+                    },
+                    {
+                        "name": "email",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+                    },
+                    {
+                        "name": "defensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "offensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "lastMatchTime",
+                        "type": "string",
+                        "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "redDeffenseAfter",
+            "type": {
+                "type": "record",
+                "name": "RedDeffenseAfter",
+                "fields": [
+                    {
+                        "name": "uuid",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+                    },
+                    {
+                        "name": "nickName",
+                        "type": "string",
+                        "pattern": "[0-9a-zA-Z]+"
+                    },
+                    {
+                        "name": "email",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+                    },
+                    {
+                        "name": "defensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "offensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "lastMatchTime",
+                        "type": "string",
+                        "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "redOffenseAfter",
+            "type": {
+                "type": "record",
+                "name": "RedOffenseAfter",
+                "fields": [
+                    {
+                        "name": "uuid",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+                    },
+                    {
+                        "name": "nickName",
+                        "type": "string",
+                        "pattern": "[0-9a-zA-Z]+"
+                    },
+                    {
+                        "name": "email",
+                        "type": "string",
+                        "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+                    },
+                    {
+                        "name": "defensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "offensePoints",
+                        "type": "long",
+                        "minimum": 200,
+                        "maximum": 800
+                    },
+                    {
+                        "name": "lastMatchTime",
+                        "type": "string",
+                        "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+                    }
+                ]
+            }
+        }
+    ]
+}

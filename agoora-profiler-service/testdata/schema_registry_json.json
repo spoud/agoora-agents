@@ -1,0 +1,80 @@
+{
+    "properties": {
+        "GET /pet/findByStatus": {
+            "properties": {
+                "Parameters": {
+                    "type": "object",
+                    "properties": {
+                        "status": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "Response": {
+                    "type": "object",
+                    "properties": {
+                        "200": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "Category": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "photoUrls": {
+                                    "type": "array",
+                                    "properties": {
+                                        "": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "tags": {
+                                    "type": "array",
+                                    "properties": {
+                                        "Tag": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "photoUrls"
+                            ]
+                        },
+                        "400": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "type": "object"
+        }   
+    },
+    "type": "object",
+    "$schema": "http://json-schema.org/schema#"
+}

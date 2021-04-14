@@ -1,0 +1,53 @@
+{
+    "_comment": "BEWARE THIS DATA IS HANDMADE (WITH CARE BUT STILL)AND MAY NOT REPRESENT THE ACTUAL NESTED STRUCTURE",
+    "type": "record",
+    "name": "whatever",
+    "namespace": "data.producer.iss",
+    "fields": [
+        {
+            "name": "complex",
+            "type": {
+                "type": "record",
+                "name": "complexType",
+                "fields": [
+                    {
+                        "name": "subtypeString",
+                        "type": "string"
+                    },
+                    {
+                        "name": "subtypeNumber",
+                        "type": ["string", null]
+                    },
+                    {
+                        "name": "subtypeComplex",
+                        "type": {
+                            "type": "record",
+                            "name": "subtypeComplex",
+                            "fields": [
+                                {
+                                    "name": "subtypeString",
+                                    "type": ["string", "null"]
+                                },
+                                {
+                                    "name": "subtypeNumber",
+                                    "type": "long"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "simpleString",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        {
+            "name": "simpleNumber",
+            "type": "long"
+        }
+    ]
+}

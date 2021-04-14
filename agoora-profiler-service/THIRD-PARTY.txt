@@ -1,0 +1,47 @@
+
+Apache-2.0
+	'ansiwrap' by 'Jonathan Eunice <jonathan.eunice@gmail.com>' ('https://github.com/jonathaneunice/ansiwrap')
+	'bleach' by 'Will Kahn-Greene <willkg@mozilla.com>' ('https://github.com/mozilla/bleach')
+	'grpcio' by 'The gRPC Authors <grpc-io@googlegroups.com>' ('https://grpc.io')
+	'grpcio-tools' by 'The gRPC Authors <grpc-io@googlegroups.com>' ('https://grpc.io')
+	'python-dateutil' by 'Gustavo Niemeyer <gustavo@niemeyer.net>' ('https://dateutil.readthedocs.io')
+	'requests' by 'Kenneth Reitz <me@kennethreitz.org>' ('http://python-requests.org')
+	'tenacity' by 'Julien Danjou <julien@danjou.info>' ('https://github.com/jd/tenacity')
+	'tornado' by 'Facebook <python-tornado@googlegroups.com>' ('http://www.tornadoweb.org/')
+
+BSD-3-clause
+	'backcall' by 'Thomas Kluyver <takowl@gmail.com>' ('https://github.com/takluyver/backcall')
+	'enum34' by 'Ethan Furman <ethan@stoneleaf.us>' ('https://bitbucket.org/stoneleaf/enum34')
+	'idna' by 'Kim Davies <kim@cynosure.com.au>' ('https://github.com/kjd/idna')
+	'ipython' by 'The IPython Development Team <ipython-dev@python.org>' ('https://ipython.org')
+	'ipython-genutils' by 'IPython Development Team <ipython-dev@scipy.org>' ('http://ipython.org')
+	'jupyter-client' by 'Jupyter Development Team <jupyter@googlegroups.com>' ('https://jupyter.org')
+	'jupyter-core' by 'Jupyter Development Team <jupyter@googlegroups.org>' ('https://jupyter.org')
+	'mistune' by 'Hsiaoming Yang <me@lepture.com>' ('https://github.com/lepture/mistune')
+	'nbconvert' by 'Jupyter Development Team <jupyter@googlegroups.com>' ('https://jupyter.org')
+	'nbformat' by 'Jupyter Development Team <jupyter@googlegroups.com>' ('http://jupyter.org')
+	'numpy' by 'Travis E. Oliphant et al.' ('https://www.numpy.org')
+	'pandas' by None ('http://pandas.pydata.org')
+	'pandocfilters' by 'John MacFarlane <fiddlosopher@gmail.com>' ('http://github.com/jgm/pandocfilters')
+	'papermill' by 'nteract contributors <nteract@googlegroups.com>' ('https://github.com/nteract/papermill')
+	'prompt-toolkit' by 'Jonathan Slenders <UNKNOWN>' ('https://github.com/jonathanslenders/python-prompt-toolkit')
+	'protobuf' by None ('https://developers.google.com/protocol-buffers/')
+	'testpath' by 'Jupyter Development Team <jupyter@googlegroups.com>' ('https://github.com/jupyter/testpath')
+	'traitlets' by 'IPython Development Team <ipython-dev@scipy.org>' ('http://ipython.org')
+
+MIT
+	'future' by 'Ed Schofield <ed@pythoncharmers.com>' ('https://python-future.org')
+	'genson' by 'Jon Wolverton <wolverton.jr@gmail.com>' ('https://github.com/wolverdude/genson/')
+	'jedi' by 'David Halter <davidhalter88@gmail.com>' ('https://github.com/davidhalter/jedi')
+	'pandas-profiling' by 'Jos Polfliet <jos.polfliet+panpro@gmail.com>' ('https://github.com/pandas-profiling/pandas-profiling')
+	'parso' by 'David Halter <davidhalter88@gmail.com>' ('https://github.com/davidhalter/parso')
+	'pickleshare' by 'Ville Vainio <vivainio@gmail.com>' ('https://github.com/pickleshare/pickleshare')
+	'pytz' by 'Stuart Bishop <stuart@stuartbishop.net>' ('http://pythonhosted.org/pytz')
+	'tqdm' by None ('https://github.com/tqdm/tqdm')
+	'urllib3' by 'Andrey Petrov <andrey.petrov@shazow.net>' ('https://urllib3.readthedocs.io/')
+
+Python-2.0
+	'defusedxml' by 'Christian Heimes <christian@python.org>' ('https://github.com/tiran/defusedxml')
+	'matplotlib' by 'John D. Hunter, Michael Droettboom <matplotlib-users@python.org>' ('http://matplotlib.org')
+	'textwrap3' by 'Jonathan Eunice <jonathan.eunice@gmail.com>' ('https://github.com/jonathaneunice/textwrap3')
+

@@ -1,0 +1,256 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "matchUuid": {
+      "type": "string",
+      "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+    },
+    "matchTime": {
+      "type": "string",
+      "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+    },
+    "redScore": { "type": "integer", "minimum": 0, "maximum": 8 },
+    "blueScore": { "type": "integer", "minimum": 0, "maximum": 8 },
+    "points": { "type": "integer", "minimum": 0, "maximum": 41 },
+    "blueDeffenseBefore": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        },
+        "nickName": { "type": "string", "pattern": "[0-9a-zA-Z]+" },
+        "email": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+        },
+        "defensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "offensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "lastMatchTime": {
+          "type": "string",
+          "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+        }
+      },
+      "required": [
+        "defensePoints",
+        "email",
+        "lastMatchTime",
+        "nickName",
+        "offensePoints",
+        "uuid"
+      ]
+    },
+    "blueOffenseBefore": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        },
+        "nickName": { "type": "string", "pattern": "[0-9a-zA-Z]+" },
+        "email": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+        },
+        "defensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "offensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "lastMatchTime": {
+          "type": "string",
+          "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+        }
+      },
+      "required": [
+        "defensePoints",
+        "email",
+        "lastMatchTime",
+        "nickName",
+        "offensePoints",
+        "uuid"
+      ]
+    },
+    "redDeffenseBefore": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        },
+        "nickName": { "type": "string", "pattern": "[0-9a-zA-Z]+" },
+        "email": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+        },
+        "defensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "offensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "lastMatchTime": {
+          "type": "string",
+          "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+        }
+      },
+      "required": [
+        "defensePoints",
+        "email",
+        "lastMatchTime",
+        "nickName",
+        "offensePoints",
+        "uuid"
+      ]
+    },
+    "redOffenseBefore": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        },
+        "nickName": { "type": "string", "pattern": "[0-9a-zA-Z]+" },
+        "email": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+        },
+        "defensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "offensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "lastMatchTime": {
+          "type": "string",
+          "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+        }
+      },
+      "required": [
+        "defensePoints",
+        "email",
+        "lastMatchTime",
+        "nickName",
+        "offensePoints",
+        "uuid"
+      ]
+    },
+    "blueDeffenseAfter": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        },
+        "nickName": { "type": "string", "pattern": "[0-9a-zA-Z]+" },
+        "email": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+        },
+        "defensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "offensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "lastMatchTime": {
+          "type": "string",
+          "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+        }
+      },
+      "required": [
+        "defensePoints",
+        "email",
+        "lastMatchTime",
+        "nickName",
+        "offensePoints",
+        "uuid"
+      ]
+    },
+    "blueOffenseAfter": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        },
+        "nickName": { "type": "string", "pattern": "[0-9a-zA-Z]+" },
+        "email": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+        },
+        "defensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "offensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "lastMatchTime": {
+          "type": "string",
+          "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+        }
+      },
+      "required": [
+        "defensePoints",
+        "email",
+        "lastMatchTime",
+        "nickName",
+        "offensePoints",
+        "uuid"
+      ]
+    },
+    "redDeffenseAfter": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        },
+        "nickName": { "type": "string", "pattern": "[0-9a-zA-Z]+" },
+        "email": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+        },
+        "defensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "offensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "lastMatchTime": {
+          "type": "string",
+          "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+        }
+      },
+      "required": [
+        "defensePoints",
+        "email",
+        "lastMatchTime",
+        "nickName",
+        "offensePoints",
+        "uuid"
+      ]
+    },
+    "redOffenseAfter": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        },
+        "nickName": { "type": "string", "pattern": "[0-9a-zA-Z]+" },
+        "email": {
+          "type": "string",
+          "pattern": "[0-9a-fA-F]*.[0-9a-fA-F]*@spoud.io"
+        },
+        "defensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "offensePoints": { "type": "integer", "minimum": 200, "maximum": 800 },
+        "lastMatchTime": {
+          "type": "string",
+          "pattern": "[0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}Z"
+        }
+      },
+      "required": [
+        "defensePoints",
+        "email",
+        "lastMatchTime",
+        "nickName",
+        "offensePoints",
+        "uuid"
+      ]
+    }
+  },
+  "required": [
+    "blueDeffenseAfter",
+    "blueDeffenseBefore",
+    "blueOffenseAfter",
+    "blueOffenseBefore",
+    "blueScore",
+    "matchTime",
+    "matchUuid",
+    "points",
+    "redDeffenseAfter",
+    "redDeffenseBefore",
+    "redOffenseAfter",
+    "redOffenseBefore",
+    "redScore"
+  ]
+}

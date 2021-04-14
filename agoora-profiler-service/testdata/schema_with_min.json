@@ -1,0 +1,19 @@
+{
+   "type": "record",
+   "name": "RandomData",
+   "namespace": "data.producer.random",
+   "fields": [
+       {
+           "name": "random_integer",
+           "type": "int",
+           "expectations": [
+               {
+                  "kwargs": {
+                   "min_value": 0
+                 },
+                 "expectation_type": "expect_column_values_to_be_between"
+               }
+           ]
+       }
+   ]
+}

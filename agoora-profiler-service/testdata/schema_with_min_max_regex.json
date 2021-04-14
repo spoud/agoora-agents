@@ -1,0 +1,33 @@
+{
+   "type": "record",
+   "name": "RandomData",
+   "namespace": "data.producer.random",
+   "fields": [
+       {
+           "name": "random_integer",
+           "type": "int",
+           "expectations": [
+           {
+                  "kwargs": {
+                   "min_value": 0,
+                   "max_value": 3
+                 },
+                 "expectation_type": "expect_column_values_to_be_between"
+               }
+           ]
+       },
+        {
+           "name": "random_string",
+           "type": "string",
+           "expectations": [
+           {
+                 "kwargs": {
+                   "regex": "id_"
+                 },
+                 "meta": {},
+                 "expectation_type": "expect_column_values_to_match_regex"
+               }
+           ]
+       }
+   ]
+}

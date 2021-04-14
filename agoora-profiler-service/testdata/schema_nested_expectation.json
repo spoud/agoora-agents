@@ -1,0 +1,31 @@
+{
+    "type": "record",
+    "name": "IssPositionMessage",
+    "namespace": "data.producer.iss",
+    "fields": [
+        {
+            "name": "iss_position",
+            "type": {
+                "type": "record",
+                "name": "IssPosition",
+                "fields": [
+                    {
+                        "name": "longitude",
+                        "type": "string",
+                        "pattern": "foo"
+                    },
+                    {
+                        "name": "latitude",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "timestamp",
+            "type": "long",
+            "minimum": 0,
+            "maximum": 10
+        }
+    ]
+}

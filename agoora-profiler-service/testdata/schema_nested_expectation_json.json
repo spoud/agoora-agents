@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "complex": {
+            "type": "object",
+            "properties": {
+                "type1number": {
+                    "type": "number",
+                    "pattern": "foo"
+                },
+                "type3complex": {
+                    "type": "object",
+                    "properties": {
+                        "subtype1number": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 10
+                        }
+                    },
+                    "required": [
+                        "subtype1number"
+                    ]
+                }
+            },
+            "required": [
+                "type3complex"
+            ]
+        }
+    }
+}
+
