@@ -1,0 +1,23 @@
+{
+    "type": "record",
+    "name": "RandomMessage",
+    "namespace": "data.producer.random",
+    "fields": [
+        {
+            "name": "random_string",
+            "type": "string"
+        },
+        {
+            "name": "random_integer",
+            "type": "integer"
+        },
+        {
+            "name": "random_float",
+            "type": "integer"
+        },
+        {
+            "name": "random_boolean",
+            "type": "boolean"
+        }
+    ]
+}

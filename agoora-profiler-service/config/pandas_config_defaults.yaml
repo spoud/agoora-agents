@@ -1,0 +1,38 @@
+# Title of the document
+title: "Pandas Profiling Report"
+
+# Number of workers (0=multiprocessing.cpu_count())
+pool_size: 1
+
+# which diagrams to show
+missing_diagrams:
+    bar: False
+    matrix: False
+    heatmap: False
+    dendrogram: False
+
+interactions:
+  continuous: False
+
+correlations:
+    pearson:
+      calculate: False
+    spearman:
+      calculate: False
+    kendall:
+      calculate: False
+    phi_k:
+      calculate: False
+    cramers:
+      calculate: False
+    recoded:
+      calculate: False
+
+check_recoded: False
+
+html:
+  # Styling options for the HTML report
+    style:
+      full_width: True
+    navbar_show: False
+

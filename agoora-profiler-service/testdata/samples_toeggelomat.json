@@ -1,0 +1,142 @@
+[{
+    "matchUuid": "12df67c3-22ce-46c5-b563-32de79c63785",
+    "matchTime": "2020-08-14T11:37:12.180799Z",
+    "redScore": 2,
+    "blueScore": 7,
+    "points": 11,
+    "blueDeffenseBefore": {
+        "uuid": "f7eca34c-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Thomas",
+        "email": "thomas.schuerch@spoud.io",
+        "defensePoints": 484,
+        "offensePoints": 432,
+        "lastMatchTime": "2020-08-12T13:04:02.158036Z"
+    },
+    "blueOffenseBefore": {
+        "uuid": "b480ad5c-00c5-11ea-8d71-362b9e155667",
+        "nickName": "Julian",
+        "email": "julian.stampfli@spoud.io",
+        "defensePoints": 547,
+        "offensePoints": 684,
+        "lastMatchTime": "2020-08-13T12:46:00.13615Z"
+    },
+    "redDeffenseBefore": {
+        "uuid": "f7eca220-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Jonathan",
+        "email": "jonathan.lacost@spoud.io ",
+        "defensePoints": 491,
+        "offensePoints": 527,
+        "lastMatchTime": "2020-07-22T13:05:21.364233Z"
+    },
+    "redOffenseBefore": {
+        "uuid": "f7ec92b2-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Danielle",
+        "email": "danielle.flueckiger@spoud.io",
+        "defensePoints": 466,
+        "offensePoints": 440,
+        "lastMatchTime": "2020-07-13T14:02:13.97937Z"
+    },
+    "blueDeffenseAfter": {
+        "uuid": "f7eca34c-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Thomas",
+        "email": "thomas.schuerch@spoud.io",
+        "defensePoints": 496,
+        "offensePoints": 432,
+        "lastMatchTime": "2020-08-14T11:37:12.182785Z"
+    },
+    "blueOffenseAfter": {
+        "uuid": "b480ad5c-00c5-11ea-8d71-362b9e155667",
+        "nickName": "Julian",
+        "email": "julian.stampfli@spoud.io",
+        "defensePoints": 547,
+        "offensePoints": 696,
+        "lastMatchTime": "2020-08-14T11:37:12.182785Z"
+    },
+    "redDeffenseAfter": {
+        "uuid": "f7eca220-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Jonathan",
+        "email": "jonathan.lacost@spoud.io ",
+        "defensePoints": 481,
+        "offensePoints": 527,
+        "lastMatchTime": "2020-08-14T11:37:12.182785Z"
+    },
+    "redOffenseAfter": {
+        "uuid": "f7ec92b2-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Danielle",
+        "email": "danielle.flueckiger@spoud.io",
+        "defensePoints": 466,
+        "offensePoints": 430,
+        "lastMatchTime": "2020-08-14T11:37:12.182785Z"
+    }
+},
+{
+    "matchUuid": "12df67c3-22ce-46c5-b563-32de79c63786",
+    "matchTime": "2020-08-14T11:37:12.180799Z",
+    "redScore": 2,
+    "blueScore": 7,
+    "points": 11,
+    "blueDeffenseBefore": {
+        "uuid": "f7eca34c-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Ronaldo",
+        "email": "christiano.ronaldo@spoud.io",
+        "defensePoints": 484,
+        "offensePoints": 432,
+        "lastMatchTime": "2020-08-12T13:04:02.158036Z"
+    },
+    "blueOffenseBefore": {
+        "uuid": "b480ad5c-00c5-11ea-8d71-362b9e155667",
+        "nickName": "Messi",
+        "email": "lionell.messi@spoud.io",
+        "defensePoints": 547,
+        "offensePoints": 684,
+        "lastMatchTime": "2020-08-13T12:46:00.13615Z"
+    },
+    "redDeffenseBefore": {
+        "uuid": "f7eca220-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Ronaldinho",
+        "email": "ronaldo.deassis@spoud.io ",
+        "defensePoints": 491,
+        "offensePoints": 527,
+        "lastMatchTime": "2020-07-22T13:05:21.364233Z"
+    },
+    "redOffenseBefore": {
+        "uuid": "f7ec92b2-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Neymar",
+        "email": "neymar.silvasantos@spoud.io",
+        "defensePoints": 466,
+        "offensePoints": 440,
+        "lastMatchTime": "2020-07-13T14:02:13.97937Z"
+    },
+    "blueDeffenseAfter": {
+        "uuid": "f7eca34c-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Zidane",
+        "email": "zinedine.zidane@spoud.io",
+        "defensePoints": 496,
+        "offensePoints": 432,
+        "lastMatchTime": "2020-08-14T11:37:12.182785Z"
+    },
+    "blueOffenseAfter": {
+        "uuid": "b480ad5c-00c5-11ea-8d71-362b9e155667",
+        "nickName": "Pelé",
+        "email": "edson.arantesdosascimento@spoud.io",
+        "defensePoints": 547,
+        "offensePoints": 696,
+        "lastMatchTime": "2020-08-14T11:37:12.182785Z"
+    },
+    "redDeffenseAfter": {
+      "uuid": "f7ec92b2-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Neymar",
+        "email": "neymar.silvasantos@spoud.io",
+        "defensePoints": 481,
+        "offensePoints": 527,
+        "lastMatchTime": "2020-08-14T11:37:12.182785Z"
+    },
+    "redOffenseAfter": {
+        "uuid": "f7eca220-09d6-11ea-8d71-362b9e155667",
+        "nickName": "Ronaldinho",
+        "email": "ronaldo.deassis@spoud.io ",
+        "defensePoints": 466,
+        "offensePoints": 430,
+        "lastMatchTime": "2020-08-14T11:37:12.182785Z"
+    }
+}]

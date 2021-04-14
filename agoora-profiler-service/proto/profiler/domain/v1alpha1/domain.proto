@@ -1,0 +1,61 @@
+syntax = "proto3";
+package io.spoud.sdm.profiler.domain.v1alpha1;
+
+option java_package = "io.spoud.sdm.profiler.domain.v1alpha1";
+option java_multiple_files = true;
+
+message ProfilerError {
+  string message = 1;
+
+  enum Type {
+    UNKNOWN = 0;
+    UNKNOWN_ENCODING = 1;
+    NO_DATA = 2;
+    //The following should no longer happen since we stream multiple messages
+    //in case the message is longer than the maximum allowed size
+    //deprecated since 2020-04-30 because of no more limits in the streaming case
+    PROFILE_TOO_BIG = 3 [deprecated = true];
+    PROFILE_EXCEPTION = 4;
+  }
+
+  Type type = 2;
+}
+
+
+message Meta {
+  string request_id = 1;
+  string schema = 3;
+  ProfilerError error = 4;
+  string service_version = 5;
+  int32 total_records = 6;
+  int32 schema_byte_size = 7;
+  int32 profile_byte_size = 8;
+}
+
+
+message QualityMetrics {
+  float attribute_quality_index = 1;
+  float attribute_integrity = 2;
+  float attribute_specification = 3;
+  repeated AttributeDetail attribute_details = 4;
+}
+
+message AttributeDetail {
+  string name = 1;
+  float integrity = 2;
+  float specification = 3;
+  float quality_index = 4;
+}
+
+
+message InspectionError {
+  string message = 1;
+
+  enum Type {
+    UNKNOWN = 0;
+    UNKNOWN_ENCODING = 1;
+    NO_DATA = 2;
+  }
+
+  Type type = 2;
+}

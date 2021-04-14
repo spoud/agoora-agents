@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Profile report generated with the `pandas-profiling` Python package">
+    <meta name="author" content="Jos Polfliet, Simon Brugman and the open source community.">
+    <meta name="generator" content="Pandas Profiling {{ version }}" />
+    <meta name="url" content="https://github.com/pandas-profiling/pandas-profiling">
+
+    <title>{{ title }}</title>
+
+    {% include 'style.html' %}
+
+    <style>
+
+        .container .row.header:first-child {
+            display: none;
+        }
+        .container-fluid .row.header:first-child {
+            display: none;
+        }
+        .row.variable {
+            border: none;
+        }
+        .row.header {
+            border: none;
+        }
+        body {
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+    {{ content }}
+    </div>
+    {% include 'footer.html' %}
+    {% include 'javascript.html' %}
+</body>
+</html>

@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "complex": {
+            "type": "object",
+            "properties": {
+                "type1number": {
+                    "type": "number",
+                    "pattern": "foo",
+                    "expectations": [
+                    {
+                     "kwargs": {
+                       "regex": "foo"
+                     },
+                     "expectation_type": "expect_column_values_to_match_regex"
+                    }
+                    ]
+                },
+                "type3complex": {
+                    "type": "object",
+                    "properties": {
+                        "subtype1number": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 10,
+                            "expectations": [
+                            {
+                              "kwargs": {
+                               "min_value": 0,
+                               "max_value": 10
+                             },
+                             "expectation_type": "expect_column_values_to_be_between"
+                            }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "subtype1number"
+                    ]
+                }
+            },
+            "required": [
+                "type3complex"
+            ]
+        }
+    }
+}
+

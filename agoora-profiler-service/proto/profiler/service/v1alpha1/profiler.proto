@@ -1,0 +1,38 @@
+syntax = "proto3";
+package io.spoud.sdm.profiler.v1alpha1;
+
+option java_package = "io.spoud.sdm.profiler.service.v1alpha1";
+option java_multiple_files = true;
+
+import "profiler/domain/v1alpha1/domain.proto";
+
+service Profiler {
+  rpc ProfileDataStream (stream ProfileRequest) returns (stream ProfileDataStreamResponse);
+  rpc InspectQuality (stream InspectionRequest) returns (InspectionDataStreamResponse);
+}
+
+message ProfileRequest {
+  string request_id = 1;
+  string json_data = 2;
+}
+
+message ProfileDataStreamResponse {
+  oneof response {
+    io.spoud.sdm.profiler.domain.v1alpha1.Meta meta = 1;
+    string profile = 2;
+  }
+}
+
+message InspectionRequest {
+  string samples_json = 1;
+  string schema_json = 2;
+  bool is_schema_inferred = 3;
+}
+
+message InspectionDataStreamResponse {
+
+  oneof response {
+    io.spoud.sdm.profiler.domain.v1alpha1.QualityMetrics metric = 1;
+    io.spoud.sdm.profiler.domain.v1alpha1.InspectionError error = 2;
+  }
+}

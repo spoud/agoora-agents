@@ -1,0 +1,29 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "random_string": {
+            "type": "string",
+            "pattern": ".*z"
+        },
+        "random_integer": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+        },
+        "random_float": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 0.9
+        },
+        "random_boolean": {
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "random_boolean",
+        "random_float",
+        "random_integer",
+        "random_string"
+    ]
+}

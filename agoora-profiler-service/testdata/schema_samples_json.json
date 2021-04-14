@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "random_string": {
+            "type": "string"
+        },
+        "random_integer": {
+            "type": "integer"
+        },
+        "random_float": {
+            "type": "number"
+        },
+        "random_boolean": {
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "random_boolean",
+        "random_float",
+        "random_integer",
+        "random_string"
+    ]
+}

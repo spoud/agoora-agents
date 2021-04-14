@@ -1,0 +1,27 @@
+ {
+  "name": "RandomMessage",
+  "namespace": "data.producer.random",
+  "fields": [
+    {
+      "name": "random_string",
+      "type": "string",
+      "pattern": ".*z"
+    },
+    {
+      "name": "random_integer",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    {
+      "name": "random_float",
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 0.9
+    },
+    {
+      "name": "random_boolean",
+      "type": "boolean"
+    }
+  ]
+}

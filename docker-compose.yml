@@ -52,4 +52,7 @@ services:
       - "local.spoud.io:172.17.0.1"
 
   agoora-profiler-service:
-    image: spoud/sdm-profiler-service
+    image: spoud/agoora-profiler-service
+    build: agoora-profiler-service/
+    ports:
+      - '8089:8089'

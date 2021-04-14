@@ -1,0 +1,59 @@
+FROM python:3.7-slim as builder
+
+WORKDIR /build
+
+RUN apt-get update && \
+    apt-get install -y \
+    libpng-dev \
+    freetype* \
+    libblas-dev \
+    liblapack-dev \
+    libatlas-base-dev \
+    gfortran \
+    git \
+    fonts-liberation && \
+    apt-get install -y --no-install-recommends build-essential gcc && \
+    python -m venv /opt/venv
+
+ENV PATH="/opt/venv/bin:$PATH"
+COPY requirements.txt ./
+RUN  pip install -Ur requirements.txt
+
+
+
+COPY proto/ ./proto/
+RUN python3 -m grpc_tools.protoc -I./proto --python_out=./ --grpc_python_out=./ ./proto/profiler/domain/v1alpha1/domain.proto ./proto/profiler/service/v1alpha1/profiler.proto
+COPY config/* ./config/
+COPY profiler_app.py ./
+COPY profiler_it.py ./
+COPY quality_inspection/ ./quality_inspection/
+COPY testdata/* ./testdata/
+RUN python3 profiler_it.py
+RUN python3 -m unittest quality_inspection/tests/*
+
+FROM python:3.7-slim
+
+RUN apt update && apt install -y fonts-liberation
+
+RUN groupadd -r profiler && useradd --no-log-init -r -m -g profiler profiler
+USER profiler
+ENV HOME="/tmp"
+
+EXPOSE 8089
+
+WORKDIR /app
+
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /build/profiler ./profiler
+COPY --from=builder /build/*.py ./
+COPY config/* ./config/
+COPY quality_inspection/ ./quality_inspection/
+COPY profiler_app.py ./
+COPY template/wrapper.html /opt/venv/lib/python3.7/site-packages/pandas_profiling/view/templates
+
+
+ENV PATH="/opt/venv/bin:$PATH"
+# set home so that any user is able to write into. The profiler builds some cache etc. and wants to store in home.
+ARG VERSION=default
+ENV SDM_PROFILER_SERVICE_VERSION=${VERSION}
+ENTRYPOINT python profiler_app.py

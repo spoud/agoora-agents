@@ -82,7 +82,7 @@ pipeline {
             axes {
                 axis{
                     name 'AGENT'
-                    values 'agoora-pgsql-agent', 'agoora-mqtt-agent', 'agoora-kafka-agent', 'agoora-openapi-agent'
+                    values 'agoora-pgsql-agent', 'agoora-mqtt-agent', 'agoora-kafka-agent', 'agoora-openapi-agent', 'agoora-profiler-service'
                 }
             }
             stages{
