@@ -22,8 +22,8 @@
 
         <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <quarkus-plugin.version>1.13.0.Final</quarkus-plugin.version>
-        <quarkus.platform.version>1.13.0.Final</quarkus.platform.version>
+        <quarkus-plugin.version>1.13.1.Final</quarkus-plugin.version>
+        <quarkus.platform.version>1.13.1.Final</quarkus.platform.version>
 
         <sonar.projectKey>spoud_${project.artifactId}</sonar.projectKey>
         <sonar.organization>spoud</sonar.organization>
