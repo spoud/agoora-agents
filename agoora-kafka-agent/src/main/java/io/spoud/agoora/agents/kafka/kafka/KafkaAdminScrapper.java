@@ -31,11 +31,11 @@ public class KafkaAdminScrapper {
   private final KafkaTopicMapper kafkaTopicMapper;
   private final KafkaConsumerGroupMapper kafkaConsumerGroupMapper;
   private AdminClient adminClient;
-  private Pattern t;
+  private Pattern topicFilterRegex;
   private Pattern consumerGroupFilterRegex;
 
   void postConstruct(@Observes StartupEvent event) {
-    t = Pattern.compile(config.getKafka().getTopicFilterRegex());
+    topicFilterRegex = Pattern.compile(config.getKafka().getTopicFilterRegex());
     consumerGroupFilterRegex = Pattern.compile(config.getKafka().getConsumerGroupFilterRegex());
     adminClient = KafkaFactory.createAdminClient(config);
   }
@@ -45,7 +45,7 @@ public class KafkaAdminScrapper {
       List<String> topicNames =
           adminClient.listTopics().names().get().stream()
               .filter(t -> !t.startsWith("_")) // remove internal topics
-              .filter(t -> this.t.matcher(t).matches())
+              .filter(t -> this.topicFilterRegex.matcher(t).matches())
               .collect(Collectors.toList());
       return adminClient.describeTopics(topicNames).all().get().values().stream()
           .map(
