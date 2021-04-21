@@ -5,7 +5,7 @@ This agent will scrape an MQTT broker.
 ## Configuration
 
 ```
---8<-- "components/agoora-agents/agoora-mqtt-agent/src/main/resources/application.yml"
+--8<-- "components/agoora-mqtt-agent/src/main/resources/application.yml"
 ```
 
 ## Minimal configuration 

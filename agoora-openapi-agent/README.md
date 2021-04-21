@@ -1,4 +1,4 @@
-# sdm-openapi-agent
+# agoora-openapi-agent
 
 This agent scrape an Open API endpoint and extract all tags as Data Port and all method/path 
 as Data Item.
@@ -10,9 +10,9 @@ responses, ...)
 
 The required configuration is:
 ```shell
-SDM_ENDPOINT=app.agoora.com
-SDM_TRANSPORT_PATH=/public/openapi
-SDM_AUTH_USER_NAME=${AGENT_USERNAME}
-SDM_AUTH_USER_TOKEN=${AGENT_TOKEN}
-SDM_OPENAPI_BASE_URL=https://petstore3.swagger.io/
+AGOORA_ENDPOINT=app.agoora.com
+AGOORA_TRANSPORT_PATH=/public/openapi
+AGOORA_AUTH_USER_NAME=${AGENT_USERNAME}
+AGOORA_AUTH_USER_TOKEN=${AGENT_TOKEN}
+AGOORA_OPENAPI_BASE_URL=https://petstore3.swagger.io/
 ```
