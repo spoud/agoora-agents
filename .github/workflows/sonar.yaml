@@ -16,6 +16,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
+          distribution: 'adopt'
       - name: Build with Maven
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
