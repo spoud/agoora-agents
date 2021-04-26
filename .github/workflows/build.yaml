@@ -17,8 +17,10 @@ jobs:
           graalvm: '21.0.0.2'
           java: 'java11'
           arch: 'amd64'
+      - name: Maven version
+        run: mvn -v
       - name: Build with Maven
         run: mvn --batch-mode clean package
       - name: Build native
-        run: mvn --batch-mode package -DskipTests -Pnative
+        run: mvn --batch-mode package -DskipTests -Pnative -Dquarkus.native.native-image-xmx=4g
 
