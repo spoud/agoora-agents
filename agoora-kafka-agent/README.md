@@ -10,7 +10,7 @@ This agents target Kafka. It will:
 ## Configuration
 
 ```
---8<-- "components/agoora-agents/agoora-kafka-agent/src/main/resources/application.yml"
+--8<-- "components/agoora-kafka-agent/src/main/resources/application.yml"
 ```
 
 ### SSL

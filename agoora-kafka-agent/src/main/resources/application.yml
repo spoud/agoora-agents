@@ -59,6 +59,9 @@ agoora:
     insecure: true
 
 quarkus:
+  kafka:
+    snappy:
+      enabled: true
   reactive-messaging:
     health:
       enabled: false

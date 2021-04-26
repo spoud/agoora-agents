@@ -1,4 +1,4 @@
-# SDM Postgresql Agent
+# Agoora Postgresql Agent
 
 This agent will scrape a postgresql database.
 
@@ -8,7 +8,7 @@ and create a profile).
 ## Configuration
 
 ```
---8<-- "components/agoora-agents/agoora-pgsql-agent/src/main/resources/application.yml"
+--8<-- "components/agoora-pgsql-agent/src/main/resources/application.yml"
 ```
 
 ## Minimal configuration 
@@ -17,16 +17,16 @@ and create a profile).
 QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://{HOST}:{PORT}/{DATABASE}
 QUARKUS_DATASOURCE_USERNAME={USERNAME}
 QUARKUS_DATASOURCE_PASSWORD={PASSWORD}
-SDM_ENDPOINT=app.agoora.com
-SDM_AUTH_USER_NAME={AGENT_USERNAME}
-SDM_AUTH_USER_PASSWORD={AGENT_SECRET}
-SDM_PROFILER_ENDPOINT=localhost:8089
+AGOORA_ENDPOINT=app.agoora.com
+AGOORA_AUTH_USER_NAME={AGENT_USERNAME}
+AGOORA_AUTH_USER_PASSWORD={AGENT_SECRET}
+AGOORA_PROFILER_ENDPOINT=localhost:8089
 ```
 
 ## Enable/disable profiling
 
 If you don't want the agent to look into your data you can disable the profiling by using:
 ```
-SDM_SCRAPPER_PROFILING_ENABLED=false
+AGOORA_SCRAPPER_PROFILING_ENABLED=false
 ```
 This way you can avoid that some sample data end up in the UI.
