@@ -112,6 +112,37 @@ jobs:
           docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}
           docker push spoud/${{ matrix.agents }}:dev
 
+  publish-release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: maven-output
+      - name: prepare-binaries
+        run: |
+          mkdir binaries/
+          mv agoora-kafka-agent/target/*-runner binaries/agoora-kafka-agent
+          mv agoora-mqtt-agent/target/*-runner binaries/agoora-mqtt-agent
+          mv agoora-openapi-agent/target/quarkus-app/**/*.jar binaries/agoora-openapi-agent.jar
+          mv agoora-pgsql-agent/target/*-runner binaries/agoora-pgsql-agent
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            README.md
+            LICENCE
+            binaries/agoora-kafka-agent
+            binaries/agoora-mqtt-agent
+            binaries/agoora-openapi-agent.jar
+            binaries/agoora-pgsql-agent
+
+
   stop-runner:
     name: Stop self-hosted EC2 runner
     needs:
