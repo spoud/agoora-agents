@@ -27,7 +27,7 @@ jobs:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           ec2-image-id: ami-0dca0a69b4b09c006
-          ec2-instance-type: t3.2xlarge
+          ec2-instance-type: c5a.2xlarge
           subnet-id: subnet-f579fa9f
           security-group-id: sg-02302868ae4943d2c
           aws-resource-tags: >
@@ -89,7 +89,7 @@ jobs:
           - agoora-kafka-agent
           - agoora-mqtt-agent
           - aggora-openapi-agent
-          - pgsql-agent
+          - aggora-pgsql-agent
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
@@ -104,10 +104,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: docker push tag
-        run: docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}
-      - name: docker push dev
-        run: docker push spoud/${{ matrix.agents }}:dev
+      - name: docker push
+        if: github.ref == 'refs/heads/master'
+        run: |
+          docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}
+          docker push spoud/${{ matrix.agents }}:dev
 
   stop-runner:
     name: Stop self-hosted EC2 runner
