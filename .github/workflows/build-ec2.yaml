@@ -75,7 +75,7 @@ jobs:
       - name: ls kafka
         run: ls -lah agoora-kafka-agent/targets
 
-  build-docker:
+  docker-build:
     needs:
       - start-runner
       - build
