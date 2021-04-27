@@ -27,8 +27,8 @@ jobs:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           ec2-image-id: ami-0dca0a69b4b09c006
-#          ec2-instance-type: c5a.2xlarge # cost ~0.16 CHF per build (30min build time)
-          ec2-instance-type: c5a.8xlarge # cost ~0.24 CHF per build (20min build time)
+          ec2-instance-type: c5a.2xlarge # cost ~0.16 CHF per build (30min build time)
+#          ec2-instance-type: c5a.8xlarge # cost ~0.24 CHF per build (20min build time)
           subnet-id: subnet-f579fa9f
           security-group-id: sg-02302868ae4943d2c
           aws-resource-tags: >
@@ -71,7 +71,7 @@ jobs:
       - name: Build with Maven
         run: mvn --batch-mode clean package
       - name: Build native
-        run: mvn --batch-mode package -DskipTests -Pnative -T 1C
+        run: mvn --batch-mode package -DskipTests -Pnative
       - uses: actions/upload-artifact@v2
         with:
           name: maven-output
