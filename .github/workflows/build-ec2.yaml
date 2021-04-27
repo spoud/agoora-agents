@@ -75,7 +75,7 @@ jobs:
         with:
           path: |
             ./**/target/*-runner
-            ./**/target/*.jar
+            ./**/target/quarkus-app/*.jar
 
   test-output-build:
     needs:
