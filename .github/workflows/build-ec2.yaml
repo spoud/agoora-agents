@@ -71,7 +71,7 @@ jobs:
       - name: Build with Maven
         run: mvn --batch-mode clean package
       - name: Build native
-        run: mvn --batch-mode package -DskipTests -Pnative -T 1C
+        run: mvn --batch-mode package -DskipTests -Pnative
       - uses: actions/upload-artifact@v2
         with:
           name: maven-output
