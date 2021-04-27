@@ -1,0 +1,166 @@
+name: Java build EC2
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  start-runner:
+    name: Start self-hosted EC2 runner
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+      git-tag:  ${{ steps.git-tag.outputs.git-tag }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+      - name: Start EC2 runner
+        id: start-ec2-runner
+        uses: machulav/ec2-github-runner@v2.2.0
+        with:
+          mode: start
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          ec2-image-id: ami-0dca0a69b4b09c006
+#          ec2-instance-type: c5a.2xlarge # cost ~0.16 CHF per build (30min build time)
+          ec2-instance-type: c5a.8xlarge # cost ~0.24 CHF per build (20min build time)
+          subnet-id: subnet-f579fa9f
+          security-group-id: sg-02302868ae4943d2c
+          aws-resource-tags: >
+            [
+              {"Key": "Name", "Value": "ec2-github-runner"},
+              {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
+            ]
+      - name: git tag
+        id: git-tag
+        run: .github/git-tag.sh
+
+  build:
+    needs: start-runner # required to start the main job when the runner is ready
+    runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
+    env:
+      MAVEN_OPTS: -Xmx4g
+
+    steps:
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: 3.6.3
+      - uses: DeLaGuardo/setup-graalvm@4.0
+        with:
+          graalvm: '21.0.0.2'
+          java: 'java11'
+          arch: 'amd64'
+      - name: Maven version
+        run: mvn -v
+      - name: Build with Maven
+        run: mvn --batch-mode clean package
+      - name: Build native
+        run: mvn --batch-mode package -DskipTests -Pnative -T 1C
+      - uses: actions/upload-artifact@v2
+        with:
+          name: maven-output
+          path: |
+            ./**/target/*-runner
+            ./**/target/quarkus-app/**/*
+
+  docker-build:
+    needs:
+      - start-runner
+      - build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        agents:
+          - agoora-kafka-agent
+          - agoora-mqtt-agent
+          - agoora-openapi-agent
+          - agoora-pgsql-agent
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: maven-output
+      - name: docker build
+        run: docker build -t spoud/${{ matrix.agents }}:dev ./${{ matrix.agents }}/
+      - name: docker tag
+        run: docker tag spoud/${{ matrix.agents }}:dev spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: docker push
+        run: |
+          docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}
+          docker push spoud/${{ matrix.agents }}:dev
+
+  publis-release:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: maven-output
+      - name: prepare-binaries
+        run: |
+          mkdir binaries/
+          mv agoora-kafka-agent/target/*-runner binaries/agoora-kafka-agent
+          mv agoora-mqtt-agent/target/*-runner binaries/agoora-mqtt-agent
+          mv agoora-openapi-agent/target/quarkus-app/**/*.jar binaries/agoora-openapi-agent.jar
+          mv agoora-pgsql-agent/target/*-runner binaries/agoora-pgsql-agent
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+          README.md
+          LICENCE
+          binaries/agoora-kafka-agent
+          binaries/agoora-mqtt-agent
+          binaries/agoora-openapi-agent.jar
+          binaries/agoora-pgsql-agent
+
+  stop-runner:
+    name: Stop self-hosted EC2 runner
+    needs:
+      - start-runner
+      - build
+    runs-on: ubuntu-latest
+    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+      - name: Stop EC2 runner
+        uses: machulav/ec2-github-runner@v2.2.0
+        with:
+          mode: stop
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          label: ${{ needs.start-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
