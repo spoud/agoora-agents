@@ -124,9 +124,9 @@ jobs:
           name: maven-output
       - name: prepare-binaries
         run: |
-          mkdir binaries/
+          mkdir binaries
           mv agoora-kafka-agent/target/*-runner binaries/agoora-kafka-agent
-          mv agoora-mqtt-agent/target/quarkus-app/**/*.jar binaries/agoora-mqtt-agent.jar
+          mv agoora-mqtt-agent/target/quarkus-app/*.jar binaries/agoora-mqtt-agent.jar
           mv agoora-openapi-agent/target/*-runner binaries/agoora-openapi-agent
           mv agoora-pgsql-agent/target/*-runner binaries/agoora-pgsql-agent
           ls -lah binaries/
