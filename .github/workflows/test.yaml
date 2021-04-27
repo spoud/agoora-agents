@@ -72,7 +72,9 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: maven-output
-          path: ./**/target/*
+          path: |
+            ./**/target/*-runner
+            ./**/target/*.jar
 
   test-output-build:
     needs:
@@ -88,7 +90,7 @@ jobs:
       - name: ls root
         run: ls -lah
       - name: ls kafka
-        run: ls -lah agoora-kafka-agent/targets
+        run: ls -lah agoora-kafka-agent/target
 
   docker-build:
     needs:
@@ -109,9 +111,9 @@ jobs:
         with:
           name: maven-output
       - name: docker build
-        run: docker build -t spoud/ ${{ matrix.agents }}:dev ./${{ matrix.agents }}/
+        run: docker build -t spoud/${{ matrix.agents }}:dev ./${{ matrix.agents }}/
       - name: docker push
-        run: docker push spoud/ ${{ matrix.agents }}:dev
+        run: docker push spoud/${{ matrix.agents }}:dev
 
   stop-runner:
     name: Stop self-hosted EC2 runner
