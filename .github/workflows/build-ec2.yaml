@@ -27,7 +27,8 @@ jobs:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           ec2-image-id: ami-0dca0a69b4b09c006
-          ec2-instance-type: c5a.2xlarge
+#          ec2-instance-type: c5a.2xlarge
+          ec2-instance-type: c5a.8xlarge
           subnet-id: subnet-f579fa9f
           security-group-id: sg-02302868ae4943d2c
           aws-resource-tags: >
@@ -89,8 +90,8 @@ jobs:
         agents:
           - agoora-kafka-agent
           - agoora-mqtt-agent
-          - aggora-openapi-agent
-          - aggora-pgsql-agent
+          - agoora-openapi-agent
+          - agoora-pgsql-agent
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
@@ -116,7 +117,6 @@ jobs:
     needs:
       - start-runner
       - build
-      - docker-build
     runs-on: ubuntu-latest
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     steps:
