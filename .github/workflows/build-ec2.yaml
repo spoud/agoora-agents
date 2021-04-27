@@ -73,6 +73,7 @@ jobs:
         run: mvn --batch-mode package -DskipTests -Pnative
       - uses: actions/upload-artifact@v2
         with:
+          name: maven-output
           path: |
             ./**/target/*-runner
             ./**/target/quarkus-app/**/*
