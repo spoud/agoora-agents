@@ -31,6 +31,7 @@ jobs:
             [
               {"Key": "Name", "Value": "ec2-github-runner"},
               {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
+            ]
       - name: git tag
         id: git-tag
         shell: bash
