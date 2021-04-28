@@ -126,9 +126,12 @@ jobs:
         run: |
           mkdir binaries
           mv agoora-kafka-agent/target/*-runner binaries/agoora-kafka-agent
-          mv agoora-mqtt-agent/target/quarkus-app/*.jar binaries/agoora-mqtt-agent.jar
           mv agoora-openapi-agent/target/*-runner binaries/agoora-openapi-agent
           mv agoora-pgsql-agent/target/*-runner binaries/agoora-pgsql-agent
+          tar -czvf binaries/agoora-kafka-agent-jar.tar.gz ./agoora-kafka-agent/target/quarkus-app
+          tar -czvf binaries/agoora-mqtt-agent-jar.tar.gz ./agoora-mqtt-agent/target/quarkus-app
+          tar -czvf binaries/agoora-openapi-agent-jar.tar.gz ./agoora-openapi-agent/target/quarkus-app
+          tar -czvf binaries/agoora-pgsql-agent-jar.tar.gz ./agoora-pgsql-agent/target/quarkus-app
           ls -lah binaries/
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -139,10 +142,12 @@ jobs:
             README.md
             LICENCE
             binaries/agoora-kafka-agent
-            binaries/agoora-mqtt-agent.jar
             binaries/agoora-openapi-agent
             binaries/agoora-pgsql-agent
-
+            binaries/agoora-kafka-agent-jar.tar.gz
+            binaries/agoora-mqtt-agent-jar.tar.gz
+            binaries/agoora-openapi-agent-jar.tar.gz
+            binaries/agoora-pgsql-agent-jar.tar.gz
 
   stop-runner:
     name: Stop self-hosted EC2 runner
