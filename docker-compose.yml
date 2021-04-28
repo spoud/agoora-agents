@@ -51,7 +51,7 @@ services:
     extra_hosts:
       - "local.spoud.io:172.17.0.1"
 
-  agoora-profiler-service:
+  profiler-service:
     image: spoud/agoora-profiler-service
     build: agoora-profiler-service/
     ports:
