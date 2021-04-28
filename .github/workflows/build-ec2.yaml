@@ -134,14 +134,7 @@ jobs:
           files: |
             README.md
             LICENCE
-            binaries/agoora-kafka-agent
-            binaries/agoora-mqtt-agent
-            binaries/agoora-openapi-agent
-            binaries/agoora-pgsql-agent
-            binaries/agoora-kafka-agent-jar.tar.gz
-            binaries/agoora-mqtt-agent-jar.tar.gz
-            binaries/agoora-openapi-agent-jar.tar.gz
-            binaries/agoora-pgsql-agent-jar.tar.gz
+            binaries/*
 
   stop-runner:
     name: Stop self-hosted EC2 runner
