@@ -92,6 +92,7 @@ jobs:
           - agoora-mqtt-agent
           - agoora-openapi-agent
           - agoora-pgsql-agent
+          - agoora-profiler-service
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
