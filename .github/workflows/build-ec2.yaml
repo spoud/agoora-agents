@@ -84,7 +84,7 @@ jobs:
       - start-runner
       - build
     runs-on: ubuntu-latest
-    environment:
+    env:
       DOCKER_BUILDKIT: 1
     strategy:
       fail-fast: false
