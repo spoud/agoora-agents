@@ -123,25 +123,19 @@ jobs:
         with:
           name: maven-output
       - name: prepare-binaries
-        run: |
-          mkdir binaries
-          mv agoora-kafka-agent/target/*-runner binaries/agoora-kafka-agent
-          mv agoora-openapi-agent/target/*-runner binaries/agoora-openapi-agent
-          mv agoora-pgsql-agent/target/*-runner binaries/agoora-pgsql-agent
-          tar -czvf binaries/agoora-kafka-agent-jar.tar.gz ./agoora-kafka-agent/target/quarkus-app
-          tar -czvf binaries/agoora-mqtt-agent-jar.tar.gz ./agoora-mqtt-agent/target/quarkus-app
-          tar -czvf binaries/agoora-openapi-agent-jar.tar.gz ./agoora-openapi-agent/target/quarkus-app
-          tar -czvf binaries/agoora-pgsql-agent-jar.tar.gz ./agoora-pgsql-agent/target/quarkus-app
-          ls -lah binaries/
+        run: .github/prepare-binaries.sh
       - name: Release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_TAG: ${{ needs.start-runner.outputs.git-tag }}
         with:
+          body_path: .github/release-body.md
           files: |
             README.md
             LICENCE
             binaries/agoora-kafka-agent
+            binaries/agoora-mqtt-agent
             binaries/agoora-openapi-agent
             binaries/agoora-pgsql-agent
             binaries/agoora-kafka-agent-jar.tar.gz

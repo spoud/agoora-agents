@@ -38,3 +38,4 @@ nb-configuration.xml
 *.log
 
 .env
+binaries/
