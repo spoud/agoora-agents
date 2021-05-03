@@ -109,8 +109,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: docker push
-        if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
+      - name: docker push master
+        if: github.ref == 'refs/heads/master'
+        run: |
+          docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}
+          docker push spoud/${{ matrix.agents }}:dev
+      - name: docker push tag
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}
           docker push spoud/${{ matrix.agents }}:latest
