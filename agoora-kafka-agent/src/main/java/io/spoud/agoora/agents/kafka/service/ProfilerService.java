@@ -118,7 +118,7 @@ public class ProfilerService {
           // take care of profiler result
           String html = profilerResponse.getHtml();
 
-          if (html == null) {
+          if (html != null) {
             LOG.debug("Profile received for table {}: {}bytes", kafkaTopic, html.length());
             String htmlId =
                 blobClient.uploadBlobUtf8(
