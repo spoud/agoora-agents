@@ -117,13 +117,13 @@ jobs:
       - name: docker build and tag jar
         if: steps.dockerfile_jar_exists.outputs.files_exists == 'true'
         run: |
-          docker build -t spoud/${{ matrix.agents }}:dev ./${{ matrix.agents }}/
+          docker build -t spoud/${{ matrix.agents }}:dev -f ./${{ matrix.agents }}/Dockerfile.jar ./${{ matrix.agents }}/
           docker tag spoud/${{ matrix.agents }}:dev spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}
           docker tag spoud/${{ matrix.agents }}:dev spoud/${{ matrix.agents }}:latest
       - name: docker build and tag native
         if: steps.dockerfile_native_exists.outputs.files_exists == 'true'
         run: |
-          docker build -t spoud/${{ matrix.agents }}:dev-native ./${{ matrix.agents }}/
+          docker build -t spoud/${{ matrix.agents }}:dev-native -f ./${{ matrix.agents }}/Dockerfile.native ./${{ matrix.agents }}/
           docker tag spoud/${{ matrix.agents }}:dev-native spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}-native
           docker tag spoud/${{ matrix.agents }}:dev-native spoud/${{ matrix.agents }}:latest-native
 
