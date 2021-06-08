@@ -199,12 +199,12 @@ public class LogisticsService {
                   .build());
     } catch (final StatusRuntimeException e) {
       LOG.error(
-          "Error while updating data offer state in logistics (set state to deleted), will skip and continue.",
+          "Error while updating data port in logistics (set state to deleted), will skip and continue.",
           e);
       return Optional.empty();
     }
     LOG.info(
-        "Inactivated data offer state with id '{}' and name '{}'", saved.getId(), saved.getName());
+        "Inactivated data port with id '{}' and name '{}'", saved.getId(), saved.getName());
     return Optional.of(saved);
   }
 

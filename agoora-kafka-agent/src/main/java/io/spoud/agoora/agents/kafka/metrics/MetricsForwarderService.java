@@ -42,10 +42,12 @@ public class MetricsForwarderService {
         .getStates()
         .forEach(
             dataPort -> {
-              String id = dataPort.getDataPortId();
+              String dataPortId = dataPort.getDataPortId();
               String topicName = dataPort.getTopicName();
               HashMap<Integer, MetricValue> topicMetric = new HashMap<>();
-              dataPortsMetrics.put(topicName, topicMetric);
+
+              if (dataPortId != null) {
+                dataPortsMetrics.put(topicName, topicMetric);
                 kafkaTopicReader
                     .getEndOffsetByTopic(topicName)
                     .forEach(
@@ -60,11 +62,15 @@ public class MetricsForwarderService {
                               metricValue.getValue());
                           topicMetric.put(topicPartition.partition(), metricValue);
                           lookerService.updateMetrics(
-                              id,
+                              dataPortId,
                               type,
                               metricValue.getValue(),
                               Map.of("partition", String.valueOf(topicPartition.partition())));
                         });
+
+              } else {
+                LOG.warn("No data port id for topic {}, cannot upload metrics", topicName);
+              }
             });
     LOG.info("Metrics scraping DONE {}.", type);
     return dataPortsMetrics;
