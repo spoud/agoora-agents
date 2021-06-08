@@ -46,7 +46,7 @@ public class MetricsForwarderService {
               String topicName = dataPort.getTopicName();
               HashMap<Integer, MetricValue> topicMetric = new HashMap<>();
 
-              if (dataPortId == null) {
+              if (dataPortId != null) {
                 dataPortsMetrics.put(topicName, topicMetric);
                 kafkaTopicReader
                     .getEndOffsetByTopic(topicName)
