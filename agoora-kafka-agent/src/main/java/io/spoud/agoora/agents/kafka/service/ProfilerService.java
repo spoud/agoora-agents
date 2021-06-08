@@ -118,17 +118,18 @@ public class ProfilerService {
           // take care of profiler result
           String html = profilerResponse.getHtml();
 
-          LOG.debug(
-              "Profile received for table {}: {}bytes",
-              kafkaTopic,
-              html == null ? -1 : html.length());
-          String htmlId =
-              blobClient.uploadBlobUtf8(
-                  html,
-                  config.getTransport().getAgooraPathObject().getResourceGroupPath(),
-                  ResourceEntity.Type.DATA_PORT);
-          if (htmlId != null) {
-            dataProfileRequest.setProfileHtmlBlobId(htmlId);
+          if (html == null) {
+            LOG.debug("Profile received for table {}: {}bytes", kafkaTopic, html.length());
+            String htmlId =
+                blobClient.uploadBlobUtf8(
+                    html,
+                    config.getTransport().getAgooraPathObject().getResourceGroupPath(),
+                    ResourceEntity.Type.DATA_PORT);
+            if (htmlId != null) {
+              dataProfileRequest.setProfileHtmlBlobId(htmlId);
+            }
+          } else {
+            LOG.warn("Html content is null");
           }
         }
       }
