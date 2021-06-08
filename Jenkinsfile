@@ -90,8 +90,14 @@ pipeline {
                     when { changeRequest() }
                     steps {
                         dir("${AGENT}"){
-                            sh "docker build -t spoud/${AGENT}:test ."
-                            sh "docker rmi spoud/${AGENT}:test"
+                            if (fileExists('Dockerfile.jar')) {
+                                sh "docker build -t spoud/${AGENT}:test -f Dockerfile.jar ."
+                                sh "docker rmi spoud/${AGENT}:test"
+                            }
+                            if (fileExists('Dockerfile.native')) {
+                                sh "docker build -t spoud/${AGENT}:test -f Dockerfile.native ."
+                                sh "docker rmi spoud/${AGENT}:test"
+                            }
                         }
                     }
                 }
@@ -107,12 +113,23 @@ pipeline {
                         dir(agent){
                             withCredentials([usernamePassword(credentialsId: '95c0e4c5-7a97-4c15-a5bf-4c2f1561c762', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                                 sh "docker login -u $USER -p $PASS"
-                                sh "docker build -t spoud/${AGENT}:${GIT_TAG} ."
-                                sh "docker tag spoud/${AGENT}:${GIT_TAG} spoud/${AGENT}:latest"
-                                sh "docker push spoud/${AGENT}:${GIT_TAG}"
-                                sh "docker push spoud/${AGENT}:latest"
-                                sh "docker rmi spoud/${AGENT}:latest"
-                                sh "docker rmi spoud/${AGENT}:${GIT_TAG}"
+
+                                if (fileExists('Dockerfile.native')) {
+                                    sh "docker build -t spoud/${AGENT}:${GIT_TAG}-native -f Dockerfile.native ."
+                                    sh "docker tag spoud/${AGENT}:${GIT_TAG}-native spoud/${AGENT}:latest-native"
+                                    sh "docker push spoud/${AGENT}:${GIT_TAG}-native"
+                                    sh "docker push spoud/${AGENT}:latest-native"
+                                    sh "docker rmi spoud/${AGENT}:latest-native"
+                                    sh "docker rmi spoud/${AGENT}:${GIT_TAG}-native"
+                                }
+                                if (fileExists('Dockerfile.jar')) {
+                                    sh "docker build -t spoud/${AGENT}:${GIT_TAG} -f Dockerfile.jar ."
+                                    sh "docker tag spoud/${AGENT}:${GIT_TAG} spoud/${AGENT}:latest"
+                                    sh "docker push spoud/${AGENT}:${GIT_TAG}"
+                                    sh "docker push spoud/${AGENT}:latest"
+                                    sh "docker rmi spoud/${AGENT}:latest"
+                                    sh "docker rmi spoud/${AGENT}:${GIT_TAG}"
+                                }
                             }
                         }
                     }
