@@ -45,6 +45,7 @@ public class KafkaFactory {
   private static Properties getCommonProperties(KafkaAgentConfig kafkaAgentConfig) {
     final Properties props = new Properties();
     final KafkaConfig kafkaConfig = kafkaAgentConfig.getKafka();
+    props.put("security.protocol", kafkaConfig.getProtocol());
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfig.getBootstrapServers());
 
     // fix weird path (/tmp/tomcat-docbase.5741419017537392227.8080/...)
