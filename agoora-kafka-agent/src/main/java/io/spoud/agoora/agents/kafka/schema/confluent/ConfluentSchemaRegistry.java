@@ -13,6 +13,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import java.util.Map;
 import java.util.Optional;
@@ -121,6 +122,10 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
       } else {
         LOG.error("Exception when querying schema registry for url", ex);
       }
+    } catch (ProcessingException ex) {
+      LOG.error(
+          "Issue with confluent schema registry, there is good chance that the certificate is not recognized",
+          ex);
     }
     return Optional.empty();
   }

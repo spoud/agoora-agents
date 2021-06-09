@@ -26,45 +26,48 @@ public class SchemaService {
 
   public Map<String, String> update(String topicName, String dataPortId) {
     Map<String, String> properties = new HashMap<>();
+    try {
+      for (SchemaRegistryClient schemaRegistry : schemaRegistries) {
+        schemaRegistry
+            .getLatestSchemaForTopic(topicName, KafkaStreamPart.VALUE)
+            .ifPresentOrElse(
+                schema -> {
+                  LOG.debug(
+                      "One schema found for the topic {} in the registry {}",
+                      topicName,
+                      schemaRegistry);
 
-    for (SchemaRegistryClient schemaRegistry : schemaRegistries) {
-      schemaRegistry
-          .getLatestSchemaForTopic(topicName, KafkaStreamPart.VALUE)
-          .ifPresentOrElse(
-              schema -> {
-                LOG.debug(
-                    "One schema found for the topic {} in the registry {}",
-                    topicName,
-                    schemaRegistry);
+                  try {
+                    Schema saved =
+                        schemaClient.saveSchema(
+                            ResourceEntity.Type.DATA_PORT,
+                            dataPortId,
+                            kafkaAgentConfig
+                                .getTransport()
+                                .getAgooraPathObject()
+                                .getResourceGroupPath(),
+                            schema.getContent(),
+                            SchemaSource.Type.REGISTRY,
+                            schema.getEncoding());
+                    LOG.info("Successfully saved schema with uuid '{}'", saved.getId());
+                  } catch (StatusRuntimeException ex) {
+                    LOG.error("Unable to save schema '{}'", schema, ex);
+                  }
 
-                try {
-                  Schema saved =
-                      schemaClient.saveSchema(
-                          ResourceEntity.Type.DATA_PORT,
-                          dataPortId,
-                          kafkaAgentConfig
-                              .getTransport()
-                              .getAgooraPathObject()
-                              .getResourceGroupPath(),
-                          schema.getContent(),
-                          SchemaSource.Type.REGISTRY,
-                          schema.getEncoding());
-                  LOG.info("Successfully saved schema with uuid '{}'", saved.getId());
-                } catch (StatusRuntimeException ex) {
-                  LOG.error("Unable to save schema '{}'", schema, ex);
-                }
-
-                schemaRegistry
-                    .getDeepDiveToolUrl(topicName)
-                    .ifPresent(
-                        url ->
-                            properties.put(
-                                Constants.PROPETIES_DEEP_DIVE_TOOL_SCHEMA_REGISTRY, url));
-              },
-              () -> {
-                LOG.debug(
-                    "No schema found for topic {} in the registry {}", topicName, schemaRegistry);
-              });
+                  schemaRegistry
+                      .getDeepDiveToolUrl(topicName)
+                      .ifPresent(
+                          url ->
+                              properties.put(
+                                  Constants.PROPETIES_DEEP_DIVE_TOOL_SCHEMA_REGISTRY, url));
+                },
+                () -> {
+                  LOG.debug(
+                      "No schema found for topic {} in the registry {}", topicName, schemaRegistry);
+                });
+      }
+    } catch (Exception ex) {
+      LOG.error("Unable to update schema", ex);
     }
     return properties;
   }
