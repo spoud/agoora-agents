@@ -25,7 +25,8 @@ A documentation with deployment examples can be found at https://docs.agoora.com
 We decided to use Java together with Quarkus for your agents. We think it's the best fit the cloud and for 
 where those agents will be used. 
 
-Our agents are distributed via docker: https://hub.docker.com/u/spoud
+Our agents are distributed via docker (https://hub.docker.com/u/spoud) and github releases
+(https://github.com/spoud/agoora-agents/releases) 
 
 ## How to contribute
 
