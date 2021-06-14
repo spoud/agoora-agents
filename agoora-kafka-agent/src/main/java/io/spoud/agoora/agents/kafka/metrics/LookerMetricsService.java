@@ -19,8 +19,7 @@ public class LookerMetricsService {
   public void updateMetrics(
       String resourceId,
       MetricsType type,
-      Double value,
-      Map<String, String> additionalTags) {
+      Double value) {
 
     MetricType protoMetricType = MetricType.UNDEFINED;
 
@@ -38,12 +37,11 @@ public class LookerMetricsService {
 
     try {
       LOG.debug(
-          "Update metrics. ResourceId={}, type={}, value={}, additionalTags",
+          "Update metrics. ResourceId={}, type={}, value={}",
           resourceId,
           protoMetricType,
-          value,
-          additionalTags);
-      metricsClient.updateMetric(resourceId, protoMetricType, value, additionalTags);
+          value);
+      metricsClient.updateMetric(resourceId, protoMetricType, value);
     } catch (StatusRuntimeException e) {
       LOG.error("Error while updating metrics, will skip and continue.", e);
     }

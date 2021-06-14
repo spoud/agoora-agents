@@ -2,11 +2,12 @@ package io.spoud.agoora.agents.kafka.metrics;
 
 import io.spoud.agoora.agents.kafka.kafka.KafkaAdminScrapper;
 import io.spoud.agoora.agents.kafka.kafka.KafkaTopicReader;
-import io.spoud.agoora.agents.kafka.metrics.model.MetricValue;
 import io.spoud.agoora.agents.kafka.repository.KafkaConsumerGroupRepository;
 import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.TopicPartition;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.HashMap;
@@ -28,60 +29,49 @@ public class MetricsForwarderService {
     // TODO to improve metric accuracry we should scrape a topic and then it's consumer groups
     // (directly). And not do all topics and then all consumer groups
 
-    Map<String, Map<Integer, MetricValue>> offerMetric = scrapeDataPortMessagesMetrics();
+    Map<String, Long> offerMetric = scrapeDataPortMessagesMetrics();
 
     // data subscription state messages
     scrapeDataSubscriptionStateMessagesMetrics(offerMetric);
   }
 
-  public Map<String, Map<Integer, MetricValue>> scrapeDataPortMessagesMetrics() {
-    Map<String, Map<Integer, MetricValue>> dataPortsMetrics = new HashMap<>();
-    MetricsType type = MetricsType.DATA_PORT_MESSAGES_COUNT;
-    LOG.info("Metrics scraping for {}", type);
+  public Map<String, Long> scrapeDataPortMessagesMetrics() {
+    Map<String, Long> dataPortsMetrics = new HashMap<>();
+    LOG.info("Metrics scraping for topics");
     kafkaTopicRepository
         .getStates()
         .forEach(
             dataPort -> {
               String dataPortId = dataPort.getDataPortId();
               String topicName = dataPort.getTopicName();
-              HashMap<Integer, MetricValue> topicMetric = new HashMap<>();
 
               if (dataPortId != null) {
-                dataPortsMetrics.put(topicName, topicMetric);
-                kafkaTopicReader
-                    .getEndOffsetByTopic(topicName)
-                    .forEach(
-                        (topicPartition, offset) -> {
-                          final MetricValue metricValue =
-                              new MetricValue(System.currentTimeMillis(), offset);
-                          LOG.debug(
-                              "Got {} metrics for topic '{}' with timestamp {} and value {}. Will be forwarded.",
-                              type,
-                              topicPartition,
-                              metricValue.getTimestamp(),
-                              metricValue.getValue());
-                          topicMetric.put(topicPartition.partition(), metricValue);
-                          lookerService.updateMetrics(
-                              dataPortId,
-                              type,
-                              metricValue.getValue(),
-                              Map.of("partition", String.valueOf(topicPartition.partition())));
-                        });
+                final long offsetSum =
+                    kafkaTopicReader.getEndOffsetByTopic(topicName).values().stream()
+                        .mapToLong(offset -> offset)
+                        .sum();
+                final long now = System.currentTimeMillis();
+                LOG.debug(
+                    "Offset for topic '{}' is {}. it will be forwarded.",
+                    topicName,
+                    now,
+                    offsetSum);
+
+                dataPortsMetrics.put(topicName, offsetSum);
+
+                lookerService.updateMetrics(
+                    dataPortId, MetricsType.DATA_PORT_MESSAGES_COUNT, (double) offsetSum);
 
               } else {
                 LOG.warn("No data port id for topic {}, cannot upload metrics", topicName);
               }
             });
-    LOG.info("Metrics scraping DONE {}.", type);
+    LOG.info("Metrics scraping DONE.");
     return dataPortsMetrics;
   }
 
-  public void scrapeDataSubscriptionStateMessagesMetrics(
-      Map<String, Map<Integer, MetricValue>> dataOfferMetrics) {
-
-    MetricsType type = MetricsType.DATA_SUBSCRIPTION_STATE_MESSAGES_COUNT;
-    MetricsType lagType = MetricsType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG_COUNT;
-    LOG.info("Metrics scraping for {}", type);
+  public void scrapeDataSubscriptionStateMessagesMetrics(Map<String, Long> offsetPerTopic) {
+    LOG.info("Metrics scraping for consumer group ");
 
     kafkaConsumerGroupRepository
         .getStates()
@@ -90,56 +80,30 @@ public class MetricsForwarderService {
               String id = dataSubscriptionState.getDataSubscriptionStateId();
               String consumerGroup = dataSubscriptionState.getConsumerGroupName();
               String topicName = dataSubscriptionState.getTopicName();
-              kafkaService
-                  .getOffsetByConsumerGroup(consumerGroup)
-                  .forEach(
-                      (topicPartition, offsetAndMetadata) -> {
-                        // filter out non related consumer group topics
-                        if (!topicPartition.topic().equals(topicName)) {
-                          return;
-                        }
-                        int partition = topicPartition.partition();
 
-                        final MetricValue metricValue =
-                            new MetricValue(System.currentTimeMillis(), offsetAndMetadata.offset());
-                        LOG.debug(
-                            "Got {} metrics for consumerGroup '{}' with timestamp {} and value {}. Will be forwarded.",
-                            type,
-                            consumerGroup,
-                            metricValue.getValue());
+              final Map<TopicPartition, OffsetAndMetadata> offsetByConsumerGroup =
+                  kafkaService.getOffsetByConsumerGroup(consumerGroup);
+
+              final long consumerOffsetSum =
+                  offsetByConsumerGroup.entrySet().stream()
+                      .filter(e -> e.getKey().topic().equals(topicName))
+                      .map(Map.Entry::getValue)
+                      .mapToLong(OffsetAndMetadata::offset)
+                      .sum();
+
+              lookerService.updateMetrics(
+                  id,
+                  MetricsType.DATA_SUBSCRIPTION_STATE_MESSAGES_COUNT,
+                  (double) consumerOffsetSum);
+
+              Optional.ofNullable(offsetPerTopic.get(topicName))
+                  .map(topicOffset -> topicOffset - consumerOffsetSum)
+                  .ifPresent(
+                      lag -> {
                         lookerService.updateMetrics(
                             id,
-                            type,
-                            metricValue.getValue(),
-                            Map.of("partition", String.valueOf(partition)));
-
-                        Optional.ofNullable(dataOfferMetrics.get(topicName))
-                            .map(m -> m.get(partition))
-                            .map(MetricValue::getValue)
-                            .ifPresentOrElse(
-                                dataOfferOffset -> {
-                                  final MetricValue lagMetricValue =
-                                      new MetricValue(
-                                          System.currentTimeMillis(),
-                                          dataOfferOffset - offsetAndMetadata.offset());
-                                  LOG.debug(
-                                      "Got {} metrics for consumerGroup '{}' with timestamp {} and value {}. Will be forwarded.",
-                                      lagType,
-                                      consumerGroup,
-                                      lagMetricValue.getValue());
-                                  lookerService.updateMetrics(
-                                      id,
-                                      lagType,
-                                      lagMetricValue.getValue(),
-                                      Map.of("partition", String.valueOf(partition)));
-                                },
-                                () -> {
-                                  LOG.warn(
-                                      "No data offer metric to compute lag for topic='{}', consumer-group='{}', partition='{}'",
-                                      topicName,
-                                      consumerGroup,
-                                      partition);
-                                });
+                            MetricsType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG_COUNT,
+                            (double) lag);
                       });
             });
   }

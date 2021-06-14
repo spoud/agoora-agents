@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import java.time.Duration;
 import java.util.stream.IntStream;
 
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
@@ -69,14 +68,11 @@ class MetricsForwarderServiceTest {
     metricsForwarderService.scrapeMetrics();
 
     verify(metricsClient)
-        .updateMetric(
-            eq("m-t-1"), eq(ResourceMetric.MetricType.DATA_PORT_MESSAGES), eq(10.0d), anyMap());
+        .updateMetric(eq("m-t-1"), eq(ResourceMetric.MetricType.DATA_PORT_MESSAGES), eq(10.0d));
     verify(metricsClient)
-        .updateMetric(
-            eq("m-t-2"), eq(ResourceMetric.MetricType.DATA_PORT_MESSAGES), eq(14.0d), anyMap());
+        .updateMetric(eq("m-t-2"), eq(ResourceMetric.MetricType.DATA_PORT_MESSAGES), eq(14.0d));
     verify(metricsClient)
-        .updateMetric(
-            eq("m-t-3"), eq(ResourceMetric.MetricType.DATA_PORT_MESSAGES), eq(0.0d), anyMap());
+        .updateMetric(eq("m-t-3"), eq(ResourceMetric.MetricType.DATA_PORT_MESSAGES), eq(0.0d));
   }
 
   @Test
@@ -138,39 +134,33 @@ class MetricsForwarderServiceTest {
         .updateMetric(
             eq("m-g-1-1"),
             eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES),
-            eq(10.0d),
-            anyMap());
+            eq(10.0d));
     verify(metricsClient)
         .updateMetric(
             eq("m-g-1-1"),
             eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG),
-            eq(9.0d),
-            anyMap());
+            eq(9.0d));
 
     verify(metricsClient)
         .updateMetric(
             eq("m-g-1-2"),
             eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES),
-            eq(14.0d),
-            anyMap());
+            eq(14.0d));
     verify(metricsClient)
         .updateMetric(
             eq("m-g-1-2"),
             eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG),
-            eq(12.0d),
-            anyMap());
+            eq(12.0d));
 
     verify(metricsClient)
         .updateMetric(
             eq("m-g-2-2"),
             eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES),
-            eq(14.0d),
-            anyMap());
+            eq(14.0d));
     verify(metricsClient)
         .updateMetric(
             eq("m-g-2-2"),
             eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG),
-            eq(12.0d),
-            anyMap());
+            eq(12.0d));
   }
 }
