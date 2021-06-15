@@ -99,12 +99,10 @@ public class MetricsForwarderService {
               Optional.ofNullable(offsetPerTopic.get(topicName))
                   .map(topicOffset -> topicOffset - consumerOffsetSum)
                   .ifPresent(
-                      lag -> {
-                        lookerService.updateMetrics(
-                            id,
-                            MetricsType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG_COUNT,
-                            (double) lag);
-                      });
+                      lag -> lookerService.updateMetrics(
+                          id,
+                          MetricsType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG_COUNT,
+                          (double) lag));
             });
   }
 }
