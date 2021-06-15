@@ -8,8 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 
-import java.util.Map;
-
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -32,7 +30,7 @@ class MetricsClientTest {
     metricsClient.updateMetric(
         resourceId, ResourceMetric.MetricType.DATA_PORT_ATTRIBUTE_INTEGRITY, 1.0);
     metricsClient.updateMetric(
-        resourceId, ResourceMetric.MetricType.DATA_PORT_DATASET_SIZE_BYTES, 2.0, Map.of("k", "v"));
+        resourceId, ResourceMetric.MetricType.DATA_PORT_DATASET_SIZE_BYTES, 2.0);
 
     verify(stub)
         .updateMetric(
@@ -57,7 +55,6 @@ class MetricsClientTest {
                                 .setResourceId(resourceId)
                                 .setType(ResourceMetric.MetricType.DATA_PORT_DATASET_SIZE_BYTES)
                                 .setValue(2.0)
-                                .putAllTags(Map.of("k", "v"))
                                 .build())
                         .build())));
   }

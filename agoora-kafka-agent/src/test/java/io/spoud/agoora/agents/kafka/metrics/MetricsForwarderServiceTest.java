@@ -17,8 +17,6 @@ import javax.inject.Inject;
 import java.time.Duration;
 import java.util.stream.IntStream;
 
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 @QuarkusTest
@@ -69,14 +67,10 @@ class MetricsForwarderServiceTest {
     metricsForwarderService.scrapeMetrics();
 
     verify(metricsClient)
-        .updateMetric(
-            eq("m-t-1"), eq(ResourceMetric.MetricType.DATA_PORT_MESSAGES), eq(10.0d), anyMap());
+        .updateMetric("m-t-1", ResourceMetric.MetricType.DATA_PORT_MESSAGES, 10.0d);
     verify(metricsClient)
-        .updateMetric(
-            eq("m-t-2"), eq(ResourceMetric.MetricType.DATA_PORT_MESSAGES), eq(14.0d), anyMap());
-    verify(metricsClient)
-        .updateMetric(
-            eq("m-t-3"), eq(ResourceMetric.MetricType.DATA_PORT_MESSAGES), eq(0.0d), anyMap());
+        .updateMetric("m-t-2", ResourceMetric.MetricType.DATA_PORT_MESSAGES, 14.0d);
+    verify(metricsClient).updateMetric("m-t-3", ResourceMetric.MetricType.DATA_PORT_MESSAGES, 0.0d);
   }
 
   @Test
@@ -135,42 +129,21 @@ class MetricsForwarderServiceTest {
     metricsForwarderService.scrapeMetrics();
 
     verify(metricsClient)
-        .updateMetric(
-            eq("m-g-1-1"),
-            eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES),
-            eq(10.0d),
-            anyMap());
+        .updateMetric("m-g-1-1", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES, 10.0d);
     verify(metricsClient)
         .updateMetric(
-            eq("m-g-1-1"),
-            eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG),
-            eq(9.0d),
-            anyMap());
+            "m-g-1-1", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG, 9.0d);
 
     verify(metricsClient)
-        .updateMetric(
-            eq("m-g-1-2"),
-            eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES),
-            eq(14.0d),
-            anyMap());
+        .updateMetric("m-g-1-2", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES, 14.0d);
     verify(metricsClient)
         .updateMetric(
-            eq("m-g-1-2"),
-            eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG),
-            eq(12.0d),
-            anyMap());
+            "m-g-1-2", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG, 12.0d);
 
     verify(metricsClient)
-        .updateMetric(
-            eq("m-g-2-2"),
-            eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES),
-            eq(14.0d),
-            anyMap());
+        .updateMetric("m-g-2-2", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES, 14.0d);
     verify(metricsClient)
         .updateMetric(
-            eq("m-g-2-2"),
-            eq(ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG),
-            eq(12.0d),
-            anyMap());
+            "m-g-2-2", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG, 12.0d);
   }
 }
