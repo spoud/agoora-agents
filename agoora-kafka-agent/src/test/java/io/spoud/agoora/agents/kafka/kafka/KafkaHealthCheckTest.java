@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 import javax.inject.Inject;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,13 +27,13 @@ class KafkaHealthCheckTest extends AbstractService {
     assertThat(call.getState()).isEqualTo(HealthCheckResponse.State.UP);
     assertThat(call.getName()).isEqualTo("Kafka connection health check");
     assertThat(call.getData()).isPresent();
-    assertThat(call.getData().get())
-        .isEqualTo(
-            Map.of("nodes", config.getKafka().getBootstrapServers().replace("PLAINTEXT://", "")));
+    assertThat(call.getData().get()).containsOnlyKeys("nodes");
+    assertThat(call.getData().get().get("nodes"))
+        .isEqualTo(config.getKafka().getBootstrapServers().replace("PLAINTEXT://", ""));
   }
 
   @Test
-  @Disabled // disabled because it takes more than 1 min to complete
+  @Disabled(" disabled because it takes more than 1 min to complete")
   @Timeout(120)
   void testNoConnection() {
     final String backup = config.getKafka().getBootstrapServers();
@@ -47,6 +46,7 @@ class KafkaHealthCheckTest extends AbstractService {
     assertThat(call.getState()).isEqualTo(HealthCheckResponse.State.DOWN);
     assertThat(call.getName()).isEqualTo("Kafka connection health check");
     assertThat(call.getData()).isPresent();
+    assertThat(call.getData().get()).containsOnlyKeys("reason");
     assertThat((String) call.getData().get().get("reason"))
         .contains("org.apache.kafka.common.errors.TimeoutException: Call(callName=listNodes");
   }
