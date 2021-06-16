@@ -30,6 +30,8 @@ class KafkaHealthCheckTest extends AbstractService {
     assertThat(call.getData().get()).containsOnlyKeys("nodes");
     assertThat(call.getData().get().get("nodes"))
         .isEqualTo(config.getKafka().getBootstrapServers().replace("PLAINTEXT://", ""));
+
+    kafkaHealthCheck.stop();
   }
 
   @Test
@@ -49,5 +51,7 @@ class KafkaHealthCheckTest extends AbstractService {
     assertThat(call.getData().get()).containsOnlyKeys("reason");
     assertThat((String) call.getData().get().get("reason"))
         .contains("org.apache.kafka.common.errors.TimeoutException: Call(callName=listNodes");
+
+    kafkaHealthCheck.stop();
   }
 }
