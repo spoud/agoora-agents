@@ -8,7 +8,7 @@ import io.spoud.agoora.agents.kafka.repository.KafkaConsumerGroupRepository;
 import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
 import io.spoud.agoora.agents.kafka.utils.KafkaUtils;
 import io.spoud.agoora.agents.test.mock.MetricsClientMockProvider;
-import io.spoud.sdm.looker.v1alpha1.ResourceMetric;
+import io.spoud.sdm.looker.domain.v1alpha1.ResourceMetricType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,11 +66,9 @@ class MetricsForwarderServiceTest {
 
     metricsForwarderService.scrapeMetrics();
 
-    verify(metricsClient)
-        .updateMetric("m-t-1", ResourceMetric.MetricType.DATA_PORT_MESSAGES, 10.0d);
-    verify(metricsClient)
-        .updateMetric("m-t-2", ResourceMetric.MetricType.DATA_PORT_MESSAGES, 14.0d);
-    verify(metricsClient).updateMetric("m-t-3", ResourceMetric.MetricType.DATA_PORT_MESSAGES, 0.0d);
+    verify(metricsClient).updateMetric("m-t-1", ResourceMetricType.Type.DATA_PORT_MESSAGES, 10.0d);
+    verify(metricsClient).updateMetric("m-t-2", ResourceMetricType.Type.DATA_PORT_MESSAGES, 14.0d);
+    verify(metricsClient).updateMetric("m-t-3", ResourceMetricType.Type.DATA_PORT_MESSAGES, 0.0d);
   }
 
   @Test
@@ -129,21 +127,21 @@ class MetricsForwarderServiceTest {
     metricsForwarderService.scrapeMetrics();
 
     verify(metricsClient)
-        .updateMetric("m-g-1-1", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES, 10.0d);
+        .updateMetric("m-g-1-1", ResourceMetricType.Type.DATA_SUBSCRIPTION_STATE_MESSAGES, 10.0d);
     verify(metricsClient)
         .updateMetric(
-            "m-g-1-1", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG, 9.0d);
+            "m-g-1-1", ResourceMetricType.Type.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG, 9.0d);
 
     verify(metricsClient)
-        .updateMetric("m-g-1-2", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES, 14.0d);
+        .updateMetric("m-g-1-2", ResourceMetricType.Type.DATA_SUBSCRIPTION_STATE_MESSAGES, 14.0d);
     verify(metricsClient)
         .updateMetric(
-            "m-g-1-2", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG, 12.0d);
+            "m-g-1-2", ResourceMetricType.Type.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG, 12.0d);
 
     verify(metricsClient)
-        .updateMetric("m-g-2-2", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES, 14.0d);
+        .updateMetric("m-g-2-2", ResourceMetricType.Type.DATA_SUBSCRIPTION_STATE_MESSAGES, 14.0d);
     verify(metricsClient)
         .updateMetric(
-            "m-g-2-2", ResourceMetric.MetricType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG, 12.0d);
+            "m-g-2-2", ResourceMetricType.Type.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG, 12.0d);
   }
 }

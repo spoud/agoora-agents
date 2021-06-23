@@ -6,11 +6,11 @@ import io.spoud.agoora.agents.api.client.DataItemClient;
 import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.agoora.agents.api.client.MetricsClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
+import io.spoud.agoora.agents.pgsql.repository.DataPortRepository;
 import io.spoud.agoora.agents.test.mock.DataItemClientMockProvider;
 import io.spoud.agoora.agents.test.mock.DataPortClientMockProvider;
 import io.spoud.agoora.agents.test.mock.MetricsClientMockProvider;
 import io.spoud.agoora.agents.test.mock.SchemaClientMockProvider;
-import io.spoud.agoora.agents.pgsql.repository.DataPortRepository;
 import io.spoud.sdm.global.domain.v1.ResourceEntity;
 import io.spoud.sdm.global.selection.v1.BaseRef;
 import io.spoud.sdm.global.selection.v1.IdPathRef;
@@ -24,7 +24,7 @@ import io.spoud.sdm.logistics.service.v1.DataItemChange;
 import io.spoud.sdm.logistics.service.v1.DataPortChange;
 import io.spoud.sdm.logistics.service.v1.SaveDataItemRequest;
 import io.spoud.sdm.logistics.service.v1.SaveDataPortRequest;
-import io.spoud.sdm.looker.v1alpha1.ResourceMetric;
+import io.spoud.sdm.looker.domain.v1alpha1.ResourceMetricType;
 import io.spoud.sdm.schema.domain.v1alpha.SchemaEncoding;
 import io.spoud.sdm.schema.domain.v1alpha.SchemaSource;
 import org.junit.jupiter.api.AfterEach;
@@ -52,8 +52,7 @@ class DataServiceTest {
       "{\"properties\":{\"address_uuid\":{\"type\":\"uuid\"},\"label\":{\"type\":\"varchar\"},\"line1\":{\"type\":\"varchar\"},\"line2\":{\"type\":\"varchar\"},\"meta\":{\"type\":\"text\"},\"created\":{\"type\":\"timestamp\"},\"updated\":{\"type\":\"timestamp\"},\"created_by\":{\"type\":\"varchar\"},\"updated_by\":{\"type\":\"varchar\"},\"city_uuid\":{\"type\":\"uuid\"}},\"required\":[\"address_uuid\",\"label\",\"line1\",\"created\",\"updated\",\"created_by\",\"updated_by\",\"city_uuid\"]}";
   private static final String SCHEMA_3 =
       "{\"properties\":{\"city_uuid\":{\"type\":\"uuid\"},\"label\":{\"type\":\"varchar\"},\"meta\":{\"type\":\"text\"},\"created\":{\"type\":\"timestamp\"},\"updated\":{\"type\":\"timestamp\"},\"created_by\":{\"type\":\"varchar\"},\"updated_by\":{\"type\":\"varchar\"}},\"required\":[\"city_uuid\",\"label\",\"created\",\"updated\",\"created_by\",\"updated_by\"]}";
-  @Inject
-  DataService dataService;
+  @Inject DataService dataService;
   @Inject ReferenceService referenceService;
   @Inject DataPortRepository dataPortRepository;
   @Inject DataPortClient dataPortClient;
@@ -87,7 +86,8 @@ class DataServiceTest {
         .atMost(Duration.ofSeconds(5))
         .until(() -> mockingDetails(dataItemClient).getInvocations().size() >= 3);
 
-    verify(dataPortClient).save(eq(createDataPortRequestFor("postgres", "/default/", "/default/postgres")));
+    verify(dataPortClient)
+        .save(eq(createDataPortRequestFor("postgres", "/default/", "/default/postgres")));
 
     final String dataPortUuid = DataPortClientMockProvider.lastUuid.toString();
 
@@ -122,18 +122,18 @@ class DataServiceTest {
             eq(SchemaEncoding.Type.JSON));
 
     verify(metricsCLient, times(2))
-        .updateMetric(anyString(), eq(ResourceMetric.MetricType.DATA_PORT_DATASET_COUNT), eq(2.0));
+        .updateMetric(anyString(), eq(ResourceMetricType.Type.DATA_PORT_DATASET_COUNT), eq(2.0));
     verify(metricsCLient)
-        .updateMetric(anyString(), eq(ResourceMetric.MetricType.DATA_PORT_DATASET_COUNT), eq(3.0));
-    verify(metricsCLient)
-        .updateMetric(
-            anyString(), eq(ResourceMetric.MetricType.DATA_PORT_DATASET_SIZE_BYTES), eq(49152.0));
+        .updateMetric(anyString(), eq(ResourceMetricType.Type.DATA_PORT_DATASET_COUNT), eq(3.0));
     verify(metricsCLient)
         .updateMetric(
-            anyString(), eq(ResourceMetric.MetricType.DATA_PORT_DATASET_SIZE_BYTES), eq(81920.0));
+            anyString(), eq(ResourceMetricType.Type.DATA_PORT_DATASET_SIZE_BYTES), eq(49152.0));
     verify(metricsCLient)
         .updateMetric(
-            anyString(), eq(ResourceMetric.MetricType.DATA_PORT_DATASET_SIZE_BYTES), eq(65536.0));
+            anyString(), eq(ResourceMetricType.Type.DATA_PORT_DATASET_SIZE_BYTES), eq(81920.0));
+    verify(metricsCLient)
+        .updateMetric(
+            anyString(), eq(ResourceMetricType.Type.DATA_PORT_DATASET_SIZE_BYTES), eq(65536.0));
   }
 
   private SaveDataPortRequest createDataPortRequestFor(

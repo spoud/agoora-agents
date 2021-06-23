@@ -29,7 +29,7 @@ import io.spoud.sdm.logistics.service.v1.DataItemChange;
 import io.spoud.sdm.logistics.service.v1.DataPortChange;
 import io.spoud.sdm.logistics.service.v1.SaveDataItemRequest;
 import io.spoud.sdm.logistics.service.v1.SaveDataPortRequest;
-import io.spoud.sdm.looker.v1alpha1.ResourceMetric;
+import io.spoud.sdm.looker.domain.v1alpha1.ResourceMetricType;
 import io.spoud.sdm.schema.domain.v1alpha.SchemaEncoding;
 import io.spoud.sdm.schema.domain.v1alpha.SchemaSource;
 import lombok.RequiredArgsConstructor;
@@ -112,7 +112,11 @@ public class DataService {
                         ResourceGroupRef.newBuilder()
                             .setIdPath(
                                 IdPathRef.newBuilder()
-                                    .setPath(config.getTransport().getAgooraPathObject().getResourceGroupPath())
+                                    .setPath(
+                                        config
+                                            .getTransport()
+                                            .getAgooraPathObject()
+                                            .getResourceGroupPath())
                                     .buildPartial())
                             .build())
                     .setProperties(PropertyMap.newBuilder().putAllProperties(allProperties).build())
@@ -182,7 +186,7 @@ public class DataService {
               LOG.debug("Table {} has {} rows", table.getName(), rowCount);
               uploadMetric(
                   dataItem.getId(),
-                  ResourceMetric.MetricType.DATA_PORT_DATASET_COUNT,
+                  ResourceMetricType.Type.DATA_PORT_DATASET_COUNT,
                   rowCount); // TODO be more generic and use data item
             });
     databaseScrapper
@@ -191,18 +195,18 @@ public class DataService {
             bytes -> {
               LOG.debug("Table {} size is {} bytes", table.getName(), bytes);
               uploadMetric(
-                  dataItem.getId(), ResourceMetric.MetricType.DATA_PORT_DATASET_SIZE_BYTES, bytes);
+                  dataItem.getId(), ResourceMetricType.Type.DATA_PORT_DATASET_SIZE_BYTES, bytes);
             });
     databaseScrapper
         .getChangesCount(table.getName())
         .ifPresent(
             count -> {
               LOG.debug("Table {} changes count is {}", table.getName(), count);
-              uploadMetric(dataItem.getId(), ResourceMetric.MetricType.DATA_PORT_MUTATIONS, count);
+              uploadMetric(dataItem.getId(), ResourceMetricType.Type.DATA_PORT_MUTATIONS, count);
             });
   }
 
-  private void uploadMetric(String resourceId, ResourceMetric.MetricType type, double value) {
+  private void uploadMetric(String resourceId, ResourceMetricType.Type type, double value) {
     try {
       metricsClient.updateMetric(resourceId, type, value);
     } catch (Exception ex) {

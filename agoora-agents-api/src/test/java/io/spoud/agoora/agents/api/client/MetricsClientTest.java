@@ -1,7 +1,8 @@
 package io.spoud.agoora.agents.api.client;
 
+import io.spoud.sdm.looker.domain.v1alpha1.ResourceMetric;
+import io.spoud.sdm.looker.domain.v1alpha1.ResourceMetricType;
 import io.spoud.sdm.looker.v1alpha1.MetricsServiceGrpc;
-import io.spoud.sdm.looker.v1alpha1.ResourceMetric;
 import io.spoud.sdm.looker.v1alpha1.UpdateMetricRequest;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,9 +29,9 @@ class MetricsClientTest {
     String resourceId = "resource";
 
     metricsClient.updateMetric(
-        resourceId, ResourceMetric.MetricType.DATA_PORT_ATTRIBUTE_INTEGRITY, 1.0);
+        resourceId, ResourceMetricType.Type.DATA_PORT_ATTRIBUTE_INTEGRITY, 1.0);
     metricsClient.updateMetric(
-        resourceId, ResourceMetric.MetricType.DATA_PORT_DATASET_SIZE_BYTES, 2.0);
+        resourceId, ResourceMetricType.Type.DATA_PORT_DATASET_SIZE_BYTES, 2.0);
 
     verify(stub)
         .updateMetric(
@@ -40,7 +41,7 @@ class MetricsClientTest {
                         .setMetric(
                             ResourceMetric.newBuilder()
                                 .setResourceId(resourceId)
-                                .setType(ResourceMetric.MetricType.DATA_PORT_ATTRIBUTE_INTEGRITY)
+                                .setType(ResourceMetricType.Type.DATA_PORT_ATTRIBUTE_INTEGRITY)
                                 .setValue(1.0)
                                 .build())
                         .build())));
@@ -53,7 +54,7 @@ class MetricsClientTest {
                         .setMetric(
                             ResourceMetric.newBuilder()
                                 .setResourceId(resourceId)
-                                .setType(ResourceMetric.MetricType.DATA_PORT_DATASET_SIZE_BYTES)
+                                .setType(ResourceMetricType.Type.DATA_PORT_DATASET_SIZE_BYTES)
                                 .setValue(2.0)
                                 .build())
                         .build())));
