@@ -8,9 +8,11 @@ import io.spoud.sdm.looker.domain.v1alpha1.ResourceMetricType;
 import io.spoud.sdm.looker.v1alpha1.MetricsServiceGrpc;
 import io.spoud.sdm.looker.v1alpha1.UpdateMetricRequest;
 import io.spoud.sdm.looker.v1alpha1.UpdateOperationalMetricRequest;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
@@ -59,7 +61,9 @@ public class MetricsClient {
   }
 
   @Data
-  @SuperBuilder
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class OperationalMetric {
     private ResourceMetricType.Type type;
     private double value;

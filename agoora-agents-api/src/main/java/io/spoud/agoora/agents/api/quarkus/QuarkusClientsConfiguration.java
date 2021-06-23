@@ -13,6 +13,7 @@ import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
 import io.spoud.agoora.agents.api.factory.ClientsFactory;
 import io.spoud.agoora.agents.api.factory.ClientsFactoryImpl;
+import io.spoud.agoora.agents.api.metrics.OperationalMetricsService;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.Dependent;
@@ -72,5 +73,10 @@ public class QuarkusClientsConfiguration {
   @Produces
   SchemaClient schemaClient() {
     return clientsFactory.getSchemaClient();
+  }
+
+  @Produces
+  OperationalMetricsService operationalMetricsService() {
+    return new OperationalMetricsService(clientsFactory.getMetricsClient());
   }
 }
