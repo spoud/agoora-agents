@@ -16,6 +16,12 @@ services:
     environment:
       - "AGOORA_PROFILER_ENDPOINT=agoora-profiler-service:8089"
 
+  kafka-agent-native:
+    image: spoud/agoora-kafka-agent:latest-native
+    build:
+      context: agoora-kafka-agent
+      dockerfile: Dockerfile.native
+
   kafka-agent:
     image: spoud/agoora-kafka-agent
     build:
