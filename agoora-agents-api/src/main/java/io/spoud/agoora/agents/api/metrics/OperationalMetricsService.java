@@ -30,7 +30,7 @@ public class OperationalMetricsService {
   public synchronized void iterationEnd(
       String agentUsername, String transportPath, Duration loopInterval) {
     if (lastIterationStart == null) {
-      throw new IllegalArgumentException("You should call iterationStart before iterationEnd");
+      throw new IllegalStateException("You should call iterationStart before iterationEnd");
     }
     loopCounter++;
 
