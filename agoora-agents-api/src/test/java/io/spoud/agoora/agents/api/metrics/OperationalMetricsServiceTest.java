@@ -28,10 +28,9 @@ class OperationalMetricsServiceTest {
 
   @Test
   void testEndWithoutStart() {
+    final Duration duration = Duration.ofMinutes(1);
     assertThatThrownBy(
-            () ->
-                operationalMetricsService.iterationEnd(
-                    "agent", "/transport/asdf", Duration.ofMinutes(1)))
+            () -> operationalMetricsService.iterationEnd("agent", "/transport/asdf", duration))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("You should call iterationStart before iterationEnd");
   }

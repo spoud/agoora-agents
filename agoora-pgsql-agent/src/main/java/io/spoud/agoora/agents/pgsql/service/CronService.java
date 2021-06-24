@@ -48,11 +48,7 @@ public class CronService {
 
                 if (scrapperConfig.getProfiling().isEnabled()) {
                   LOG.info("Start Profiling");
-                  try {
-                    profilerService.runProfiler();
-                  } catch (Exception ex) {
-                    LOG.error("Error while profiling", ex);
-                  }
+                  profilerService.runProfiler();
                 }
 
                 operationalMetricsService.iterationEnd(
