@@ -10,6 +10,7 @@ import io.spoud.agoora.agents.api.client.MetricsClient;
 import io.spoud.agoora.agents.api.client.ProfilerClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.api.factory.ClientsFactory;
+import io.spoud.agoora.agents.api.metrics.OperationalMetricsService;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.Dependent;
@@ -64,5 +65,10 @@ public class AgentLibConfiguration {
   @Produces
   SchemaClient schemaClient() {
     return clientsFactory.getSchemaClient();
+  }
+
+  @Produces
+  OperationalMetricsService operationalMetricsService() {
+    return new OperationalMetricsService(clientsFactory.getMetricsClient());
   }
 }

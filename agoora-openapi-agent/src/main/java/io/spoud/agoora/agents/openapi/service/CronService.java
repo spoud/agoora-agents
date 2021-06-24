@@ -2,6 +2,7 @@ package io.spoud.agoora.agents.openapi.service;
 
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
+import io.spoud.agoora.agents.api.metrics.OperationalMetricsService;
 import io.spoud.agoora.agents.openapi.config.data.OpenApiAgooraConfig;
 import io.spoud.agoora.agents.openapi.config.data.ScrapperFeatureConfig;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,8 @@ public class CronService {
 
   private final OpenApiAgooraConfig config;
 
+    private final OperationalMetricsService operationalMetricsService;
+
   void onStart(@Observes StartupEvent ev) {
     ScrapperFeatureConfig stateConfig = config.getScrapper().getState();
 
@@ -36,7 +39,13 @@ public class CronService {
               v -> {
                 LOG.info("Start looking at data ports");
                 try {
+                    operationalMetricsService.iterationStart();
                   dataService.updateStates();
+
+                    operationalMetricsService.iterationEnd(
+                            config.getAuth().getUser().getName(),
+                            config.getTransport().getAgooraPath(),
+                            stateConfig.getInterval());
                 } catch (Exception ex) {
                   LOG.error("Error while updating the data ports", ex);
                 }

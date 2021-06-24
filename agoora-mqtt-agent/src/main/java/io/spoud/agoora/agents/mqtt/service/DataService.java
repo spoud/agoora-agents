@@ -18,7 +18,7 @@ import io.spoud.sdm.logistics.selection.v1.ResourceGroupRef;
 import io.spoud.sdm.logistics.selection.v1.TransportMatchingProperties;
 import io.spoud.sdm.logistics.service.v1.DataPortChange;
 import io.spoud.sdm.logistics.service.v1.SaveDataPortRequest;
-import io.spoud.sdm.looker.v1alpha1.ResourceMetric;
+import io.spoud.sdm.looker.domain.v1alpha1.ResourceMetricType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -89,7 +89,7 @@ public class DataService {
             .build());
   }
 
-  private void uploadMetric(String resourceId, ResourceMetric.MetricType type, double value) {
+  private void uploadMetric(String resourceId, ResourceMetricType.Type type, double value) {
     try {
       metricsClient.updateMetric(resourceId, type, value);
     } catch (Exception ex) {
@@ -109,9 +109,9 @@ public class DataService {
                       dataPort.getId(), msgPerDuration);
 
               uploadMetric(
-                  dataPort.getId(), ResourceMetric.MetricType.DATA_PORT_MESSAGES, messageCounter);
+                  dataPort.getId(), ResourceMetricType.Type.DATA_PORT_MESSAGES, messageCounter);
               uploadMetric(
-                  dataPort.getId(), ResourceMetric.MetricType.DATA_PORT_BYTES, bytesPerDuration);
+                  dataPort.getId(), ResourceMetricType.Type.DATA_PORT_BYTES, bytesPerDuration);
               LOG.info(
                   "Metric for topic {} : msg/duration={} msgCounter={} bytes/duration={}",
                   topicDescription.getDataPortTopic(),

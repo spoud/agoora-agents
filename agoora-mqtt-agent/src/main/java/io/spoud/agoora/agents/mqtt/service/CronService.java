@@ -3,6 +3,7 @@ package io.spoud.agoora.agents.mqtt.service;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
+import io.spoud.agoora.agents.api.metrics.OperationalMetricsService;
 import io.spoud.agoora.agents.mqtt.config.data.MqttAgooraConfig;
 import io.spoud.agoora.agents.mqtt.config.data.ScrapperConfig;
 import io.spoud.agoora.agents.mqtt.mqtt.IterationContext;
@@ -29,6 +30,7 @@ public class CronService {
   private final ExecutorService managedExecutor = Executors.newSingleThreadExecutor();
   private final ScheduledExecutorService scheduledExecutorService =
       Executors.newSingleThreadScheduledExecutor();
+  private final OperationalMetricsService operationalMetricsService;
 
   private final MqttAgooraConfig config;
   private IterationContext lastIterationContext;
@@ -56,22 +58,32 @@ public class CronService {
         .subscribe()
         .with(
             unused -> {
+              operationalMetricsService.iterationStart();
               final ScheduledFuture<?> old =
                   terminationSchedule.getAndSet(
                       scheduledExecutorService.schedule(
-                          () -> mqttScrapper.stopRemainingOfPreviousIteration(lastIterationContext),
+                          () -> stopScrapper(scrapperConfig),
                           scrapperConfig.getMaxWait().toMillis(),
                           TimeUnit.MILLISECONDS));
               // stop the previous iteration if not already executed
               if (old != null) {
                 old.cancel(true);
                 // stop previous iteration if needed
-                mqttScrapper.stopRemainingOfPreviousIteration(lastIterationContext);
+                stopScrapper(scrapperConfig);
               }
 
               LOG.info(
                   "Starting MQTT listening iteration, max-wait={}", scrapperConfig.getMaxWait());
               lastIterationContext = mqttScrapper.startIteration();
             });
+  }
+
+  private void stopScrapper(ScrapperConfig scrapperConfig) {
+    mqttScrapper.stopRemainingOfPreviousIteration(lastIterationContext);
+
+    operationalMetricsService.iterationEnd(
+        config.getAuth().getUser().getName(),
+        config.getTransport().getAgooraPath(),
+        scrapperConfig.getPeriod());
   }
 }

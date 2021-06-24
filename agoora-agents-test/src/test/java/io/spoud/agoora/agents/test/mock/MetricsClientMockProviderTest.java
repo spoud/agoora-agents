@@ -1,9 +1,9 @@
 package io.spoud.agoora.agents.test.mock;
 
+import com.google.protobuf.Empty;
 import io.quarkus.test.junit.QuarkusTest;
 import io.spoud.agoora.agents.api.client.MetricsClient;
-import io.spoud.sdm.looker.v1alpha1.ResourceMetric;
-import io.spoud.sdm.looker.v1alpha1.UpdateMetricResponse;
+import io.spoud.sdm.looker.domain.v1alpha1.ResourceMetricType;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
@@ -19,16 +19,16 @@ class MetricsClientMockProviderTest {
   @Test
   void testClient() {
     final String resourceId = UUID.randomUUID().toString();
-    UpdateMetricResponse result =
+    Empty result =
         metricsClient.updateMetric(
-            resourceId, ResourceMetric.MetricType.DATA_PORT_ATTRIBUTE_INTEGRITY, 1.0);
+            resourceId, ResourceMetricType.Type.DATA_PORT_ATTRIBUTE_INTEGRITY, 1.0);
     assertThat(result).isNull();
 
     MetricsClientMockProvider.defaultMock(metricsClient);
     // test uuid validity
     result =
         metricsClient.updateMetric(
-            resourceId, ResourceMetric.MetricType.DATA_PORT_ATTRIBUTE_INTEGRITY, 1.0);
+            resourceId, ResourceMetricType.Type.DATA_PORT_ATTRIBUTE_INTEGRITY, 1.0);
     assertThat(result).isNotNull();
   }
 }

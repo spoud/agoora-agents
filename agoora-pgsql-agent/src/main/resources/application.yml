@@ -6,17 +6,14 @@ agoora-transport-path: /default/postgres
 agoora:
   scrapper:
     samples-size: 500
+    initial-delay: PT10S
+    interval: PT15M
     state:
       enabled: true
-      initial-delay: PT10S
-      interval: PT15M
     profiling:
       enabled: true
-      initial-delay: PT30S
-      interval: PT15M
     hooks:
       enabled: true
-      initial-delay: PT1S
   transport:
     agoora-path: ${agoora-transport-path}
   auth:

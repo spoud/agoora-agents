@@ -3,6 +3,7 @@ package io.spoud.agoora.agents.kafka.service;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
+import io.spoud.agoora.agents.api.metrics.OperationalMetricsService;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.agoora.agents.kafka.config.data.ScrapperConfig;
 import io.spoud.agoora.agents.kafka.metrics.MetricsForwarderService;
@@ -12,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -25,6 +25,7 @@ public class CronService {
   private final DataService dataService;
   private final ProfilerService profilerService;
   private final MetricsForwarderService metricsForwarderService;
+  private final OperationalMetricsService operationalMetricsService;
 
   private final ExecutorService managedExecutor = Executors.newSingleThreadExecutor();
 
@@ -51,7 +52,7 @@ public class CronService {
         .with(
             unused -> {
               if (!running.getAndSet(true)) {
-                final Instant start = Instant.now();
+                operationalMetricsService.iterationStart();
 
                 LOG.info("Scrapping topics");
                 dataService.updateTopics();
@@ -67,7 +68,10 @@ public class CronService {
                   profilerService.profileData();
                 }
 
-                LOG.info("Iteration took {}", Duration.between(start, Instant.now()));
+                operationalMetricsService.iterationEnd(
+                    sdmConfig.getAuth().getUser().getName(),
+                    sdmConfig.getTransport().getAgooraPath(),
+                    scrapperConfig.getPeriod());
 
                 running.set(false);
               } else {
