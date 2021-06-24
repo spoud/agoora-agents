@@ -16,6 +16,7 @@ import org.eclipse.microprofile.context.ManagedExecutor;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import java.time.Duration;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class HooksService {
           .item("")
           .onItem()
           .delayIt()
-          .by(config.getScrapper().getHooks().getInitialDelay())
+          .by(Duration.ofSeconds(5))
           .runSubscriptionOn(managedExecutor)
           .subscribe()
           .with(v -> startListeningToHooks());

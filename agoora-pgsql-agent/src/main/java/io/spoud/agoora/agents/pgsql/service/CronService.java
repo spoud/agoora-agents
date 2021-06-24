@@ -2,8 +2,9 @@ package io.spoud.agoora.agents.pgsql.service;
 
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
+import io.spoud.agoora.agents.api.metrics.OperationalMetricsService;
 import io.spoud.agoora.agents.pgsql.config.data.PgsqlAgooraConfig;
-import io.spoud.agoora.agents.pgsql.config.data.ScrapperFeatureConfig;
+import io.spoud.agoora.agents.pgsql.config.data.ScrapperConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.context.ManagedExecutor;
@@ -24,44 +25,43 @@ public class CronService {
 
   private final PgsqlAgooraConfig config;
 
+  private final OperationalMetricsService operationalMetricsService;
+
   void onStart(@Observes StartupEvent ev) {
-    ScrapperFeatureConfig stateConfig = config.getScrapper().getState();
-    ScrapperFeatureConfig profilingConfig = config.getScrapper().getProfiling();
+    final ScrapperConfig scrapperConfig = config.getScrapper();
 
-    if (stateConfig.isEnabled()) {
-      Multi.createFrom()
-          .ticks()
-          .startingAfter(stateConfig.getInitialDelay())
-          .every(stateConfig.getInterval())
-          .runSubscriptionOn(managedExecutor)
-          .subscribe()
-          .with(
-              v -> {
-                LOG.info("Start looking at data ports");
-                try {
+    Multi.createFrom()
+        .ticks()
+        .startingAfter(scrapperConfig.getInitialDelay())
+        .every(scrapperConfig.getInterval())
+        .runSubscriptionOn(managedExecutor)
+        .subscribe()
+        .with(
+            v -> {
+              try {
+                operationalMetricsService.iterationStart();
+
+                if (scrapperConfig.getState().isEnabled()) {
+                  LOG.info("Start looking at data ports");
                   dataService.updateStates();
-                } catch (Exception ex) {
-                  LOG.error("Error while updating the data ports", ex);
                 }
-              });
-    }
 
-    if (profilingConfig.isEnabled()) {
-      Multi.createFrom()
-          .ticks()
-          .startingAfter(profilingConfig.getInitialDelay())
-          .every(profilingConfig.getInterval())
-          .runSubscriptionOn(managedExecutor)
-          .subscribe()
-          .with(
-              v -> {
-                LOG.info("Start Profiling");
-                try {
-                  profilerService.runProfiler();
-                } catch (Exception ex) {
-                  LOG.error("Error while profiling", ex);
+                if (scrapperConfig.getProfiling().isEnabled()) {
+                  LOG.info("Start Profiling");
+                  try {
+                    profilerService.runProfiler();
+                  } catch (Exception ex) {
+                    LOG.error("Error while profiling", ex);
+                  }
                 }
-              });
-    }
+
+                operationalMetricsService.iterationEnd(
+                    config.getAuth().getUser().getName(),
+                    config.getTransport().getAgooraPath(),
+                    scrapperConfig.getInterval());
+              } catch (Exception ex) {
+                LOG.error("Error while updating the data ports", ex);
+              }
+            });
   }
 }
