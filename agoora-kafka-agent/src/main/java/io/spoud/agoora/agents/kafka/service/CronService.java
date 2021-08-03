@@ -52,28 +52,33 @@ public class CronService {
         .with(
             unused -> {
               if (!running.getAndSet(true)) {
-                operationalMetricsService.iterationStart();
+                try {
+                  operationalMetricsService.iterationStart();
 
-                LOG.info("Scrapping topics");
-                dataService.updateTopics();
+                  LOG.info("Scrapping topics");
+                  dataService.updateTopics();
 
-                LOG.info("Scrapping consumer groups");
-                dataService.updateConsumerGroups();
+                  LOG.info("Scrapping consumer groups");
+                  dataService.updateConsumerGroups();
 
-                LOG.info("Forwarding metrics");
-                metricsForwarderService.scrapeMetrics();
+                  LOG.info("Forwarding metrics");
+                  metricsForwarderService.scrapeMetrics();
 
-                if (scrapperConfig.getProfiling().isEnabled()) {
-                  LOG.info("Profiling data");
-                  profilerService.profileData();
+                  if (scrapperConfig.getProfiling().isEnabled()) {
+                    LOG.info("Profiling data");
+                    profilerService.profileData();
+                  }
+
+                  operationalMetricsService.iterationEnd(
+                      sdmConfig.getAuth().getUser().getName(),
+                      sdmConfig.getTransport().getAgooraPath(),
+                      scrapperConfig.getPeriod());
+
+                } catch (Exception ex) {
+                  LOG.error("Error while processing", ex);
+                } finally {
+                  running.set(false);
                 }
-
-                operationalMetricsService.iterationEnd(
-                    sdmConfig.getAuth().getUser().getName(),
-                    sdmConfig.getTransport().getAgooraPath(),
-                    scrapperConfig.getPeriod());
-
-                running.set(false);
               } else {
                 LOG.error("Previous iteration was not finished, skipping this one");
               }
