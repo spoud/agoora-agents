@@ -42,28 +42,32 @@ public class MetricsForwarderService {
         .getStates()
         .forEach(
             dataPort -> {
-              String dataPortId = dataPort.getDataPortId();
-              String topicName = dataPort.getTopicName();
+              try {
+                String dataPortId = dataPort.getDataPortId();
+                String topicName = dataPort.getTopicName();
 
-              if (dataPortId != null) {
-                final long offsetSum =
-                    kafkaTopicReader.getEndOffsetByTopic(topicName).values().stream()
-                        .mapToLong(offset -> offset)
-                        .sum();
-                final long now = System.currentTimeMillis();
-                LOG.debug(
-                    "Offset for topic '{}' is {}. it will be forwarded.",
-                    topicName,
-                    now,
-                    offsetSum);
+                if (dataPortId != null) {
+                  final long offsetSum =
+                      kafkaTopicReader.getEndOffsetByTopic(topicName).values().stream()
+                          .mapToLong(offset -> offset)
+                          .sum();
+                  final long now = System.currentTimeMillis();
+                  LOG.debug(
+                      "Offset for topic '{}' is {}. it will be forwarded.",
+                      topicName,
+                      now,
+                      offsetSum);
 
-                dataPortsMetrics.put(topicName, offsetSum);
+                  dataPortsMetrics.put(topicName, offsetSum);
 
-                lookerService.updateMetrics(
-                    dataPortId, MetricsType.DATA_PORT_MESSAGES_COUNT, (double) offsetSum);
+                  lookerService.updateMetrics(
+                      dataPortId, MetricsType.DATA_PORT_MESSAGES_COUNT, (double) offsetSum);
 
-              } else {
-                LOG.warn("No data port id for topic {}, cannot upload metrics", topicName);
+                } else {
+                  LOG.warn("No data port id for topic {}, cannot upload metrics", topicName);
+                }
+              } catch (Exception ex) {
+                LOG.warn("Unable to forward metrics for data port", ex);
               }
             });
     LOG.info("Metrics scraping DONE.");
@@ -77,32 +81,37 @@ public class MetricsForwarderService {
         .getStates()
         .forEach(
             dataSubscriptionState -> {
-              String id = dataSubscriptionState.getDataSubscriptionStateId();
-              String consumerGroup = dataSubscriptionState.getConsumerGroupName();
-              String topicName = dataSubscriptionState.getTopicName();
+              try {
+                String id = dataSubscriptionState.getDataSubscriptionStateId();
+                String consumerGroup = dataSubscriptionState.getConsumerGroupName();
+                String topicName = dataSubscriptionState.getTopicName();
 
-              final Map<TopicPartition, OffsetAndMetadata> offsetByConsumerGroup =
-                  kafkaService.getOffsetByConsumerGroup(consumerGroup);
+                final Map<TopicPartition, OffsetAndMetadata> offsetByConsumerGroup =
+                    kafkaService.getOffsetByConsumerGroup(consumerGroup);
 
-              final long consumerOffsetSum =
-                  offsetByConsumerGroup.entrySet().stream()
-                      .filter(e -> e.getKey().topic().equals(topicName))
-                      .map(Map.Entry::getValue)
-                      .mapToLong(OffsetAndMetadata::offset)
-                      .sum();
+                final long consumerOffsetSum =
+                    offsetByConsumerGroup.entrySet().stream()
+                        .filter(e -> e.getKey().topic().equals(topicName))
+                        .map(Map.Entry::getValue)
+                        .mapToLong(OffsetAndMetadata::offset)
+                        .sum();
 
-              lookerService.updateMetrics(
-                  id,
-                  MetricsType.DATA_SUBSCRIPTION_STATE_MESSAGES_COUNT,
-                  (double) consumerOffsetSum);
+                lookerService.updateMetrics(
+                    id,
+                    MetricsType.DATA_SUBSCRIPTION_STATE_MESSAGES_COUNT,
+                    (double) consumerOffsetSum);
 
-              Optional.ofNullable(offsetPerTopic.get(topicName))
-                  .map(topicOffset -> topicOffset - consumerOffsetSum)
-                  .ifPresent(
-                      lag -> lookerService.updateMetrics(
-                          id,
-                          MetricsType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG_COUNT,
-                          (double) lag));
+                Optional.ofNullable(offsetPerTopic.get(topicName))
+                    .map(topicOffset -> topicOffset - consumerOffsetSum)
+                    .ifPresent(
+                        lag ->
+                            lookerService.updateMetrics(
+                                id,
+                                MetricsType.DATA_SUBSCRIPTION_STATE_MESSAGES_LAG_COUNT,
+                                (double) lag));
+              } catch (Exception ex) {
+                LOG.warn("Unable to forward metrics for data subscription state", ex);
+              }
             });
   }
 }
