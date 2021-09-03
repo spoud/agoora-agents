@@ -52,11 +52,14 @@ public class ProfilerService {
 
                 profileSamples(kafkaTopic, samples);
               } catch (Exception ex) {
-                LOG.error(
-                    "Unable to profile topic '{}', skipping. Enable debug for full stacktrace: {}",
-                    kafkaTopic.getTopicName(),
-                    ex.getMessage());
-                LOG.error("Unable to profile topic '{}'", kafkaTopic.getTopicName(), ex);
+                if (LOG.isDebugEnabled()) {
+                  LOG.warn("Unable to profile topic '{}'", kafkaTopic.getTopicName(), ex);
+                } else {
+                  LOG.warn(
+                      "Unable to profile topic '{}', skipping. Enable debug for full stacktrace: {}",
+                      kafkaTopic.getTopicName(),
+                      ex.getMessage());
+                }
 
                 lookerClient.addDataProfile(
                     AddDataProfileRequest.newBuilder()

@@ -29,17 +29,18 @@ import java.util.stream.Collectors;
 public class KafkaTopicReader {
   public static final Duration TIMEOUT_PER_TOPIC = Duration.ofSeconds(10);
   private final KafkaAgentConfig config;
-  private Consumer<Bytes, Bytes> consumer;
+  private Consumer<Bytes, Bytes> globalConsumer;
 
   void startup(@Observes StartupEvent event) {
     LOG.debug("Staring kafka reader");
-    consumer = KafkaFactory.createConsumer(config);
+    globalConsumer = KafkaFactory.createConsumer(config);
   }
 
   public List<byte[]> getSamples(String topic) {
+    Consumer<Bytes, Bytes> consumer = KafkaFactory.createConsumer(config);
     final Instant start = Instant.now();
 
-    final Map<TopicPartition, Range> ranges = getRanges(topic);
+    final Map<TopicPartition, Range> ranges = getRanges(topic, consumer);
     if (ranges.isEmpty()) {
       return Collections.emptyList();
     }
@@ -84,23 +85,26 @@ public class KafkaTopicReader {
     }
     consumer.assign(Collections.emptyList());
     LOG.debug(
-        "Topic '{}', partition count={}, samples count={}, duration={}",
+        "Topic '{}', partition count={}, samples count={}, duration={}, ranges={}",
         topic,
         ranges.keySet().size(),
         samples.size(),
-        Duration.between(start, Instant.now()));
+        Duration.between(start, Instant.now()),
+        ranges);
+
+    consumer.close();
     return samples;
   }
 
   public Map<TopicPartition, Long> getEndOffsetByTopic(final String topic) {
-    final List<TopicPartition> topics = getTopicPartitions(topic);
+    final List<TopicPartition> topics = getTopicPartitions(topic, globalConsumer);
     if (topics.isEmpty()) {
       return Collections.emptyMap();
     }
-    return consumer.endOffsets(topics);
+    return globalConsumer.endOffsets(topics);
   }
 
-  private List<TopicPartition> getTopicPartitions(String topic) {
+  private List<TopicPartition> getTopicPartitions(String topic, Consumer<Bytes, Bytes> consumer) {
     final List<PartitionInfo> partitions = consumer.partitionsFor(topic);
     if (partitions == null) {
       LOG.warn("No partition found for topic {}", topic);
@@ -111,8 +115,8 @@ public class KafkaTopicReader {
         .collect(Collectors.toList());
   }
 
-  private Map<TopicPartition, Range> getRanges(String topic) {
-    final List<TopicPartition> topicPartitions = getTopicPartitions(topic);
+  private Map<TopicPartition, Range> getRanges(String topic, Consumer<Bytes, Bytes> consumer) {
+    final List<TopicPartition> topicPartitions = getTopicPartitions(topic, consumer);
     if (topicPartitions.isEmpty()) {
       return Collections.emptyMap();
     }
