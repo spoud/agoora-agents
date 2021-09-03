@@ -85,6 +85,12 @@ quarkus:
         level: WARN
 
 rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
+#rest-confluent-registry/mp-rest/trustStore:
+#rest-confluent-registry/mp-rest/trustStorePassword:
+#rest-confluent-registry/mp-rest/trustStoreType: JKS
+#rest-confluent-registry/mp-rest/keyStore: JKS
+#rest-confluent-registry/mp-rest/keyStorePassword: JKS
+#rest-confluent-registry/mp-rest/keyStoreType: JKS
 
 "%dev":
   agoora-endpoint: local.spoud.io
