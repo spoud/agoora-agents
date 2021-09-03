@@ -8,7 +8,6 @@ import io.spoud.agoora.agents.api.mapper.StandardProtoMapper;
 import io.spoud.agoora.agents.api.observers.ProfileResponseObserver;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.agoora.agents.kafka.data.KafkaTopic;
-import io.spoud.agoora.agents.kafka.decoder.DecoderException;
 import io.spoud.agoora.agents.kafka.decoder.DecoderService;
 import io.spoud.agoora.agents.kafka.kafka.KafkaTopicReader;
 import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
@@ -52,16 +51,14 @@ public class ProfilerService {
                 samples = decodeMessages(kafkaTopic, samples);
 
                 profileSamples(kafkaTopic, samples);
-              } catch (DecoderException ex){
-                LOG.warn("Unable to profile topic '{}' because we cannot decode it: {}", kafkaTopic.getTopicName(), ex.getMessage());
               } catch (Exception ex) {
-                if(LOG.isDebugEnabled()) {
-                  LOG.error("Unable to profile topic '{}'", kafkaTopic.getTopicName(), ex);
-                }else{
-                  LOG.error(
-                          "Unable to profile topic '{}', skipping. Enable debug for full stacktrace: {}",
-                          kafkaTopic.getTopicName(),
-                          ex.getMessage());
+                if (LOG.isDebugEnabled()) {
+                  LOG.warn("Unable to profile topic '{}'", kafkaTopic.getTopicName(), ex);
+                } else {
+                  LOG.warn(
+                      "Unable to profile topic '{}', skipping. Enable debug for full stacktrace: {}",
+                      kafkaTopic.getTopicName(),
+                      ex.getMessage());
                 }
 
                 lookerClient.addDataProfile(
