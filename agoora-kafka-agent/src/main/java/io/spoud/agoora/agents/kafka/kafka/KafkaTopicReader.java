@@ -85,11 +85,12 @@ public class KafkaTopicReader {
     }
     consumer.assign(Collections.emptyList());
     LOG.debug(
-        "Topic '{}', partition count={}, samples count={}, duration={}",
+        "Topic '{}', partition count={}, samples count={}, duration={}, ranges={}",
         topic,
         ranges.keySet().size(),
         samples.size(),
-        Duration.between(start, Instant.now()));
+        Duration.between(start, Instant.now()),
+        ranges);
 
     consumer.close();
     return samples;
