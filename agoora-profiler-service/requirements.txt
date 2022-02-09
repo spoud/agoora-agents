@@ -2,7 +2,7 @@ htmlmin
 enum34==1.1.6
 grpcio==1.28.1
 grpcio-tools==1.28.1
-numpy==1.17.4
+numpy==1.21.0
 papermill==1.0.1
 protobuf==3.8.0
 python-dateutil==2.8.1
