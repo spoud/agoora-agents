@@ -41,7 +41,7 @@ vars:
         hash: False
 
 # Sort the variables. Possible values: ascending, descending or None (leaves original sorting)
-sort: None
+sort: ascending
 
 # which diagrams to show
 missing_diagrams:
@@ -154,7 +154,6 @@ html:
 
 # Styling options for the HTML report
     style:
-      theme: None
       logo: ""
       primary_color: "#337ab7"
       full_width: True
