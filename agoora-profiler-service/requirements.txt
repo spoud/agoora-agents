@@ -4,7 +4,7 @@ grpcio==1.28.1
 grpcio-tools==1.28.1
 numpy==1.17.4
 papermill==1.0.1
-protobuf==3.8.0
+protobuf==3.15.0
 python-dateutil==2.8.1
 requests==2.23.0
 pytz==2019.1
