@@ -1,2 +1,4 @@
 env/
-Dockerfile
+venv/
+Dockerfile.jar
+CONTRIBUTION.md

@@ -1,4 +1,4 @@
-FROM python:3.7-slim as builder
+FROM python:3.10-slim as builder
 
 WORKDIR /build
 
@@ -17,7 +17,7 @@ RUN apt-get update && \
 
 ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements.txt ./
-RUN  pip install -Ur requirements.txt
+RUN  /opt/venv/bin/python -m pip install --upgrade pip && pip install -Ur requirements.txt
 
 
 
@@ -31,7 +31,7 @@ COPY testdata/* ./testdata/
 RUN python3 profiler_it.py
 RUN python3 -m unittest quality_inspection/tests/*
 
-FROM python:3.7-slim
+FROM python:3.10-slim
 
 RUN apt update && apt install -y fonts-liberation
 
