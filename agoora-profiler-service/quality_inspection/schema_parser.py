@@ -25,7 +25,7 @@ class AvroSchemaParser(AbstractSchemaParser):
             expectation_dict = dict()
         for field in schema_obj:
             final_key = f"{property_path}{AbstractSchemaParser.PROPERTY_DELIMITER}{field['name']}" \
-                if property_path is not "" else field['name']
+                if property_path != "" else field['name']
             if type(field['type']) is dict and "fields" in field['type'].keys():
                 self.extract_props_from_schema(field['type']["fields"], final_key,
                                                property_dict, expectation_dict)
@@ -57,7 +57,7 @@ class AvroSchemaParser(AbstractSchemaParser):
         if "fields" in schema_obj.keys():
             for field in schema_obj["fields"]:
                 final_key = f"{property_path}{AbstractSchemaParser.PROPERTY_DELIMITER}{field['name']}" \
-                    if property_path is not "" else field['name']
+                    if property_path != "" else field['name']
                 if "type" in field.keys() and not type(field["type"]) is list:
                     if type(field["type"]) is dict:
                         self.extract_required_props(field["type"], final_key,

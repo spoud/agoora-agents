@@ -4,23 +4,20 @@ import logging
 import os
 from concurrent import futures
 from genson import SchemaBuilder
-from func_timeout import func_timeout, FunctionTimedOut, func_set_timeout
+from func_timeout import FunctionTimedOut, func_set_timeout
 import matplotlib
 import grpc
 import pandas as pd
 import typing
-import sys
 
 import pandas_profiling
-from pandas_profiling import config
 
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 from htmlmin.main import minify
 
 from profiler.service.v1alpha1 import profiler_pb2 as profiler_pb2
 from profiler.service.v1alpha1 import profiler_pb2_grpc as profiler_pb2_grpc
 from profiler.domain.v1alpha1 import domain_pb2 as domain_pb2
-from profiler.domain.v1alpha1 import domain_pb2_grpc as domain_pb2_grpc
 
 from quality_inspection.quality_inspector import QualityInspector
 from quality_inspection.quality_metrics import QualityMetrics
@@ -46,7 +43,6 @@ class ProfilerServicer(profiler_pb2_grpc.ProfilerServicer):
         if os.path.exists(config_path_defaults):
             self.config_path = config_path_defaults
             logging.info('found default config for the pandas profiler at ' + config_path_defaults)
-            config.config.set_file(self.config_path)
 
         if os.path.exists(config_path_custom):
             self.config_path = config_path_custom
@@ -55,16 +51,6 @@ class ProfilerServicer(profiler_pb2_grpc.ProfilerServicer):
             logging.info('did not find config for the pandas profiler at ' + config_path_custom +
                          ' will use the default config.')
 
-        if self.config_path:
-            config.config.set_file(self.config_path)
-        env_vars = dict(os.environ)
-        logging.debug('environment variables used as kwargs: ' + str(env_vars))
-
-        for key in list(env_vars.keys()):
-            new_key = '_'.join([i.replace('_', '.') for i in key.lower().split('__')])
-            env_vars[new_key] = env_vars.pop(key)
-            env_vars[new_key] = convert(env_vars[new_key])
-        config.set_args(dict(env_vars), dots=True)
 
     def InspectQuality(self, request_iterator, context: typing.Any) -> QualityMetrics:
 
@@ -131,7 +117,7 @@ class ProfilerServicer(profiler_pb2_grpc.ProfilerServicer):
             profile = None
             report_length = 0
             try:
-                profile = run_profiler(data_frame)
+                profile = run_profiler(data_frame, self.config_path)
             except FunctionTimedOut as te:
                 err_msg = 'profile timeout for request_id %s after %ss data_frame shape (rows, cols): %s' % \
                           (request_id, te.timedOutAfter, data_frame.shape)
@@ -227,8 +213,8 @@ class ProfilerServicer(profiler_pb2_grpc.ProfilerServicer):
 
 
 @func_set_timeout(int(os.getenv('PROFILER_TIMEOUT', '30')))
-def run_profiler(data_frame):
-    return pandas_profiling.ProfileReport(data_frame, lazy=False)  # enforce eager loading as in previous versions
+def run_profiler(data_frame, config_path=None):
+    return pandas_profiling.ProfileReport(data_frame, lazy=False, config_file=config_path, explorative=True)  # enforce eager loading as in previous versions
 
 
 def convert(val):

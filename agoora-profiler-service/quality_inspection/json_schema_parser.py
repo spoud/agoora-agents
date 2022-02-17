@@ -26,7 +26,7 @@ class JsonSchemaParser(AbstractSchemaParser):
             expectation_dict = dict()
 
         for key, value in schema_obj.items():
-            final_key = f"{property_path}{AbstractSchemaParser.PROPERTY_DELIMITER}{key}" if property_path is not "" \
+            final_key = f"{property_path}{AbstractSchemaParser.PROPERTY_DELIMITER}{key}" if property_path != "" \
                 else key
             if "properties" in schema_obj[key].keys():
                 self.extract_props_from_schema(schema_obj[key]["properties"], final_key,
@@ -56,13 +56,13 @@ class JsonSchemaParser(AbstractSchemaParser):
                 if property_path in required_types:
                     required_types.remove(property_path)
                 final_key = f"{property_path}{AbstractSchemaParser.PROPERTY_DELIMITER}{key}" \
-                    if property_path is not "" else key
+                    if property_path != "" else key
                 required_types.append(final_key)
 
         if "properties" in schema_obj.keys():
             for field in schema_obj['properties'].keys():
                 final_key = f"{property_path}{AbstractSchemaParser.PROPERTY_DELIMITER}{field}" \
-                    if property_path is not "" else field
+                    if property_path != "" else field
                 if "properties" in schema_obj['properties'][field].keys():
                     self.extract_required_props(schema_obj['properties'][field],
                                                 final_key, required_types, type_expectations)

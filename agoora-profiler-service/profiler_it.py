@@ -5,7 +5,6 @@ import grpc
 from profiler.service.v1alpha1 import profiler_pb2 as profiler_pb2
 from profiler.service.v1alpha1 import profiler_pb2_grpc as profiler_pb2_grpc
 from profiler.domain.v1alpha1 import domain_pb2 as domain_pb2
-from profiler.domain.v1alpha1 import domain_pb2_grpc as domain_pb2_grpc
 import profiler_app
 
 
