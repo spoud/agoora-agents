@@ -35,7 +35,7 @@ public class SchemaService {
                   LOG.debug(
                       "One schema found for the topic {} in the registry {}",
                       topicName,
-                      schemaRegistry);
+                      schemaRegistry.getDeepDiveToolUrl(topicName));
 
                   try {
                     Schema saved =
@@ -49,9 +49,9 @@ public class SchemaService {
                             schema.getContent(),
                             SchemaSource.Type.REGISTRY,
                             schema.getEncoding());
-                    LOG.info("Successfully saved schema with uuid '{}'", saved.getId());
+                    LOG.info("Successfully saved schema for topic {} with uuid '{}'", topicName, saved.getId());
                   } catch (StatusRuntimeException ex) {
-                    LOG.error("Unable to save schema '{}'", schema, ex);
+                    LOG.error("Unable to save schema '{}' for topic {}", schema, topicName, ex);
                   }
 
                   schemaRegistry
@@ -63,7 +63,7 @@ public class SchemaService {
                 },
                 () -> {
                   LOG.debug(
-                      "No schema found for topic {} in the registry {}", topicName, schemaRegistry);
+                      "No schema found for topic {} in the registry {}", topicName, schemaRegistry.getDeepDiveToolUrl(topicName));
                 });
       }
     } catch (Exception ex) {
