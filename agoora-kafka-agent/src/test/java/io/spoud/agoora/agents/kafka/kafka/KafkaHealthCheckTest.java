@@ -24,7 +24,7 @@ class KafkaHealthCheckTest extends AbstractService {
     kafkaHealthCheck.postConstruct();
 
     final HealthCheckResponse call = kafkaHealthCheck.call();
-    assertThat(call.getState()).isEqualTo(HealthCheckResponse.State.UP);
+    assertThat(call.getStatus()).isEqualTo(HealthCheckResponse.Status.UP);
     assertThat(call.getName()).isEqualTo("Kafka connection health check");
     assertThat(call.getData()).isPresent();
     assertThat(call.getData().get()).containsOnlyKeys("nodes");
@@ -45,7 +45,7 @@ class KafkaHealthCheckTest extends AbstractService {
     config.getKafka().setBootstrapServers(backup); // restore config after the post construct
 
     final HealthCheckResponse call = kafkaHealthCheck.call();
-    assertThat(call.getState()).isEqualTo(HealthCheckResponse.State.DOWN);
+    assertThat(call.getStatus()).isEqualTo(HealthCheckResponse.Status.DOWN);
     assertThat(call.getName()).isEqualTo("Kafka connection health check");
     assertThat(call.getData()).isPresent();
     assertThat(call.getData().get()).containsOnlyKeys("reason");
