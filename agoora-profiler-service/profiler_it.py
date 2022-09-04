@@ -1,5 +1,6 @@
 import json
 import unittest
+import os
 from concurrent import futures
 import grpc
 from profiler.service.v1alpha1 import profiler_pb2 as profiler_pb2
@@ -176,7 +177,7 @@ class ProfilerTest(unittest.TestCase):
 
     def test_profile_stream_no_error_on_data(self):
         def request_messages():
-            request_id = "123"
+            request_id = "124"
             for i in range(5):
                 request = profiler_pb2.ProfileRequest(
                     request_id=request_id,
@@ -195,7 +196,7 @@ class ProfilerTest(unittest.TestCase):
                 message.meta.service_version = profile.meta.service_version
                 message.meta.schema_byte_size = profile.meta.schema_byte_size
                 message.meta.profile_byte_size = profile.meta.profile_byte_size
-                self.assertEqual(json.loads(message.meta.request_id), 123)
+                self.assertEqual(json.loads(message.meta.request_id), 124)
                 self.assertEqual(5, message.meta.total_records)
                 self.assertSchema(message.meta.schema, 'x', 'string', 'y', 'integer')
             elif profile.HasField("profile"):
@@ -205,7 +206,7 @@ class ProfilerTest(unittest.TestCase):
 
     def test_profile_stream_json_normalize(self):
         def request_messages():
-            request_id = "123"
+            request_id = "125"
             for i in range(5):
                 request = profiler_pb2.ProfileRequest(
                     request_id=request_id,
@@ -224,7 +225,7 @@ class ProfilerTest(unittest.TestCase):
                 message.meta.service_version = profile.meta.service_version
                 message.meta.schema_byte_size = profile.meta.schema_byte_size
                 message.meta.profile_byte_size = profile.meta.profile_byte_size
-                self.assertEqual(json.loads(message.meta.request_id), 123)
+                self.assertEqual(json.loads(message.meta.request_id), 125)
                 self.assertEqual(5, message.meta.total_records)
                 self.assertSchema(message.meta.schema, 'x', 'object', 'foo', 'string')
                 self.assertSchema(message.meta.schema, 'x', 'object', 'test', 'integer')
@@ -238,7 +239,7 @@ class ProfilerTest(unittest.TestCase):
 
     def test_profile_stream_size_toeggolomat(self):
         def request_messages():
-            request_id = "123"
+            request_id = "126"
             with open('testdata/toeggelomat_join.json') as json_file:
                 data = json.load(json_file)
                 for d in data:
@@ -260,7 +261,7 @@ class ProfilerTest(unittest.TestCase):
                 message.meta.schema_byte_size = profile.meta.schema_byte_size
                 message.meta.profile_byte_size = profile.meta.profile_byte_size
 
-                self.assertEqual(json.loads(message.meta.request_id), 123)
+                self.assertEqual(json.loads(message.meta.request_id), 126)
                 self.assertEqual(27, message.meta.total_records)
                 self.assertSchema(message.meta.schema, 'matchUuid', 'string', 'blueScore', 'integer')
             elif profile.HasField("profile"):
@@ -269,7 +270,7 @@ class ProfilerTest(unittest.TestCase):
 
     def test_profile_stream_size_huge_report_timeout(self):
         def request_messages():
-            request_id = "123"
+            request_id = "127"
             with open('testdata/huge-report.json') as json_file:
                 data = json.load(json_file)
                 for d in data:
@@ -291,7 +292,7 @@ class ProfilerTest(unittest.TestCase):
                 message.meta.schema_byte_size = profile.meta.schema_byte_size
                 message.meta.profile_byte_size = profile.meta.profile_byte_size
 
-                self.assertEqual(json.loads(message.meta.request_id), 123)
+                self.assertEqual(json.loads(message.meta.request_id), 127)
                 self.assertEqual(3, message.meta.total_records)
                 self.assertSchema(message.meta.schema, 'field1', 'string', 'field101', 'string')
 
@@ -304,7 +305,7 @@ class ProfilerTest(unittest.TestCase):
 
     def test_profile_stream_not_so_huge_report_returns_2_profile_messages(self):
         def request_messages():
-            request_id = "123"
+            request_id = "128"
             with open(
                 'testdata/not-so-huge-report.json') as json_file:
                 data = json.load(json_file)
@@ -314,7 +315,6 @@ class ProfilerTest(unittest.TestCase):
                         json_data=json.dumps(d))
                     yield request
 
-        # os.getenv('PROFILER_TIMEOUT', '30')
         # test
         num_returned = 0
         message = profiler_pb2.ProfileDataStreamResponse()

@@ -28,7 +28,7 @@ COPY profiler_app.py ./
 COPY profiler_it.py ./
 COPY quality_inspection/ ./quality_inspection/
 COPY testdata/* ./testdata/
-RUN python3 profiler_it.py
+RUN PROFILER_TIMEOUT=60 python3 profiler_it.py
 RUN python3 -m unittest quality_inspection/tests/*
 
 FROM python:3.10-slim
