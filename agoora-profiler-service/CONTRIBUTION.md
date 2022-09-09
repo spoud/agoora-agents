@@ -6,7 +6,7 @@ To run the agoora-profiler-service locally, do:
 
 ```
 pip3 install -Ur requirements.txt
-python3 -m grpc_tools.protoc -I./proto --python_out=./ --grpc_python_out=./ ./proto/profiler.proto
+python3 -m grpc_tools.protoc -I./proto --python_out=./ --grpc_python_out=./ ./proto/profiler/service/v1alpha1/profiler.proto
 ```
 
 ### Docker

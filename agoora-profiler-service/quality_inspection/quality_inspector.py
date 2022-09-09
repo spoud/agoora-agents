@@ -2,7 +2,7 @@ from __future__ import annotations
 import numpy as np
 from great_expectations.core import ExpectationSuite, ExpectationConfiguration
 from great_expectations.dataset import PandasDataset
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 from collections import defaultdict
 
 from quality_inspection.abstract_schema_parser import SchemaParserResult
