@@ -167,7 +167,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           GIT_TAG: ${{ needs.start-runner.outputs.git-tag }}
         with:
           body_path: .github/release-body.md
