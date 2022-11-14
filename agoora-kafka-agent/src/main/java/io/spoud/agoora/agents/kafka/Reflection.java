@@ -49,5 +49,6 @@ import io.spoud.sdm.logistics.domain.v1.Transport;
       // XML
       com.ctc.wstx.sr.ValidatingStreamReader.class,
       com.ctc.wstx.stax.WstxInputFactory.class,
+      com.ctc.wstx.stax.WstxOutputFactory.class,
     })
 public class Reflection {}
