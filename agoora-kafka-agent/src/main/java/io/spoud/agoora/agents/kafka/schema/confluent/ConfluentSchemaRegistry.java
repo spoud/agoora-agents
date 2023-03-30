@@ -36,8 +36,12 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
 
   private final Optional<String> publicUrl;
 
-  @Inject @RestClient Instance<ConfluentRegistrySubjectResource> confluentRegistrySubjectResource;
-  @Inject @RestClient Instance<ConfluentRegistrySchemaResource> confluentRegistrySchemaResource;
+  @Inject
+  @RestClient
+  Instance<ConfluentRegistrySubjectResource> confluentRegistrySubjectResource;
+  @Inject
+  @RestClient
+  Instance<ConfluentRegistrySchemaResource> confluentRegistrySchemaResource;
 
   @ConfigProperty(name = "rest-confluent-registry/mp-rest/url")
   Optional<String> registryUrl;
@@ -61,7 +65,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
     if (!registryDefined()) {
       return Optional.empty();
     }
-    LOG.debug("Searching for schema for topic '{}'", topic);
+    LOG.debug("Searching for {} schema for topic '{}'", part, topic);
     return getSchema(topic, part).map(this::mapToSchemaObject);
   }
 

@@ -16,9 +16,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class SchemaClientTest {
 
@@ -47,6 +45,8 @@ class SchemaClientTest {
                                 .build())
                         .setSource(SchemaSource.Type.INFERRED)
                         .setEncoding(SchemaEncoding.Type.JSON)
+                        .setKeyEncoding(SchemaEncoding.Type.JSON)
+                        .setKeyContent("content")
                         .build())
                 .build());
 
@@ -57,9 +57,13 @@ class SchemaClientTest {
             "/path/",
             "content",
             SchemaSource.Type.INFERRED,
-            SchemaEncoding.Type.JSON);
+            SchemaEncoding.Type.JSON,
+            "content",
+            SchemaEncoding.Type.JSON
+        );
 
     assertThat(schema.getEncoding()).isEqualTo(SchemaEncoding.Type.JSON);
+    assertThat(schema.getKeyEncoding()).isEqualTo(SchemaEncoding.Type.JSON);
     assertThat(schema.getSource()).isEqualTo(SchemaSource.Type.INFERRED);
 
     verify(stub)
@@ -67,11 +71,14 @@ class SchemaClientTest {
             eq(
                 SaveSchemaRequest.newBuilder()
                     .setEntityRef(
-                        EntityRef.newBuilder().setEntityType(ResourceEntity.Type.DATA_PORT).setId("id").build())
+                        EntityRef.newBuilder().setEntityType(ResourceEntity.Type.DATA_PORT)
+                            .setId("id").build())
                     .setPath("/path/")
                     .setSource(SchemaSource.Type.INFERRED)
                     .setEncoding(SchemaEncoding.Type.JSON)
                     .setContent("content")
+                    .setKeyContent("content")
+                    .setKeyEncoding(SchemaEncoding.Type.JSON)
                     .build()));
   }
 }

@@ -38,10 +38,7 @@ import java.util.Map;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mockingDetails;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @QuarkusTest()
 class DataServiceTest {
@@ -52,13 +49,20 @@ class DataServiceTest {
       "{\"properties\":{\"address_uuid\":{\"type\":\"uuid\"},\"label\":{\"type\":\"varchar\"},\"line1\":{\"type\":\"varchar\"},\"line2\":{\"type\":\"varchar\"},\"meta\":{\"type\":\"text\"},\"created\":{\"type\":\"timestamp\"},\"updated\":{\"type\":\"timestamp\"},\"created_by\":{\"type\":\"varchar\"},\"updated_by\":{\"type\":\"varchar\"},\"city_uuid\":{\"type\":\"uuid\"}},\"required\":[\"address_uuid\",\"label\",\"line1\",\"created\",\"updated\",\"created_by\",\"updated_by\",\"city_uuid\"]}";
   private static final String SCHEMA_3 =
       "{\"properties\":{\"city_uuid\":{\"type\":\"uuid\"},\"label\":{\"type\":\"varchar\"},\"meta\":{\"type\":\"text\"},\"created\":{\"type\":\"timestamp\"},\"updated\":{\"type\":\"timestamp\"},\"created_by\":{\"type\":\"varchar\"},\"updated_by\":{\"type\":\"varchar\"}},\"required\":[\"city_uuid\",\"label\",\"created\",\"updated\",\"created_by\",\"updated_by\"]}";
-  @Inject DataService dataService;
-  @Inject ReferenceService referenceService;
-  @Inject DataPortRepository dataPortRepository;
-  @Inject DataPortClient dataPortClient;
-  @Inject DataItemClient dataItemClient;
-  @Inject SchemaClient schemaClient;
-  @Inject MetricsClient metricsCLient;
+  @Inject
+  DataService dataService;
+  @Inject
+  ReferenceService referenceService;
+  @Inject
+  DataPortRepository dataPortRepository;
+  @Inject
+  DataPortClient dataPortClient;
+  @Inject
+  DataItemClient dataItemClient;
+  @Inject
+  SchemaClient schemaClient;
+  @Inject
+  MetricsClient metricsCLient;
 
   @BeforeEach
   void setup() {
@@ -103,7 +107,9 @@ class DataServiceTest {
             eq("/default/"),
             eq(SCHEMA_1),
             eq(SchemaSource.Type.INFERRED),
-            eq(SchemaEncoding.Type.JSON));
+            eq(SchemaEncoding.Type.JSON),
+            eq(""),
+            eq(SchemaEncoding.Type.UNKNOWN));
     verify(schemaClient)
         .saveSchema(
             eq(ResourceEntity.Type.DATA_ITEM),
@@ -111,7 +117,9 @@ class DataServiceTest {
             eq("/default/"),
             eq(SCHEMA_2),
             eq(SchemaSource.Type.INFERRED),
-            eq(SchemaEncoding.Type.JSON));
+            eq(SchemaEncoding.Type.JSON),
+            eq(""),
+            eq(SchemaEncoding.Type.UNKNOWN));
     verify(schemaClient)
         .saveSchema(
             eq(ResourceEntity.Type.DATA_ITEM),
@@ -119,7 +127,9 @@ class DataServiceTest {
             eq("/default/"),
             eq(SCHEMA_3),
             eq(SchemaSource.Type.INFERRED),
-            eq(SchemaEncoding.Type.JSON));
+            eq(SchemaEncoding.Type.JSON),
+            eq(""),
+            eq(SchemaEncoding.Type.UNKNOWN));
 
     verify(metricsCLient, times(2))
         .updateMetric(anyString(), eq(ResourceMetricType.Type.DATA_PORT_DATASET_COUNT), eq(2.0));

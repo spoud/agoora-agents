@@ -170,7 +170,9 @@ public class DataService {
                   config.getTransport().getAgooraPathObject().getResourceGroupPath(),
                   schemaContent,
                   SchemaSource.Type.INFERRED,
-                  SchemaEncoding.Type.JSON) // TODO new Schema encoding ?
+                  SchemaEncoding.Type.JSON,
+                  "",
+                  SchemaEncoding.Type.UNKNOWN)
               .getId();
       LOG.info("Schema {} saved for data item {}", schemaId, dataItem.getId());
     } catch (Exception ex) {

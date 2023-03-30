@@ -31,6 +31,7 @@ import java.util.Optional;
 @ApplicationScoped
 @RequiredArgsConstructor
 public class ProfilerService {
+
   private final KafkaTopicRepository kafkaTopicRepository;
   private final KafkaTopicReader kafkaTopicReader;
   private final BlobClient blobClient;
@@ -168,11 +169,14 @@ public class ProfilerService {
                     config.getTransport().getAgooraPathObject().getResourceGroupPath(),
                     schemaContent,
                     SchemaSource.Type.INFERRED,
-                    SchemaEncoding.Type.JSON)
+                    SchemaEncoding.Type.JSON,
+                    "", // TODO: add schema key content from profile
+                    SchemaEncoding.Type.UNKNOWN
+                )
                 .getId();
-        LOG.info("Schema {} saved for data port {}", schemaId, kafkaTopic.getDataPortId());
+        LOG.info("Profiler Schema {} saved for data port {}", schemaId, kafkaTopic.getDataPortId());
       } catch (Exception ex) {
-        LOG.error("Unable to send schema for data port {}", kafkaTopic.getDataPortId(), ex);
+        LOG.error("Unable to send profiler schema for data port {}", kafkaTopic.getDataPortId(), ex);
       }
     } else {
       LOG.warn(

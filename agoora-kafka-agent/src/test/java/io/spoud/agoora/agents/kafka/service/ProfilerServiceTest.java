@@ -31,10 +31,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 @QuarkusTest
 class ProfilerServiceTest {
@@ -46,15 +43,22 @@ class ProfilerServiceTest {
   public static final String PROFILE_TOPIC_UNKNOWN_DATA = "profile-topic-wrong-data";
   public static final byte[] JSON_DATA = "{\"field\":\"hello\"}".getBytes(StandardCharsets.UTF_8);
   public static final String AVRO_DATA = "146f6270797068777769788e0428848a3c01";
-  public static final byte[] UNKNOWN_DATA = new byte[] {(byte) 0xA1, (byte) 0xB2, (byte) 0xC3};
+  public static final byte[] UNKNOWN_DATA = new byte[]{(byte) 0xA1, (byte) 0xB2, (byte) 0xC3};
 
-  @Inject SchemaClient schemaClient;
-  @Inject ProfilerClient profilerClient;
-  @Inject LookerClient lookerClient;
-  @Inject ProfilerService profilerService;
-  @Inject KafkaTopicRepository kafkaTopicRepository;
-  @Inject KafkaUtils kafkaUtils;
-  @Inject SchemaRegistryUtil schemaRegistryUtil;
+  @Inject
+  SchemaClient schemaClient;
+  @Inject
+  ProfilerClient profilerClient;
+  @Inject
+  LookerClient lookerClient;
+  @Inject
+  ProfilerService profilerService;
+  @Inject
+  KafkaTopicRepository kafkaTopicRepository;
+  @Inject
+  KafkaUtils kafkaUtils;
+  @Inject
+  SchemaRegistryUtil schemaRegistryUtil;
 
   @BeforeEach
   void setup() {
@@ -94,7 +98,9 @@ class ProfilerServiceTest {
             eq("/default/"),
             any(),
             eq(SchemaSource.Type.INFERRED),
-            eq(SchemaEncoding.Type.JSON));
+            eq(SchemaEncoding.Type.JSON),
+            eq(""),
+            eq(SchemaEncoding.Type.UNKNOWN));
   }
 
   @Test
@@ -128,7 +134,9 @@ class ProfilerServiceTest {
             eq("/default/"),
             any(),
             eq(SchemaSource.Type.INFERRED),
-            eq(SchemaEncoding.Type.JSON));
+            eq(SchemaEncoding.Type.JSON),
+            eq(""),
+            eq(SchemaEncoding.Type.UNKNOWN));
   }
 
   @Test
@@ -154,7 +162,9 @@ class ProfilerServiceTest {
             eq("/default/"),
             any(),
             eq(SchemaSource.Type.INFERRED),
-            eq(SchemaEncoding.Type.JSON));
+            eq(SchemaEncoding.Type.JSON),
+            eq(""),
+            eq(SchemaEncoding.Type.UNKNOWN));
 
     ArgumentCaptor<AddDataProfileRequest> captor =
         ArgumentCaptor.forClass(AddDataProfileRequest.class);
@@ -175,7 +185,7 @@ class ProfilerServiceTest {
 
     profilerService.profileData();
 
-    verify(schemaClient, never()).saveSchema(any(), eq("klm"), any(), any(), any(), any());
+    verify(schemaClient, never()).saveSchema(any(), eq("klm"), any(), any(), any(), any(), any(), any());
     verify(profilerClient, never()).profileData(eq(PROFILE_TOPIC_NO_DATA), any());
 
     ArgumentCaptor<AddDataProfileRequest> captor =
@@ -199,7 +209,7 @@ class ProfilerServiceTest {
 
     profilerService.profileData();
 
-    verify(schemaClient, never()).saveSchema(any(), eq("pqr"), any(), any(), any(), any());
+    verify(schemaClient, never()).saveSchema(any(), eq("pqr"), any(), any(), any(), any(), any(), any());
     verify(profilerClient, never()).profileData(eq(PROFILE_TOPIC_UNKNOWN_DATA), any());
 
     ArgumentCaptor<AddDataProfileRequest> captor =
@@ -219,19 +229,22 @@ class ProfilerServiceTest {
   void testSchema() {
     final KafkaTopic kafkaTopic = KafkaTopic.builder().dataPortId("stu").build();
     profilerService.uploadSchema(
-            kafkaTopic, ProfileResponseObserver.ProfilerResponse.builder().build());
+        kafkaTopic, ProfileResponseObserver.ProfilerResponse.builder().build());
 
     verifyNoMoreInteractions(schemaClient);
 
-    profilerService.uploadSchema(kafkaTopic, ProfileResponseObserver.ProfilerResponse.builder().schema("blabla").build());
+    profilerService.uploadSchema(kafkaTopic,
+        ProfileResponseObserver.ProfilerResponse.builder().schema("blabla").build());
 
     verify(schemaClient)
-            .saveSchema(
-                    eq(ResourceEntity.Type.DATA_PORT),
-                    eq("stu"),
-                    eq("/default/"),
-                    eq("blabla"),
-                    eq(SchemaSource.Type.INFERRED),
-                    eq(SchemaEncoding.Type.JSON));
+        .saveSchema(
+            eq(ResourceEntity.Type.DATA_PORT),
+            eq("stu"),
+            eq("/default/"),
+            eq("blabla"),
+            eq(SchemaSource.Type.INFERRED),
+            eq(SchemaEncoding.Type.JSON),
+            eq(""),
+            eq(SchemaEncoding.Type.UNKNOWN));
   }
 }

@@ -21,7 +21,7 @@ public class SchemaClientMockProvider {
 
   public static void defaultMock(SchemaClient mock) {
     reset(mock);
-    when(mock.saveSchema(any(), any(), any(), any(), any(), any()))
+    when(mock.saveSchema(any(), any(), any(), any(), any(), any(), any(), any()))
         .thenAnswer(
             a -> {
               ResourceEntity.Type entityType = a.getArgument(0, ResourceEntity.Type.class);

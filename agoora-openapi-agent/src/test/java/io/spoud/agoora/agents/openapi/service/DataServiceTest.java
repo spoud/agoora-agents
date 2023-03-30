@@ -35,24 +35,30 @@ import java.util.Map;
 
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mockingDetails;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @QuarkusTest()
 class DataServiceTest {
+
   private static final String SCHEMA_1 =
       "{\"properties\":{\"produces\":{\"properties\":{\"application/json\":{},\"application/xml\":{},\"application/x-www-form-urlencoded\":{}}},\"requestBody\":{\"type\":\"object\",\"properties\":{\"photoUrls\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"},\"category\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}},\"tags\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}}},\"status\":{\"type\":\"string\"}}},\"responses\":{\"properties\":{\"200\":{\"type\":\"object\",\"properties\":{\"photoUrls\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"},\"category\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}},\"tags\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}}},\"status\":{\"type\":\"string\"}}},\"405\":{\"type\":\"object\"}}}}}";
   private static final String SCHEMA_2 =
       "{\"properties\":{\"parameters\":{\"properties\":{\"api_key\":{\"type\":\"string\"},\"petId\":{\"type\":\"integer\"}}},\"responses\":{\"properties\":{\"400\":{\"type\":\"object\"}}}}}";
 
-  @Inject DataService dataService;
-  @Inject ReferenceService referenceService;
-  @Inject DataPortRepository dataPortRepository;
-  @Inject DataItemRepository dataItemRepository;
-  @Inject DataPortClient dataPortClient;
-  @Inject DataItemClient dataItemClient;
-  @Inject SchemaClient schemaClient;
+  @Inject
+  DataService dataService;
+  @Inject
+  ReferenceService referenceService;
+  @Inject
+  DataPortRepository dataPortRepository;
+  @Inject
+  DataItemRepository dataItemRepository;
+  @Inject
+  DataPortClient dataPortClient;
+  @Inject
+  DataItemClient dataItemClient;
+  @Inject
+  SchemaClient schemaClient;
 
   @BeforeEach
   void setup() {
@@ -99,7 +105,10 @@ class DataServiceTest {
             eq("/default/"),
             eq(SCHEMA_1),
             eq(SchemaSource.Type.REGISTRY),
-            eq(SchemaEncoding.Type.JSON));
+            eq(SchemaEncoding.Type.JSON),
+            eq(""),
+            eq(SchemaEncoding.Type.UNKNOWN)
+        );
     verify(schemaClient)
         .saveSchema(
             eq(ResourceEntity.Type.DATA_ITEM),
@@ -107,7 +116,9 @@ class DataServiceTest {
             eq("/default/"),
             eq(SCHEMA_2),
             eq(SchemaSource.Type.REGISTRY),
-            eq(SchemaEncoding.Type.JSON));
+            eq(SchemaEncoding.Type.JSON),
+            eq(""),
+            eq(SchemaEncoding.Type.UNKNOWN));
   }
 
   private SaveDataPortRequest createDataPortRequestFor(
