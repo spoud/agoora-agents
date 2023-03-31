@@ -6,7 +6,7 @@ import org.testcontainers.containers.KafkaContainer;
 public class SchemaRegistryContainer extends GenericContainer<SchemaRegistryContainer> {
 
   public SchemaRegistryContainer() {
-    this("6.1.1");
+    this("7.3.2");
   }
 
   public SchemaRegistryContainer(String version) {
