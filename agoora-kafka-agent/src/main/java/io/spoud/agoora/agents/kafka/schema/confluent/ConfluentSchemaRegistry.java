@@ -1,5 +1,6 @@
 package io.spoud.agoora.agents.kafka.schema.confluent;
 
+import io.quarkus.logging.Log;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import io.spoud.agoora.agents.kafka.schema.SchemaRegistryClient;
@@ -36,8 +37,12 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
 
   private final Optional<String> publicUrl;
 
-  @Inject @RestClient Instance<ConfluentRegistrySubjectResource> confluentRegistrySubjectResource;
-  @Inject @RestClient Instance<ConfluentRegistrySchemaResource> confluentRegistrySchemaResource;
+  @Inject
+  @RestClient
+  Instance<ConfluentRegistrySubjectResource> confluentRegistrySubjectResource;
+  @Inject
+  @RestClient
+  Instance<ConfluentRegistrySchemaResource> confluentRegistrySchemaResource;
 
   @ConfigProperty(name = "rest-confluent-registry/mp-rest/url")
   Optional<String> registryUrl;
@@ -61,7 +66,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
     if (!registryDefined()) {
       return Optional.empty();
     }
-    LOG.debug("Searching for schema for topic '{}'", topic);
+    LOG.debug("Searching for {} schema for topic '{}'", part, topic);
     return getSchema(topic, part).map(this::mapToSchemaObject);
   }
 
@@ -99,15 +104,23 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
                     .replace(PUBLIC_URL_SUBJECT_REPLACEMENT, topic + "-" + DEEP_DIVE_TOOL_SUBJECT));
   }
 
-  private Schema mapToSchemaObject(String rawSchema) {
+  private Schema mapToSchemaObject(SchemaRegistrySubject rawSchema) {
+    SchemaEncoding.Type encoding = SchemaEncoding.Type.AVRO; // default encoding for confluent
+    try {
+      if (rawSchema.getSchemaType() != null) {
+        encoding = SchemaEncoding.Type.valueOf(rawSchema.getSchemaType());
+      }
+    } catch (IllegalArgumentException e) {
+      Log.error(e);
+    }
     return Schema.newBuilder()
-        .setEncodingValue(SchemaEncoding.Type.AVRO_VALUE)
-        .setContent(rawSchema)
+        .setEncoding(encoding)
+        .setContent(rawSchema.getSchema())
         .build();
   }
 
   // TODO cache, but timed
-  private Optional<String> getSchema(String topic, KafkaStreamPart part) {
+  private Optional<SchemaRegistrySubject> getSchema(String topic, KafkaStreamPart part) {
     LOG.debug("Looking for schema for topic '{}' and type '{}'", topic, part);
 
     try {
@@ -115,7 +128,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
           confluentRegistrySubjectResource
               .get()
               .getLatestSubject(topic + "-" + part.getSubjectPostfix());
-      return Optional.of(latestSubject.getSchema());
+      return Optional.of(latestSubject);
     } catch (WebApplicationException ex) {
       if (ex.getResponse().getStatus() == 404) {
         // not issue, the schema just doesn't exists

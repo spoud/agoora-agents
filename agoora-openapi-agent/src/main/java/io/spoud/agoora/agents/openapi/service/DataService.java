@@ -5,8 +5,8 @@ import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.api.mapper.StandardProtoMapper;
 import io.spoud.agoora.agents.openapi.Constants;
-import io.spoud.agoora.agents.openapi.config.data.OpenApiConfig;
 import io.spoud.agoora.agents.openapi.config.data.OpenApiAgooraConfig;
+import io.spoud.agoora.agents.openapi.config.data.OpenApiConfig;
 import io.spoud.agoora.agents.openapi.jsonschema.SchemaUtil;
 import io.spoud.agoora.agents.openapi.repository.DataItemRepository;
 import io.spoud.agoora.agents.openapi.repository.DataPortRepository;
@@ -36,7 +36,6 @@ import javax.enterprise.context.ApplicationScoped;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 @Slf4j
 @ApplicationScoped
@@ -114,7 +113,8 @@ public class DataService {
                             .setIdPath(
                                 IdPathRef.newBuilder()
                                     .setPath(
-                                        config.getTransport().getAgooraPathObject().getResourceGroupPath())
+                                        config.getTransport().getAgooraPathObject()
+                                            .getResourceGroupPath())
                                     .buildPartial())
                             .build())
                     .setProperties(PropertyMap.newBuilder().putAllProperties(allProperties).build())
@@ -145,7 +145,8 @@ public class DataService {
                                     .build())
                             .build())
                     .setState(StateChange.AVAILABLE)
-                    .setLabel(StandardProtoMapper.stringValue(operation.getMethod() + " " + operation.getPath()))
+                    .setLabel(StandardProtoMapper.stringValue(
+                        operation.getMethod() + " " + operation.getPath()))
                     .setTransportUrl(StandardProtoMapper.stringValue(operation.getUrl()))
                     .setDataPortRef(
                         DataPortRef.newBuilder()
@@ -168,7 +169,9 @@ public class DataService {
                   config.getTransport().getAgooraPathObject().getResourceGroupPath(),
                   schemaContent,
                   SchemaSource.Type.REGISTRY,
-                  SchemaEncoding.Type.JSON) // TODO new Schema encoding ?
+                  SchemaEncoding.Type.JSON,
+                  "",
+                  SchemaEncoding.Type.UNKNOWN)
               .getId();
       LOG.info("Schema {} saved for data item {}", schemaId, dataItem.getId());
     } catch (Exception ex) {

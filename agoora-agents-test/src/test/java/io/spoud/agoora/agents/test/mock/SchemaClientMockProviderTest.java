@@ -16,7 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @QuarkusTest
 class SchemaClientMockProviderTest {
 
-  @Inject SchemaClient schemaClient;
+  @Inject
+  SchemaClient schemaClient;
 
   @Test
   void testClient() {
@@ -28,7 +29,10 @@ class SchemaClientMockProviderTest {
             "/path/",
             "content",
             SchemaSource.Type.INFERRED,
-            SchemaEncoding.Type.JSON);
+            SchemaEncoding.Type.JSON,
+            "content",
+            SchemaEncoding.Type.JSON
+        );
     assertThat(schema).isNull();
 
     SchemaClientMockProvider.defaultMock(schemaClient);
@@ -39,7 +43,10 @@ class SchemaClientMockProviderTest {
             "/path/",
             "content",
             SchemaSource.Type.INFERRED,
-            SchemaEncoding.Type.JSON);
+            SchemaEncoding.Type.JSON,
+            "content",
+            SchemaEncoding.Type.JSON
+        );
     assertThat(schema).isNotNull();
     assertThat(UUID.fromString(schema.getId()).toString()).isEqualTo(schema.getId());
     assertThat(schema.getEntityRef().getEntityType()).isEqualTo(ResourceEntity.Type.DATA_PORT);
@@ -47,6 +54,8 @@ class SchemaClientMockProviderTest {
     assertThat(schema.getPath()).isEqualTo("/path/");
     assertThat(schema.getContent()).isEqualTo("content");
     assertThat(schema.getSource()).isEqualTo(SchemaSource.Type.INFERRED);
+    assertThat(schema.getEncoding()).isEqualTo(SchemaEncoding.Type.JSON);
+    assertThat(schema.getContent()).isEqualTo("content");
     assertThat(schema.getEncoding()).isEqualTo(SchemaEncoding.Type.JSON);
   }
 }

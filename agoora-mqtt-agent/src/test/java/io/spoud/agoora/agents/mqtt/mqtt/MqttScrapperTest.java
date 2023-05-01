@@ -39,11 +39,16 @@ class MqttScrapperTest extends AbstractService {
 
   private static final String JSON_CONTENT = "{\"field\":1}";
 
-  @Inject ProfilerClient profilerClient;
-  @Inject DataPortClient dataPortClient;
-  @Inject SchemaClient schemaClient;
-  @Inject MqttScrapper mqttScrapper;
-  @Inject MqttClient mqttClient;
+  @Inject
+  ProfilerClient profilerClient;
+  @Inject
+  DataPortClient dataPortClient;
+  @Inject
+  SchemaClient schemaClient;
+  @Inject
+  MqttScrapper mqttScrapper;
+  @Inject
+  MqttClient mqttClient;
 
   @BeforeEach
   void setupMock() {
@@ -85,7 +90,10 @@ class MqttScrapperTest extends AbstractService {
             eq("/default/"),
             eq(ProfilerClientMockProvider.SCHEMA),
             eq(SchemaSource.Type.INFERRED),
-            eq(SchemaEncoding.Type.JSON));
+            eq(SchemaEncoding.Type.JSON),
+            eq(""),
+            eq(SchemaEncoding.Type.UNKNOWN)
+        );
 
     mqttScrapper.stopRemainingOfPreviousIteration(iterationContext);
 

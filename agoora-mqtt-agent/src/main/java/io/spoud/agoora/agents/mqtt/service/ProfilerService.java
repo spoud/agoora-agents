@@ -160,7 +160,11 @@ public class ProfilerService {
                     config.getTransport().getAgooraPathObject().getResourceGroupPath(),
                     schemaContent,
                     SchemaSource.Type.INFERRED,
-                    SchemaEncoding.Type.JSON)
+                    SchemaEncoding.Type.JSON,
+                    "",
+                    SchemaEncoding.Type.UNKNOWN
+
+                )
                 .getId();
         LOG.info("Schema {} saved for data port {}", schemaId, dataPort.getId());
       } catch (Exception ex) {

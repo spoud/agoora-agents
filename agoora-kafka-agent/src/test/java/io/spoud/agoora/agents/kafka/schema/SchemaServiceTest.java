@@ -24,9 +24,12 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @QuarkusTest
 class SchemaServiceTest extends AbstractService {
 
-  @Inject SchemaClient schemaClient;
-  @Inject SchemaService schemaService;
-  @Inject SchemaRegistryUtil schemaRegistryUtil;
+  @Inject
+  SchemaClient schemaClient;
+  @Inject
+  SchemaService schemaService;
+  @Inject
+  SchemaRegistryUtil schemaRegistryUtil;
 
   @BeforeEach
   void setup() {
@@ -37,6 +40,9 @@ class SchemaServiceTest extends AbstractService {
   void testWithSchema() {
     schemaRegistryUtil.addSchemaVersion(
         "schema-topic1", KafkaStreamPart.VALUE, "registry/confluent/version1.json");
+    schemaRegistryUtil.addSchemaVersion(
+        "schema-topic1", KafkaStreamPart.KEY, "registry/confluent/version1.json");
+
     final Map<String, String> properties = schemaService.update("schema-topic1", "abc");
 
     assertThat(properties)
@@ -50,7 +56,10 @@ class SchemaServiceTest extends AbstractService {
             eq("/default/"),
             any(),
             eq(SchemaSource.Type.REGISTRY),
-            eq(SchemaEncoding.Type.AVRO));
+            eq(SchemaEncoding.Type.AVRO),
+            any(),
+            eq(SchemaEncoding.Type.AVRO)
+        );
   }
 
   @Test
