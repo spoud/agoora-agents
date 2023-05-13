@@ -1,14 +1,10 @@
 package io.spoud.agoora.agents.openapi.config.data;
 
-import io.quarkus.arc.config.ConfigProperties;
+import io.smallrye.config.ConfigMapping;
 import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@ConfigProperties(prefix = "agoora")
-@NoArgsConstructor
-public class OpenApiAgooraConfig extends AgooraAgentConfig {
-  private ScrapperConfig scrapper;
-  private OpenApiConfig openapi;
+@ConfigMapping(prefix = "agoora")
+public interface OpenApiAgooraConfig extends AgooraAgentConfig {
+  ScrapperConfig scrapper();
+  OpenApiConfig openapi();
 }

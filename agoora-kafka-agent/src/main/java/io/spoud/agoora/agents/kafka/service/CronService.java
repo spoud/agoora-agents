@@ -33,20 +33,20 @@ public class CronService {
 
   void onStart(@Observes StartupEvent ev) {
     if (LaunchMode.current() != LaunchMode.TEST) {
-      final ScrapperConfig scrapperConfig = sdmConfig.getScrapper();
+      final ScrapperConfig scrapperConfig = sdmConfig.scrapper();
 
       startCron(scrapperConfig);
     }
   }
 
   private void startCron(ScrapperConfig scrapperConfig) {
-    LOG.info("Staring cron with a period of {}", scrapperConfig.getPeriod());
+    LOG.info("Staring cron with a period of {}", scrapperConfig.period());
     AtomicBoolean running = new AtomicBoolean(false);
 
     Multi.createFrom()
         .ticks()
         .startingAfter(Duration.ofSeconds(5)) // wait for the complete initi
-        .every(scrapperConfig.getPeriod())
+        .every(scrapperConfig.period())
         .runSubscriptionOn(managedExecutor)
         .subscribe()
         .with(
@@ -64,15 +64,15 @@ public class CronService {
                   LOG.info("Forwarding metrics");
                   metricsForwarderService.scrapeMetrics();
 
-                  if (scrapperConfig.getProfiling().isEnabled()) {
+                  if (scrapperConfig.profiling().enabled()) {
                     LOG.info("Profiling data");
                     profilerService.profileData();
                   }
 
                   operationalMetricsService.iterationEnd(
-                      sdmConfig.getAuth().getUser().getName(),
-                      sdmConfig.getTransport().getAgooraPath(),
-                      scrapperConfig.getPeriod());
+                      sdmConfig.auth().user().name(),
+                      sdmConfig.transport().agooraPath(),
+                      scrapperConfig.period());
 
                 } catch (Exception ex) {
                   LOG.error("Error while processing", ex);

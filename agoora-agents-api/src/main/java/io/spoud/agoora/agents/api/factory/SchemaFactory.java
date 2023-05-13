@@ -12,7 +12,7 @@ public class SchemaFactory extends AbstractGrpcClientFactory {
       schemaServiceStub;
 
   public SchemaFactory(AgooraAgentConfig config) {
-    super(LOG, config.getSchema(), config.getAuth());
+    super(LOG, config.schema(), config.auth());
     schemaServiceStub =
         new LazySingletonInstance<>(() -> SchemaServiceGrpc.newBlockingStub(channel.getInstance()));
   }

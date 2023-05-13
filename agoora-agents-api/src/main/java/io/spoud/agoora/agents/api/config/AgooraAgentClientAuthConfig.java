@@ -1,25 +1,16 @@
 package io.spoud.agoora.agents.api.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public interface AgooraAgentClientAuthConfig {
 
-@Builder
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class AgooraAgentClientAuthConfig {
+  AgooraAgentUserConfig user();
 
-  private AgooraAgentUserConfig user;
+  String serverUrl();
 
-  private String serverUrl;
+  String realm();
 
-  private String realm;
+  default String trustStoreLocation(){return null;}
 
-  @Builder.Default private String trustStoreLocation = null;
+  default String trustStorePassword() {return null;}
 
-  @Builder.Default private String trustStorePassword = null;
-
-  @Builder.Default private boolean ignoreSsl = false;
+  default boolean ignoreSsl(){return false;}
 }

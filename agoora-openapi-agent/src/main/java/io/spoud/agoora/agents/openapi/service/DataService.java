@@ -52,11 +52,11 @@ public class DataService {
   private final OpenApiAgooraConfig config;
 
   public void updateStates() {
-    final OpenApiConfig openApiCOnfig = config.getOpenapi();
+    final OpenApiConfig openApiCOnfig = config.openapi();
     final SwaggerScrapper swaggerScrapper = new SwaggerScrapper(openApiCOnfig);
     final List<SwaggerTag> tags = swaggerScrapper.getEndpoints();
 
-    LOG.info("{} tags found for url'{}'", tags.size(), openApiCOnfig.getUrl());
+    LOG.info("{} tags found for url'{}'", tags.size(), openApiCOnfig.url());
     tags.forEach(
         tag -> {
           try {
@@ -89,7 +89,7 @@ public class DataService {
     Map<String, String> matchingProperties = Map.of(Constants.AGOORA_OPENAPI_TAG, tag.getName());
     Map<String, String> allProperties = new HashMap<>(matchingProperties);
     allProperties.put(Constants.AGOORA_OPENAPI_URL, tag.getUrl());
-    allProperties.put(Constants.AGOORA_DEEP_DIVE_OPENAPI, config.getOpenapi().getUiUrl());
+    allProperties.put(Constants.AGOORA_DEEP_DIVE_OPENAPI, config.openapi().uiUrl());
 
     LOG.info("Updating data port with tag name {}", tag.getName());
 
@@ -113,7 +113,7 @@ public class DataService {
                             .setIdPath(
                                 IdPathRef.newBuilder()
                                     .setPath(
-                                        config.getTransport().getAgooraPathObject()
+                                        config.transport().getAgooraPathObject()
                                             .getResourceGroupPath())
                                     .buildPartial())
                             .build())
@@ -166,7 +166,7 @@ public class DataService {
               .saveSchema(
                   ResourceEntity.Type.DATA_ITEM,
                   dataItem.getId(),
-                  config.getTransport().getAgooraPathObject().getResourceGroupPath(),
+                  config.transport().getAgooraPathObject().getResourceGroupPath(),
                   schemaContent,
                   SchemaSource.Type.REGISTRY,
                   SchemaEncoding.Type.JSON,

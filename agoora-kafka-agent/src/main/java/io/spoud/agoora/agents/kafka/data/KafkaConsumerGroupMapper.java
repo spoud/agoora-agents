@@ -16,7 +16,7 @@ public class KafkaConsumerGroupMapper {
   private final String bootstrapServers;
 
   public KafkaConsumerGroupMapper(KafkaAgentConfig config) {
-    bootstrapServers = config.getKafka().getBootstrapServers();
+    bootstrapServers = config.kafka().bootstrapServers();
   }
 
   public static Optional<String> getConsumerGroupName(Map<String, String> properties) {

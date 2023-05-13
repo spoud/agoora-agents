@@ -28,12 +28,12 @@ public class CronService {
   private final OperationalMetricsService operationalMetricsService;
 
   void onStart(@Observes StartupEvent ev) {
-    final ScrapperConfig scrapperConfig = config.getScrapper();
+    final ScrapperConfig scrapperConfig = config.scrapper();
 
     Multi.createFrom()
         .ticks()
-        .startingAfter(scrapperConfig.getInitialDelay())
-        .every(scrapperConfig.getInterval())
+        .startingAfter(scrapperConfig.initialDelay())
+        .every(scrapperConfig.interval())
         .runSubscriptionOn(managedExecutor)
         .subscribe()
         .with(
@@ -41,20 +41,20 @@ public class CronService {
               try {
                 operationalMetricsService.iterationStart();
 
-                if (scrapperConfig.getState().isEnabled()) {
+                if (scrapperConfig.state().enabled()) {
                   LOG.info("Start looking at data ports");
                   dataService.updateStates();
                 }
 
-                if (scrapperConfig.getProfiling().isEnabled()) {
+                if (scrapperConfig.profiling().enabled()) {
                   LOG.info("Start Profiling");
                   profilerService.runProfiler();
                 }
 
                 operationalMetricsService.iterationEnd(
-                    config.getAuth().getUser().getName(),
-                    config.getTransport().getAgooraPath(),
-                    scrapperConfig.getInterval());
+                    config.auth().user().name(),
+                    config.transport().agooraPath(),
+                    scrapperConfig.interval());
               } catch (Exception ex) {
                 LOG.error("Error while updating the data ports", ex);
               }

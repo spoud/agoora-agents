@@ -10,7 +10,7 @@ import grpc
 import pandas as pd
 import typing
 
-import pandas_profiling
+import ydata_profiling
 
 from pandas import json_normalize
 from htmlmin.main import minify
@@ -214,7 +214,7 @@ class ProfilerServicer(profiler_pb2_grpc.ProfilerServicer):
 
 @func_set_timeout(int(os.getenv('PROFILER_TIMEOUT', '30')))
 def run_profiler(data_frame, config_path=None):
-    return pandas_profiling.ProfileReport(data_frame, lazy=False, config_file=config_path, explorative=True)  # enforce eager loading as in previous versions
+    return ydata_profiling.ProfileReport(data_frame, lazy=False, config_file=config_path, explorative=True)  # enforce eager loading as in previous versions
 
 
 def convert(val):

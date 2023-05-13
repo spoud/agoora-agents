@@ -13,11 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
@@ -37,9 +33,9 @@ public class CronService {
 
   void onStart(@Observes StartupEvent ev) {
     if (LaunchMode.current() != LaunchMode.TEST) {
-      final ScrapperConfig scrapperConfig = config.getScrapper();
+      final ScrapperConfig scrapperConfig = config.scrapper();
 
-      if (scrapperConfig.getPeriod().compareTo(scrapperConfig.getMaxWait()) < 0) {
+      if (scrapperConfig.period().compareTo(scrapperConfig.maxWait()) < 0) {
         LOG.error("Max wait should be smaller than than the period");
       } else {
         startCron(scrapperConfig);
@@ -48,12 +44,12 @@ public class CronService {
   }
 
   private void startCron(ScrapperConfig scrapperConfig) {
-    LOG.info("Staring cron with a period of {}", scrapperConfig.getPeriod());
+    LOG.info("Staring cron with a period of {}", scrapperConfig.period());
     AtomicReference<ScheduledFuture<?>> terminationSchedule = new AtomicReference<>(null);
 
     Multi.createFrom()
         .ticks()
-        .every(scrapperConfig.getPeriod())
+        .every(scrapperConfig.period())
         .runSubscriptionOn(managedExecutor)
         .subscribe()
         .with(
@@ -63,7 +59,7 @@ public class CronService {
                   terminationSchedule.getAndSet(
                       scheduledExecutorService.schedule(
                           () -> stopScrapper(scrapperConfig),
-                          scrapperConfig.getMaxWait().toMillis(),
+                          scrapperConfig.maxWait().toMillis(),
                           TimeUnit.MILLISECONDS));
               // stop the previous iteration if not already executed
               if (old != null) {
@@ -73,7 +69,7 @@ public class CronService {
               }
 
               LOG.info(
-                  "Starting MQTT listening iteration, max-wait={}", scrapperConfig.getMaxWait());
+                  "Starting MQTT listening iteration, max-wait={}", scrapperConfig.maxWait());
               lastIterationContext = mqttScrapper.startIteration();
             });
   }
@@ -82,8 +78,8 @@ public class CronService {
     mqttScrapper.stopRemainingOfPreviousIteration(lastIterationContext);
 
     operationalMetricsService.iterationEnd(
-        config.getAuth().getUser().getName(),
-        config.getTransport().getAgooraPath(),
-        scrapperConfig.getPeriod());
+        config.auth().user().name(),
+        config.transport().agooraPath(),
+        scrapperConfig.period());
   }
 }

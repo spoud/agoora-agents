@@ -24,30 +24,24 @@ agoora:
     agoora-path: ${agoora-transport-path}
   auth:
     server-url: https://${agoora-endpoint}/auth/
-    cluster: ${agoora-cluster}
     realm: spoud
     user:
       name: to-be-defined
       token: to-be-defined
   logistics:
     endpoint: ${agoora-endpoint}
-    cluster: ${agoora-cluster}
     insecure: ${agoora-insecure}
   hooks:
     endpoint: ${agoora-endpoint}
-    cluster: ${agoora-cluster}
     insecure: ${agoora-insecure}
   schema:
     endpoint: ${agoora-endpoint}
-    cluster: ${agoora-cluster}
     insecure: ${agoora-insecure}
   looker:
     endpoint: ${agoora-endpoint}
-    cluster: ${agoora-cluster}
     insecure: ${agoora-insecure}
   blob:
     endpoint: ${agoora-endpoint}
-    cluster: ${agoora-cluster}
     insecure: ${agoora-insecure}
   profiler:
     endpoint: localhost:8089

@@ -1,14 +1,11 @@
 package io.spoud.agoora.agents.openapi.config.data;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-public class OpenApiConfig {
+public interface OpenApiConfig {
+  // Base URL
+  String baseUrl();
   // Json URL
-  private String url;
+  String url();
 
   // UI url for the deep dive tool
-  private String uiUrl;
+  String uiUrl();
 }

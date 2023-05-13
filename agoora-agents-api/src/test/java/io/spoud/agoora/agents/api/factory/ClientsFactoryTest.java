@@ -1,16 +1,6 @@
 package io.spoud.agoora.agents.api.factory;
 
-import io.spoud.agoora.agents.api.client.BlobClient;
-import io.spoud.agoora.agents.api.client.DataItemClient;
-import io.spoud.agoora.agents.api.client.DataPortClient;
-import io.spoud.agoora.agents.api.client.DataSubscriptionStateClient;
-import io.spoud.agoora.agents.api.client.HooksClient;
-import io.spoud.agoora.agents.api.client.LookerClient;
-import io.spoud.agoora.agents.api.client.MetricsClient;
-import io.spoud.agoora.agents.api.client.ProfilerClient;
-import io.spoud.agoora.agents.api.client.ResourceGroupClient;
-import io.spoud.agoora.agents.api.client.SchemaClient;
-import io.spoud.agoora.agents.api.client.TransportClient;
+import io.spoud.agoora.agents.api.client.*;
 import io.spoud.agoora.agents.api.config.AgooraAgentClientAuthConfig;
 import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
 import io.spoud.agoora.agents.api.config.AgooraAgentEndpointConfig;
@@ -18,11 +8,23 @@ import io.spoud.agoora.agents.api.config.AgooraAgentUserConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 class ClientsFactoryTest {
+
+  AgooraAgentConfig config;
+  AgooraAgentClientAuthConfig auth;
+  AgooraAgentUserConfig user;
+  AgooraAgentEndpointConfig blob;
+  AgooraAgentEndpointConfig logistics;
+  AgooraAgentEndpointConfig schema;
+  AgooraAgentEndpointConfig profiler;
+  AgooraAgentEndpointConfig looker;
+  AgooraAgentEndpointConfig hooks;
 
   public static final String ENDPOINT = "localhost:1234";
 
@@ -30,23 +32,51 @@ class ClientsFactoryTest {
 
   @BeforeEach
   void setup() {
+    config = mock(AgooraAgentConfig.class);
+    auth = mock(AgooraAgentClientAuthConfig.class);
+
+    Mockito.when(config.auth()).thenReturn(auth);
+
+    Mockito.when(auth.realm()).thenReturn("realm");
+    Mockito.when(auth.serverUrl()).thenReturn("http://localhost/auth");
+
+    user = mock(AgooraAgentUserConfig.class);
+    Mockito.when(auth.user()).thenReturn(user);
+    Mockito.when(user.name()).thenReturn("name");
+    Mockito.when(user.token()).thenReturn("token");
+
+    blob = mock(AgooraAgentEndpointConfig.class);
+    Mockito.when(config.blob()).thenReturn(blob);
+    Mockito.when(blob.endpoint()).thenReturn(ENDPOINT);
+    Mockito.when(blob.insecure()).thenReturn(true);
+
+    logistics = mock(AgooraAgentEndpointConfig.class);
+    Mockito.when(config.logistics()).thenReturn(logistics);
+    Mockito.when(logistics.endpoint()).thenReturn(ENDPOINT);
+    Mockito.when(logistics.insecure()).thenReturn(true);
+
+    schema = mock(AgooraAgentEndpointConfig.class);
+    Mockito.when(config.schema()).thenReturn(schema);
+    Mockito.when(schema.endpoint()).thenReturn(ENDPOINT);
+    Mockito.when(schema.insecure()).thenReturn(true);
+
+    profiler = mock(AgooraAgentEndpointConfig.class);
+    Mockito.when(config.profiler()).thenReturn(profiler);
+    Mockito.when(profiler.endpoint()).thenReturn(ENDPOINT);
+    Mockito.when(profiler.insecure()).thenReturn(true);
+
+    looker = mock(AgooraAgentEndpointConfig.class);
+    Mockito.when(config.looker()).thenReturn(looker);
+    Mockito.when(looker.endpoint()).thenReturn(ENDPOINT);
+    Mockito.when(looker.insecure()).thenReturn(true);
+
+    hooks = mock(AgooraAgentEndpointConfig.class);
+    Mockito.when(config.hooks()).thenReturn(hooks);
+    Mockito.when(hooks.endpoint()).thenReturn(ENDPOINT);
+    Mockito.when(hooks.insecure()).thenReturn(true);
+
     factory =
-        new ClientsFactoryImpl(
-            AgooraAgentConfig.builder()
-                .auth(
-                    AgooraAgentClientAuthConfig.builder()
-                        .realm("realm")
-                        .serverUrl("http://localhost/auth")
-                        .user(AgooraAgentUserConfig.builder().name("name").token("token").build())
-                        .build())
-                .blob(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).insecure(true).build())
-                .logistics(
-                    AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).insecure(true).build())
-                .schema(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).insecure(true).build())
-                .profiler(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
-                .looker(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
-                .hooks(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
-                .build());
+        new ClientsFactoryImpl(config);
   }
 
   @AfterEach
@@ -56,17 +86,19 @@ class ClientsFactoryTest {
 
   @Test
   void blob() {
-    ClientsFactory factory1 = new ClientsFactoryImpl(AgooraAgentConfig.builder().build());
+    Mockito.when(config.blob()).thenReturn(null);
+    ClientsFactory factory1 = new ClientsFactoryImpl(config);
 
     assertThatThrownBy(() -> factory1.getBlobClient())
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("No Endpoint configuration provided");
 
+    blob = mock(AgooraAgentEndpointConfig.class);
+    Mockito.when(config.blob()).thenReturn(blob);
+    Mockito.when(blob.endpoint()).thenReturn(ENDPOINT);
+    Mockito.when(blob.insecure()).thenReturn(true);
     ClientsFactory factory2 =
-        new ClientsFactoryImpl(
-            AgooraAgentConfig.builder()
-                .blob(AgooraAgentEndpointConfig.builder().endpoint(ENDPOINT).build())
-                .build());
+        new ClientsFactoryImpl(config);
 
     assertThat(factory2.getBlobClient()).isNotNull().isInstanceOf(BlobClient.class);
   }

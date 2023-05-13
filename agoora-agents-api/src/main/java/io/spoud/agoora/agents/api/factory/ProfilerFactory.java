@@ -11,7 +11,7 @@ public class ProfilerFactory extends AbstractGrpcClientFactory {
   private final LazySingletonInstance<ProfilerGrpc.ProfilerStub> profilerServiceStub;
 
   public ProfilerFactory(AgooraAgentConfig config) {
-    super(LOG, config.getProfiler());
+    super(LOG, config.profiler());
     profilerServiceStub = new LazySingletonInstance<>(() -> ProfilerGrpc.newStub(channel.getInstance()));
   }
 

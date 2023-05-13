@@ -5,7 +5,6 @@ quarkus:
 agoora:
   scrapper:
     samples-size: 500
-    hooks-delay: PT1S
     state:
       enabled: false
       initial-delay: PT1S

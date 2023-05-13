@@ -4,11 +4,11 @@ import io.spoud.agoora.agents.openapi.config.data.OpenApiConfig;
 import io.spoud.agoora.agents.openapi.swagger.data.SwaggerOperation;
 import io.spoud.agoora.agents.openapi.swagger.data.SwaggerSchema;
 import io.spoud.agoora.agents.openapi.swagger.data.SwaggerTag;
-import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.parser.OpenAPIV3Parser;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class SwaggerScrapper {
 
   public SwaggerScrapper(OpenApiConfig config) {
     this.config = config;
-    SwaggerParseResult result = new OpenAPIParser().readLocation(config.getUrl(), null, null);
+    SwaggerParseResult result = new OpenAPIV3Parser().readLocation(config.url(), null, null);
     this.openAPI = result.getOpenAPI();
   }
 
@@ -36,7 +36,7 @@ public class SwaggerScrapper {
             tag -> SwaggerTag.builder()
                 .name(tag.getName())
                 .description(tag.getDescription())
-                .url(config.getUrl())
+                .url(config.url())
                 .build())
         .collect(Collectors.toList());
   }

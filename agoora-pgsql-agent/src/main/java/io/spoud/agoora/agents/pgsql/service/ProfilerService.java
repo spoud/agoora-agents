@@ -18,7 +18,6 @@ import io.spoud.sdm.profiler.domain.v1alpha1.ProfilerError;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.time.Duration;
@@ -64,7 +63,7 @@ public class ProfilerService {
     LOG.debug("Start profile dataItem {} for table {}", dataItem.getId(), tableName);
 
     databaseScrapper
-        .getSamples(tableName, config.getScrapper().getSamplesSize())
+        .getSamples(tableName, config.scrapper().samplesSize())
         .ifPresent(
             samples -> {
               sampleSize.set(samples.size());
@@ -113,7 +112,7 @@ public class ProfilerService {
                     String htmlId =
                         blobClient.uploadBlobUtf8(
                             html,
-                            config.getTransport().getAgooraPathObject().getResourceGroupPath(),
+                            config.transport().getAgooraPathObject().getResourceGroupPath(),
                             ResourceEntity.Type.DATA_ITEM);
                     if (htmlId != null) {
                       dataProfileRequest.setProfileHtmlBlobId(htmlId);

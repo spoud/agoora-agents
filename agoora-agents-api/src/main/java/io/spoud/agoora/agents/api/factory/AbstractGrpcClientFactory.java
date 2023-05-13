@@ -28,13 +28,13 @@ public abstract class AbstractGrpcClientFactory implements AutoCloseable {
   }
 
   public void close() throws Exception {
-    logger.info("Stopping managed channel to {}", endpointConfig.getEndpoint());
+    logger.info("Stopping managed channel to {}", endpointConfig.endpoint());
     if (channel.isInstantiated()) {
       final ManagedChannel c = channel.getInstance();
       c.shutdownNow();
       boolean success = c.awaitTermination(5, TimeUnit.SECONDS);
       if (!success) {
-        logger.error("Unable to close client to {}", endpointConfig.getEndpoint());
+        logger.error("Unable to close client to {}", endpointConfig.endpoint());
       }
     }
   }
@@ -45,9 +45,9 @@ public abstract class AbstractGrpcClientFactory implements AutoCloseable {
       throw new IllegalArgumentException(
           "No Endpoint configuration provided for " + logger.getName());
     }
-    ManagedChannelBuilder<?> mcb = ManagedChannelBuilder.forTarget(endpointConfig.getEndpoint());
+    ManagedChannelBuilder<?> mcb = ManagedChannelBuilder.forTarget(endpointConfig.endpoint());
 
-    if (endpointConfig.isInsecure()) {
+    if (endpointConfig.insecure()) {
       mcb.usePlaintext();
     }
 
@@ -57,16 +57,16 @@ public abstract class AbstractGrpcClientFactory implements AutoCloseable {
 
       logger.info(
           "Channel build: endpoint={}, insecure={}, authUsername={}, authServer={}, authRealm={}",
-          endpointConfig.getEndpoint(),
-          endpointConfig.isInsecure(),
-          authConfig.getUser().getName(),
-          authConfig.getServerUrl(),
-          authConfig.getRealm());
+          endpointConfig.endpoint(),
+          endpointConfig.insecure(),
+          authConfig.user().name(),
+          authConfig.serverUrl(),
+          authConfig.realm());
     } else {
       logger.info(
           "Channel build: endpoint={}, insecure={}",
-          endpointConfig.getEndpoint(),
-          endpointConfig.isInsecure());
+          endpointConfig.endpoint(),
+          endpointConfig.insecure());
     }
 
     return mcb.build();

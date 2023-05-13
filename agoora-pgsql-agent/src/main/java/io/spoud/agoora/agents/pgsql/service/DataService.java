@@ -114,7 +114,7 @@ public class DataService {
                                 IdPathRef.newBuilder()
                                     .setPath(
                                         config
-                                            .getTransport()
+                                            .transport()
                                             .getAgooraPathObject()
                                             .getResourceGroupPath())
                                     .buildPartial())
@@ -167,7 +167,7 @@ public class DataService {
               .saveSchema(
                   ResourceEntity.Type.DATA_ITEM,
                   dataItem.getId(),
-                  config.getTransport().getAgooraPathObject().getResourceGroupPath(),
+                  config.transport().getAgooraPathObject().getResourceGroupPath(),
                   schemaContent,
                   SchemaSource.Type.INFERRED,
                   SchemaEncoding.Type.JSON,

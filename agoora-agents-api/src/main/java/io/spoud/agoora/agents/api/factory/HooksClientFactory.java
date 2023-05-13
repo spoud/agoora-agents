@@ -11,7 +11,7 @@ public class HooksClientFactory extends AbstractGrpcClientFactory {
   private final LazySingletonInstance<StateChangerGrpc.StateChangerStub> stateChangStub;
 
   public HooksClientFactory(AgooraAgentConfig config) {
-    super(LOG, config.getHooks(), config.getAuth());
+    super(LOG, config.hooks(), config.auth());
     stateChangStub = new LazySingletonInstance<>(() -> StateChangerGrpc.newStub(channel.getInstance()));
   }
 

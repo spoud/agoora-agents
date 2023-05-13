@@ -22,7 +22,7 @@ public class LogisticsRefService {
           if (ref == null) {
             ref =
                 IdPathRef.newBuilder()
-                    .setPath(config.getTransport().getAgooraPathObject().getAbsolutePath())
+                    .setPath(config.transport().getAgooraPathObject().getAbsolutePath())
                     .build();
           }
           return ref;
@@ -35,7 +35,7 @@ public class LogisticsRefService {
           if (ref == null) {
             ref =
                 IdPathRef.newBuilder()
-                    .setPath(config.getTransport().getAgooraPathObject().getResourceGroupPath())
+                    .setPath(config.transport().getAgooraPathObject().getResourceGroupPath())
                     .build();
           }
           return ref;

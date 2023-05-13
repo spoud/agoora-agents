@@ -16,7 +16,7 @@ public class LookerFactory extends AbstractGrpcClientFactory {
       lookerServiceStub;
 
   public LookerFactory(AgooraAgentConfig config) {
-    super(LOG, config.getLooker(), config.getAuth());
+    super(LOG, config.looker(), config.auth());
     metricServiceStub =
         new LazySingletonInstance<>(() -> MetricsServiceGrpc.newBlockingStub(channel.getInstance()));
     lookerServiceStub =

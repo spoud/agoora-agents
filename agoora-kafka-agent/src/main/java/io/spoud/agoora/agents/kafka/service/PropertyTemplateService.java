@@ -31,11 +31,11 @@ public class PropertyTemplateService {
       new AtomicReference<>(null);
 
   public Map<String, String> getKafkaTopicMap() {
-    return getMap(kafkaTopicMapCache, config.getPropertyTemplates().getKafkaTopic());
+    return getMap(kafkaTopicMapCache, config.propertyTemplates().kafkaTopic());
   }
 
   public Map<String, String> getKafkaConsumerGroupMap() {
-    return getMap(kafkaConsumerGroupCache, config.getPropertyTemplates().getKafkaConsumerGroup());
+    return getMap(kafkaConsumerGroupCache, config.propertyTemplates().kafkaConsumerGroup());
   }
 
   Map<String, String> getMap(AtomicReference<Map<String, String>> cache, Optional<String> opt) {

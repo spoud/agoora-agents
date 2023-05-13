@@ -78,7 +78,7 @@ public class DataService {
                                 IdPathRef.newBuilder()
                                     .setPath(
                                         config
-                                            .getTransport()
+                                            .transport()
                                             .getAgooraPathObject()
                                             .getResourceGroupPath())
                                     .buildPartial())

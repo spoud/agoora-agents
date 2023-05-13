@@ -1,29 +1,19 @@
 package io.spoud.agoora.agents.api.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+public interface AgooraAgentConfig {
+  AgooraAgentClientAuthConfig auth();
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-public class AgooraAgentConfig {
-  private AgooraAgentClientAuthConfig auth;
+  AgooraTransportConfig transport();
 
-  private AgooraTransportConfig transport;
+  AgooraAgentEndpointConfig logistics();
 
-  @Builder.Default private AgooraAgentEndpointConfig logistics = null;
+  AgooraAgentEndpointConfig hooks();
 
-  @Builder.Default private AgooraAgentEndpointConfig hooks = null;
+  AgooraAgentEndpointConfig schema();
 
-  @Builder.Default private AgooraAgentEndpointConfig schema = null;
+  AgooraAgentEndpointConfig looker();
 
-  @Builder.Default private AgooraAgentEndpointConfig looker = null;
+  AgooraAgentEndpointConfig blob();
 
-  @Builder.Default private AgooraAgentEndpointConfig blob = null;
-
-  @Builder.Default private AgooraAgentEndpointConfig profiler = null;
+  AgooraAgentEndpointConfig profiler();
 }

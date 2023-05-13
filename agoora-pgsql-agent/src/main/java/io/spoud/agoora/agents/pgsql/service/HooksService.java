@@ -30,7 +30,7 @@ public class HooksService {
   private final PgsqlAgooraConfig config;
 
   void onStart(@Observes StartupEvent ev) {
-    if (config.getScrapper().getHooks().isEnabled()) {
+    if (config.scrapper().hooks().enabled()) {
       // We delay hooks to let the app starts peacefully
       Uni.createFrom()
           .item("")
@@ -47,7 +47,7 @@ public class HooksService {
     LOG.info("Start listening to hooks");
     hooksClient.startListening(
         this::logRecordChange,
-        config.getTransport().getAgooraPathObject().getAbsolutePath(),
+        config.transport().getAgooraPathObject().getAbsolutePath(),
         true,
         true,
         false);

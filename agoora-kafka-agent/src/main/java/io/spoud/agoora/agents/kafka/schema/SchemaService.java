@@ -91,7 +91,7 @@ public class SchemaService {
               ResourceEntity.Type.DATA_PORT,
               dataPortId,
               kafkaAgentConfig
-                  .getTransport()
+                  .transport()
                   .getAgooraPathObject()
                   .getResourceGroupPath(),
               valueSchemaContent,

@@ -13,7 +13,6 @@ agoora:
     state:
       enabled: true
       initial-delay: PT10S
-      interval: PT15M
     hooks:
       enabled: true
       initial-delay: PT1S

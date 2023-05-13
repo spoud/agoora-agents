@@ -2,11 +2,7 @@ package io.spoud.agoora.agents.api.factory;
 
 import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
 import io.spoud.agoora.agents.api.utils.LazySingletonInstance;
-import io.spoud.sdm.logistics.service.v1.DataItemServiceGrpc;
-import io.spoud.sdm.logistics.service.v1.DataPortServiceGrpc;
-import io.spoud.sdm.logistics.service.v1.DataSubscriptionStateServiceGrpc;
-import io.spoud.sdm.logistics.service.v1.ResourceGroupServiceGrpc;
-import io.spoud.sdm.logistics.service.v1.TransportServiceGrpc;
+import io.spoud.sdm.logistics.service.v1.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,7 +21,7 @@ public class LogisticsClientsFactory extends AbstractGrpcClientFactory {
       resourceGroupStub;
 
   public LogisticsClientsFactory(AgooraAgentConfig config) {
-    super(LOG, config.getLogistics(), config.getAuth());
+    super(LOG, config.logistics(), config.auth());
     dataPortServiceStub =
         new LazySingletonInstance<>(
             () -> DataPortServiceGrpc.newBlockingStub(channel.getInstance()));

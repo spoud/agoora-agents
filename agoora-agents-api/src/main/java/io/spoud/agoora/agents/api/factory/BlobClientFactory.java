@@ -11,7 +11,7 @@ public class BlobClientFactory extends AbstractGrpcClientFactory {
   private final LazySingletonInstance<BlobServiceGrpc.BlobServiceStub> blobServiceStub;
 
   public BlobClientFactory(AgooraAgentConfig config) {
-    super(LOG, config.getBlob(), config.getAuth());
+    super(LOG, config.blob(), config.auth());
     blobServiceStub = new LazySingletonInstance<>(() -> BlobServiceGrpc.newStub(channel.getInstance()));
   }
 

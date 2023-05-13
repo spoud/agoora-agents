@@ -121,7 +121,7 @@ public class ProfilerService {
           String htmlId =
               blobClient.uploadBlobUtf8(
                   html,
-                  config.getTransport().getAgooraPathObject().getResourceGroupPath(),
+                  config.transport().getAgooraPathObject().getResourceGroupPath(),
                   ResourceEntity.Type.DATA_PORT);
           if (htmlId != null) {
             dataProfileRequest.setProfileHtmlBlobId(htmlId);
@@ -157,7 +157,7 @@ public class ProfilerService {
                 .saveSchema(
                     ResourceEntity.Type.DATA_PORT,
                     dataPort.getId(),
-                    config.getTransport().getAgooraPathObject().getResourceGroupPath(),
+                    config.transport().getAgooraPathObject().getResourceGroupPath(),
                     schemaContent,
                     SchemaSource.Type.INFERRED,
                     SchemaEncoding.Type.JSON,

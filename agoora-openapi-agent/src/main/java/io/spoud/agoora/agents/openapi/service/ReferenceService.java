@@ -19,7 +19,7 @@ public class ReferenceService {
     return BaseRef.newBuilder()
         .setIdPath(
             IdPathRef.newBuilder()
-                .setPath(config.getTransport().getAgooraPathObject().getAbsolutePath())
+                .setPath(config.transport().getAgooraPathObject().getAbsolutePath())
                 .build())
         .build();
   }

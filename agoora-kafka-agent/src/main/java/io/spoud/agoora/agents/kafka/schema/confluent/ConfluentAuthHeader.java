@@ -17,15 +17,15 @@ public class ConfluentAuthHeader implements ClientHeadersFactory {
   private final Optional<String> authHeader;
 
   public ConfluentAuthHeader(KafkaAgentConfig kafkaAgentConfig) {
-    final RegistryConfluentConfig config = kafkaAgentConfig.getRegistry().getConfluent();
+    final RegistryConfluentConfig config = kafkaAgentConfig.registry().confluent();
 
     authHeader =
         config
-            .getApiKey()
+            .apiKey()
             .flatMap(
                 apiKey ->
                     config
-                        .getApiSecret()
+                        .apiSecret()
                         .map(
                             apiSecret -> {
                               String auth = apiKey + ":" + apiSecret;

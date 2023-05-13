@@ -48,7 +48,7 @@ public class MqttScrapper {
                 if (context.reachedMaxBuffer(topicDescription)) {
                   // we've receive enough let's profile and send statistics
 
-                  if (config.getScrapper().getProfiling().isEnabled()) {
+                  if (config.scrapper().profiling().enabled()) {
                     profilerService.profileMqttMessages(
                         topicDescription, context.messageForTopic(topicDescription));
                   }
@@ -62,7 +62,7 @@ public class MqttScrapper {
   }
 
   public IterationContext startIteration() {
-    IterationContext context = new IterationContext(config.getScrapper().getMaxSamples(), config.getScrapper().getWaitTimeBeforeCountingRetained());
+    IterationContext context = new IterationContext(config.scrapper().maxSamples(), config.scrapper().waitTimeBeforeCountingRetained());
     getPaths()
         .forEach(
             path -> {
@@ -79,9 +79,9 @@ public class MqttScrapper {
   }
 
   public void stopRemainingOfPreviousIteration(IterationContext context) {
-    final ScrapperConfig scrapperConfig = config.getScrapper();
+    final ScrapperConfig scrapperConfig = config.scrapper();
     final double ratio =
-        1.0 * scrapperConfig.getPeriod().toMillis() / scrapperConfig.getMaxWait().toMillis();
+        1.0 * scrapperConfig.period().toMillis() / scrapperConfig.maxWait().toMillis();
 
     if (context != null) {
       context
@@ -106,7 +106,7 @@ public class MqttScrapper {
   }
 
   private Stream<String> getPaths() {
-    return Stream.of(config.getMqtt().getPaths().split(","))
+    return Stream.of(config.mqtt().paths().split(","))
         .map(p -> p.endsWith("/") ? p : p + "/");
   }
 

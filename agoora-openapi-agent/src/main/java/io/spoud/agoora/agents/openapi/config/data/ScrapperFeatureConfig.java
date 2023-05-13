@@ -4,9 +4,8 @@ import lombok.Data;
 
 import java.time.Duration;
 
-@Data
-public class ScrapperFeatureConfig {
-  private boolean enabled;
-  private Duration initialDelay;
-  private Duration interval = Duration.ofMinutes(15);
+public interface ScrapperFeatureConfig {
+  boolean enabled();
+  Duration initialDelay();
+  default Duration interval() {return Duration.ofMinutes(15);}
 }

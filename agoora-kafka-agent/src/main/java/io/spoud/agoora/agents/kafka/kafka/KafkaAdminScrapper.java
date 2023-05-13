@@ -35,8 +35,8 @@ public class KafkaAdminScrapper {
   private Pattern consumerGroupFilterRegex;
 
   void postConstruct(@Observes StartupEvent event) {
-    topicFilterRegex = Pattern.compile(config.getKafka().getTopicFilterRegex());
-    consumerGroupFilterRegex = Pattern.compile(config.getKafka().getConsumerGroupFilterRegex());
+    topicFilterRegex = Pattern.compile(config.kafka().topicFilterRegex());
+    consumerGroupFilterRegex = Pattern.compile(config.kafka().consumerGroupFilterRegex());
     adminClient = KafkaFactory.createAdminClient(config);
   }
 

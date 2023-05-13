@@ -44,26 +44,26 @@ public class KafkaFactory {
 
   private static Properties getCommonProperties(KafkaAgentConfig kafkaAgentConfig) {
     final Properties props = new Properties();
-    final KafkaConfig kafkaConfig = kafkaAgentConfig.getKafka();
-    props.put("security.protocol", kafkaConfig.getProtocol());
-    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfig.getBootstrapServers());
+    final KafkaConfig kafkaConfig = kafkaAgentConfig.kafka();
+    props.put("security.protocol", kafkaConfig.protocol());
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfig.bootstrapServers());
 
     // fix weird path (/tmp/tomcat-docbase.5741419017537392227.8080/...)
-    kafkaConfig.getTrustStoreLocation().ifPresent(v -> props.put("ssl.truststore.location", v));
-    kafkaConfig.getTrustStorePassword().ifPresent(v -> props.put("ssl.truststore.password", v));
-    kafkaConfig.getKeyStoreLocation().ifPresent(v -> props.put("ssl.keystore.location", v));
-    kafkaConfig.getKeyStorePassword().ifPresent(v -> props.put("ssl.keystore.password", v));
+    kafkaConfig.trustStoreLocation().ifPresent(v -> props.put("ssl.truststore.location", v));
+    kafkaConfig.trustStorePassword().ifPresent(v -> props.put("ssl.truststore.password", v));
+    kafkaConfig.keyStoreLocation().ifPresent(v -> props.put("ssl.keystore.location", v));
+    kafkaConfig.keyStorePassword().ifPresent(v -> props.put("ssl.keystore.password", v));
 
-    if (kafkaConfig.getProtocol().equals("SASL_SSL")) {
+    if (kafkaConfig.protocol().equals("SASL_SSL")) {
       LOG.debug("Using SASL_SSL");
       // confluent cloud specific
       props.put("security.protocol", "SASL_SSL");
       props.put(
           "sasl.jaas.config",
           "org.apache.kafka.common.security.plain.PlainLoginModule   required username=\""
-              + kafkaConfig.getKey().orElse("")
+              + kafkaConfig.key().orElse("")
               + "\"   password=\""
-              + kafkaConfig.getSecret().orElse("")
+              + kafkaConfig.secret().orElse("")
               + "\";");
       props.put("ssl.endpoint.identification.algorithm", "https");
       props.put("sasl.mechanism", "PLAIN");

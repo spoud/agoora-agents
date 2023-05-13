@@ -12,7 +12,6 @@ agoora:
     kafka-consumer-group: '{ "kafka.manager.url": "https://km.sdm.spoud.io/clusters/sdm/consumer-group/{CONSUMER_GROUP_NAME}/{TOPIC_NAME}", "agoora.url": "https://blabla/{RESOURCE_ID}" }'
   scrapper:
     max-samples: 10
-    wait-time-before-counting-retained: PT1S
     profiling:
       enabled: true
   registry:

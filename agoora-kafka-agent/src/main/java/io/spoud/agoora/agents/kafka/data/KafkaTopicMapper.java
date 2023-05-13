@@ -16,7 +16,7 @@ public class KafkaTopicMapper {
   private final String bootstrapServers;
 
   public KafkaTopicMapper( KafkaAgentConfig config) {
-    bootstrapServers = config.getKafka().getBootstrapServers();
+    bootstrapServers = config.kafka().bootstrapServers();
   }
 
   public static Optional<String> getTopicName(Map<String, String> properties) {

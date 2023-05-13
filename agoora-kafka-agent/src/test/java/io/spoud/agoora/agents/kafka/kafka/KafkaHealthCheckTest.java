@@ -7,6 +7,7 @@ import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.mockito.Mockito;
 
 import javax.inject.Inject;
 
@@ -29,7 +30,7 @@ class KafkaHealthCheckTest extends AbstractService {
     assertThat(call.getData()).isPresent();
     assertThat(call.getData().get()).containsOnlyKeys("nodes");
     assertThat(call.getData().get().get("nodes"))
-        .isEqualTo(config.getKafka().getBootstrapServers().replace("PLAINTEXT://", ""));
+        .isEqualTo(config.kafka().bootstrapServers().replace("PLAINTEXT://", ""));
 
     kafkaHealthCheck.stop();
   }
@@ -38,11 +39,11 @@ class KafkaHealthCheckTest extends AbstractService {
   @Disabled(" disabled because it takes more than 1 min to complete")
   @Timeout(120)
   void testNoConnection() {
-    final String backup = config.getKafka().getBootstrapServers();
-    config.getKafka().setBootstrapServers("localhost:12345");
+    final String backup = config.kafka().bootstrapServers();
+    Mockito.when(config.kafka().bootstrapServers()).thenReturn("localhost:12345");
     KafkaHealthCheck kafkaHealthCheck = new KafkaHealthCheck(config);
     kafkaHealthCheck.postConstruct();
-    config.getKafka().setBootstrapServers(backup); // restore config after the post construct
+    Mockito.when(config.kafka().bootstrapServers()).thenReturn(backup); // restore config after the post construct
 
     final HealthCheckResponse call = kafkaHealthCheck.call();
     assertThat(call.getStatus()).isEqualTo(HealthCheckResponse.Status.DOWN);

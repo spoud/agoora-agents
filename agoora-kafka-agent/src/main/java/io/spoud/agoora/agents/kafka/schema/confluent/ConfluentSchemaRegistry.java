@@ -50,7 +50,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
   private Map<Long, SchemaRegistrySubject> schemaByIdCache = new ConcurrentHashMap<>();
 
   public ConfluentSchemaRegistry(KafkaAgentConfig config) {
-    this.publicUrl = config.getRegistry().getConfluent().getPublicUrl();
+    this.publicUrl = config.registry().confluent().publicUrl();
   }
 
   private boolean registryDefined() {
