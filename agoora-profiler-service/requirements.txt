@@ -21,3 +21,5 @@ pyspark
 azure-storage-blob
 azure-identity
 azure-keyvault-secrets
+google-cloud-storage
+google-cloud-secret-manager
