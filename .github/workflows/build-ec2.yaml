@@ -15,7 +15,7 @@ jobs:
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
       git-tag:  ${{ steps.git-tag.outputs.git-tag }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Configure AWS credentials
@@ -25,7 +25,7 @@ jobs:
           role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
       - name: Start EC2 runner
         id: start-ec2-runner
-        uses: machulav/ec2-github-runner@v2.2.0
+        uses: machulav/ec2-github-runner@v2
         with:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
@@ -51,20 +51,20 @@ jobs:
 
     steps:
       - name: Cache local Maven repository
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - name: Set up Maven
         uses: stCarolas/setup-maven@v4
         with:
           maven-version: 3.6.3
-      - uses: DeLaGuardo/setup-graalvm@4.0
+      - uses: DeLaGuardo/setup-graalvm@5.0
         with:
           graalvm: '21.0.0.2'
           java: 'java11'
@@ -75,7 +75,7 @@ jobs:
         run: mvn --batch-mode clean package
       - name: Build native
         run: mvn --batch-mode package -DskipTests -Pnative
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: maven-output
           path: |
@@ -99,20 +99,20 @@ jobs:
           - agoora-pgsql-agent
           - agoora-profiler-service
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: maven-output
 
       - name: Check if docker file exist for jar
         id: dockerfile_jar_exists
-        uses: andstor/file-existence-action@v1
+        uses: andstor/file-existence-action@v2
         with:
           files: "${{ matrix.agents }}/Dockerfile.jar"
 
       - name: Check if docker file exist for native
         id: dockerfile_native_exists
-        uses: andstor/file-existence-action@v1
+        uses: andstor/file-existence-action@v2
         with:
           files: "${{ matrix.agents }}/Dockerfile.native"
 
@@ -131,7 +131,7 @@ jobs:
           docker tag spoud/${{ matrix.agents }}:dev-native spoud/${{ matrix.agents }}:latest-native
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -158,8 +158,8 @@ jobs:
       - build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: maven-output
       - name: prepare-binaries
@@ -185,12 +185,12 @@ jobs:
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: eu-central-1
           role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
       - name: Stop EC2 runner
-        uses: machulav/ec2-github-runner@v2.2.0
+        uses: machulav/ec2-github-runner@v2
         with:
           mode: stop
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
