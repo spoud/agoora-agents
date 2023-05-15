@@ -3,7 +3,7 @@ agoora-insecure: false
 agoora-transport-path: /default/kafka
 
 agoora:
-  # The scrapper is not on 100% of the time. It start listening every {period} for a maximum of {max-samples} messages and {max-wait}
+  # The scrapper is not on 100% of the time. It starts listening every {period} for a maximum of {max-samples} messages and {max-wait}
   scrapper:
     max-samples: 100
     period: PT15M

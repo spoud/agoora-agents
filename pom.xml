@@ -37,6 +37,7 @@
         <lombok.version>1.18.26</lombok.version>
         <assertj-core.version>3.24.2</assertj-core.version>
         <slf4j.version>2.0.5</slf4j.version>
+        <slf4j-jboss-logmanager.version>2.0.1.Final</slf4j-jboss-logmanager.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <protobuf.version>3.23.0</protobuf.version>
         <mockito.version>5.2.0</mockito.version>
@@ -84,9 +85,9 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>${slf4j.version}</version>
+                <groupId>org.jboss.slf4j</groupId>
+                <artifactId>slf4j-jboss-logmanager</artifactId>
+                <version>${slf4j-jboss-logmanager.version}</version>
             </dependency>
 
             <!-- Utils -->
@@ -263,6 +264,17 @@
                                 <exclClassLoaders>*QuarkusClassLoader</exclClassLoaders>
                                 <destFile>${project.build.directory}/jacoco-quarkus.exec</destFile>
                                 <append>true</append>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                                <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
                             </configuration>
                         </execution>
                     </executions>
