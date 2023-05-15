@@ -35,6 +35,16 @@
             **/*Reflection.*,
             **/*Configuration.*,
             **/*CronService.*,
+            **/*Application.*,
+            **/*Config*.*,
+            **/*ErrorInterceptor.*,
+            **/*LogInterceptor.*,
+            **/*AuthHeaderInterceptor.*,
+            **/io/spoud/agoora/agents/api/config/**/*
+            **/io/spoud/agoora/agents/kafka/config/**/*
+            **/io/spoud/agoora/agents/mqtt/config/**/*
+            **/io/spoud/agoora/agents/openapi/config/**/*
+            **/io/spoud/agoora/agents/pgsql/config/**/*
         </sonar.coverage.exclusions>
 
         <lombok.version>1.18.26</lombok.version>
