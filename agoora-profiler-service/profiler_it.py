@@ -312,6 +312,7 @@ class ProfilerTest(unittest.TestCase):
         self.assertEqual(0, message.meta.error.type)
 
     def test_profile_stream_not_so_huge_report_returns_2_profile_messages(self):
+        # be sure that the sample data produces a report which is larger than 4MB
         def request_messages():
             request_id = "128"
             with open(
