@@ -5,7 +5,7 @@ import io.spoud.agoora.agents.api.client.ProfilerClient;
 import io.spoud.agoora.agents.api.observers.ProfileResponseObserver;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;

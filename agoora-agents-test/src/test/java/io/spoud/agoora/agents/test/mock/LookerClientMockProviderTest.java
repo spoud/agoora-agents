@@ -6,7 +6,7 @@ import io.spoud.sdm.looker.domain.v1alpha1.DataProfile;
 import io.spoud.sdm.looker.v1alpha1.AddDataProfileRequest;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;

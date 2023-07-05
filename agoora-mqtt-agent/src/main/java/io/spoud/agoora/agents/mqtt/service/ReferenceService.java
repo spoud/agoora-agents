@@ -6,7 +6,7 @@ import io.spoud.sdm.global.selection.v1.IdPathRef;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 @Slf4j
 @RequiredArgsConstructor

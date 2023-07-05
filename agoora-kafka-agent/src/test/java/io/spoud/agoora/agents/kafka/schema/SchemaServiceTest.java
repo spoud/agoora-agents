@@ -12,7 +12,7 @@ import io.spoud.sdm.schema.domain.v1alpha.SchemaSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;

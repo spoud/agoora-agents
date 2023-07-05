@@ -14,7 +14,7 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.ClientBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;

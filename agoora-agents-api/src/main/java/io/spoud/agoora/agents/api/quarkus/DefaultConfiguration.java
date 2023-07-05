@@ -6,9 +6,9 @@ import io.spoud.agoora.agents.api.config.AgooraAgentConfig;
 import io.spoud.agoora.agents.api.config.AgooraAgentEndpointConfig;
 import io.spoud.agoora.agents.api.config.AgooraTransportConfig;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Default;
-import javax.ws.rs.Produces;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Default;
+import jakarta.ws.rs.Produces;
 
 @Dependent
 public class DefaultConfiguration {

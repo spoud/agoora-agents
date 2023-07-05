@@ -7,7 +7,7 @@ import io.spoud.sdm.hooks.domain.v1.StateChangeAction;
 import io.spoud.sdm.hooks.domain.v1.StateChangeFilter;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

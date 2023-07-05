@@ -5,7 +5,7 @@ import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.sdm.logistics.domain.v1.DataPort;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Map;
 import java.util.Optional;
 
