@@ -69,8 +69,13 @@ jobs:
           distribution: 'graalvm-community'
           java-version: '17'
           components: 'native-image'
-      - name: Maven version
-        run: mvn -v
+      - name: Versions
+        run: |
+          echo "GRAALVM_HOME: $GRAALVM_HOME"
+          echo "JAVA_HOME: $JAVA_HOME"
+          mvn --v
+          java --version
+          native-image --version
       - name: Build with Maven
         run: mvn --batch-mode clean package
       - name: Build native

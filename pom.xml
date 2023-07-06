@@ -14,15 +14,15 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <compile.version>11</compile.version>
-        <maven.compiler.target>11</maven.compiler.target>
-        <maven.compiler.source>11</maven.compiler.source>
+        <compile.version>17</compile.version>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>3.1.3.Final</quarkus.platform.version>
+        <quarkus.platform.version>3.2.0.Final</quarkus.platform.version>
 
         <sonar.projectKey>spoud_${project.artifactId}</sonar.projectKey>
         <sonar.organization>spoud</sonar.organization>
