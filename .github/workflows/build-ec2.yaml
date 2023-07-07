@@ -69,7 +69,6 @@ jobs:
           mvn --v
           java --version
           native-image --version
-          gcc --version
       - name: Build with Maven
         run: mvn --batch-mode clean package
       - name: Build native
