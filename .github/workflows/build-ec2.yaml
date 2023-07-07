@@ -42,8 +42,6 @@ jobs:
       - name: git tag
         id: git-tag
         run: .github/git-tag.sh
-      - name: Install dependencies
-        run: sudo apt install -y build-essential
 
   build:
     needs: start-runner # required to start the main job when the runner is ready
@@ -52,13 +50,6 @@ jobs:
       MAVEN_OPTS: -Xmx4g
 
     steps:
-      - name: Cache local Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
       - uses: actions/checkout@v3
         with:
           submodules: true
@@ -71,6 +62,7 @@ jobs:
           distribution: 'graalvm-community'
           java-version: '17'
           components: 'native-image'
+          cache: 'maven'
       - name: Versions
         run: |
           echo "GRAALVM_HOME: $GRAALVM_HOME"
@@ -80,8 +72,8 @@ jobs:
           native-image --version
       - name: Build with Maven
         run: mvn --batch-mode clean package
-      - name: Build native
-        run: mvn --batch-mode package -DskipTests -Pnative
+#      - name: Build native
+#        run: mvn --batch-mode package -DskipTests -Pnative
       - uses: actions/upload-artifact@v3
         with:
           name: maven-output
@@ -117,11 +109,11 @@ jobs:
         with:
           files: "${{ matrix.agents }}/Dockerfile.jar"
 
-      - name: Check if docker file exist for native
-        id: dockerfile_native_exists
-        uses: andstor/file-existence-action@v2
-        with:
-          files: "${{ matrix.agents }}/Dockerfile.native"
+#      - name: Check if docker file exist for native
+#        id: dockerfile_native_exists
+#        uses: andstor/file-existence-action@v2
+#        with:
+#          files: "${{ matrix.agents }}/Dockerfile.native"
 
 
       - name: docker build and tag jar
@@ -130,12 +122,12 @@ jobs:
           docker build -t spoud/${{ matrix.agents }}:dev -f ./${{ matrix.agents }}/Dockerfile.jar ./${{ matrix.agents }}/
           docker tag spoud/${{ matrix.agents }}:dev spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}
           docker tag spoud/${{ matrix.agents }}:dev spoud/${{ matrix.agents }}:latest
-      - name: docker build and tag native
-        if: steps.dockerfile_native_exists.outputs.files_exists == 'true'
-        run: |
-          docker build -t spoud/${{ matrix.agents }}:dev-native -f ./${{ matrix.agents }}/Dockerfile.native ./${{ matrix.agents }}/
-          docker tag spoud/${{ matrix.agents }}:dev-native spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}-native
-          docker tag spoud/${{ matrix.agents }}:dev-native spoud/${{ matrix.agents }}:latest-native
+#      - name: docker build and tag native
+#        if: steps.dockerfile_native_exists.outputs.files_exists == 'true'
+#        run: |
+#          docker build -t spoud/${{ matrix.agents }}:dev-native -f ./${{ matrix.agents }}/Dockerfile.native ./${{ matrix.agents }}/
+#          docker tag spoud/${{ matrix.agents }}:dev-native spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}-native
+#          docker tag spoud/${{ matrix.agents }}:dev-native spoud/${{ matrix.agents }}:latest-native
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -148,16 +140,16 @@ jobs:
         run: |
           docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }} || echo "no jar tag to push"
           docker push spoud/${{ matrix.agents }}:dev || echo "no jar dev to push"
-          docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}-native || echo "no native tag to push"
-          docker push spoud/${{ matrix.agents }}:dev-native || echo "no native dev to push"
+#          docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}-native || echo "no native tag to push"
+#          docker push spoud/${{ matrix.agents }}:dev-native || echo "no native dev to push"
 
       - name: docker push tag
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }} || echo "no jar tag to push"
           docker push spoud/${{ matrix.agents }}:latest || echo "no jar dev to push"
-          docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}-native || echo "no native tag to push"
-          docker push spoud/${{ matrix.agents }}:latest-native || echo "no native dev to push"
+#          docker push spoud/${{ matrix.agents }}:${{ needs.start-runner.outputs.git-tag }}-native || echo "no native tag to push"
+#          docker push spoud/${{ matrix.agents }}:latest-native || echo "no native dev to push"
 
   publish-release:
     if: startsWith(github.ref, 'refs/tags/')
