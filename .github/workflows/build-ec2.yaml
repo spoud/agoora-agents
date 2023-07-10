@@ -59,8 +59,9 @@ jobs:
           maven-version: 3.8.2
       - uses: graalvm/setup-graalvm@v1
         with:
-          distribution: 'graalvm-community'
+          version: 'latest'
           java-version: '17'
+          components: 'native-image'
           cache: 'maven'
       - name: Versions
         run: |
