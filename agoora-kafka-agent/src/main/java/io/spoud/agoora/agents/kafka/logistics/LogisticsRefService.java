@@ -4,7 +4,7 @@ import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.sdm.global.selection.v1.IdPathRef;
 import lombok.RequiredArgsConstructor;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.concurrent.atomic.AtomicReference;
 
 @ApplicationScoped

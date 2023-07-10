@@ -2,7 +2,7 @@ package io.spoud.agoora.agents.mqtt.repository;
 
 import com.google.common.util.concurrent.AtomicDouble;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;

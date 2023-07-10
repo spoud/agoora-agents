@@ -4,7 +4,7 @@ import io.spoud.agoora.agents.mqtt.Constants;
 import io.spoud.agoora.agents.mqtt.data.TopicDescription;
 import io.spoud.sdm.logistics.domain.v1.DataPort;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

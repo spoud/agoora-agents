@@ -11,8 +11,8 @@ import io.spoud.agoora.agents.mqtt.mqtt.MqttScrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 

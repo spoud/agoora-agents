@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.postgresql.jdbc.PgResultSetMetaData;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

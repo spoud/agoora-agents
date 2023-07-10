@@ -1,6 +1,8 @@
 package io.spoud.agoora.agents.kafka.kafka;
 
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.common.Node;
@@ -8,9 +10,6 @@ import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 import org.eclipse.microprofile.health.Liveness;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 @Liveness
 @RequiredArgsConstructor

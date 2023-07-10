@@ -2,7 +2,7 @@ package io.spoud.agoora.agents.openapi.repository;
 
 import io.spoud.sdm.logistics.domain.v1.DataPort;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

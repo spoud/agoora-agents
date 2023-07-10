@@ -8,7 +8,7 @@ import io.spoud.sdm.logistics.service.v1.DataItemChange;
 import io.spoud.sdm.logistics.service.v1.SaveDataItemRequest;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;

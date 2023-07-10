@@ -5,7 +5,7 @@ import io.spoud.agoora.agents.api.client.BlobClient;
 import io.spoud.sdm.global.domain.v1.ResourceEntity;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;

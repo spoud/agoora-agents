@@ -5,7 +5,7 @@ import io.spoud.agoora.agents.kafka.data.KafkaConsumerGroup;
 import io.spoud.agoora.agents.kafka.data.KafkaTopic;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

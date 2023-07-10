@@ -16,8 +16,8 @@ import io.spoud.agoora.agents.api.factory.ClientsFactoryImpl;
 import io.spoud.agoora.agents.api.metrics.OperationalMetricsService;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Produces;
 
 @Slf4j
 @Dependent

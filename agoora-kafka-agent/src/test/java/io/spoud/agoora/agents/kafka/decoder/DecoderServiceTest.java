@@ -11,7 +11,7 @@ import io.spoud.agoora.agents.kafka.utils.ResourceUtil;
 import io.spoud.agoora.agents.kafka.utils.SchemaRegistryUtil;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;

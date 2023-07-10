@@ -11,8 +11,8 @@ import io.spoud.sdm.schema.domain.v1alpha.SchemaSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
 import java.util.HashMap;
 import java.util.Map;
 
