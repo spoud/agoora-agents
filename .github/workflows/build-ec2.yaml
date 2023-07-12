@@ -7,63 +7,61 @@ permissions:
   contents: read
 
 jobs:
-  start-runner:
-    name: Start self-hosted EC2 runner
-    runs-on: ubuntu-latest
-    outputs:
-      label: ${{ steps.start-ec2-runner.outputs.label }}
-      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
-      git-tag:  ${{ steps.git-tag.outputs.git-tag }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: eu-central-1
-          role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
-      - name: Start EC2 runner
-        id: start-ec2-runner
-        uses: machulav/ec2-github-runner@v2
-        with:
-          mode: start
-          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-          ec2-image-id: ${{ vars.EC2_BUILDER_AMI_ID}}
-#          ec2-instance-type: c5a.2xlarge # cost ~0.16 CHF per build (30min build time)
-          ec2-instance-type: c5a.8xlarge # cost ~0.24 CHF per build (20min build time)
-          subnet-id: ${{ vars.EC2_BUILDER_SUBNET_ID}}
-          security-group-id: sg-02302868ae4943d2c
-          aws-resource-tags: >
-            [
-              {"Key": "Name", "Value": "ec2-github-runner"},
-              {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
-            ]
-      - name: git tag
-        id: git-tag
-        run: .github/git-tag.sh
-      - run: sudo apt-get install build-essential libz-dev zlib1g-dev
+#  start-runner:
+#    name: Start self-hosted EC2 runner
+#    runs-on: ubuntu-latest
+#    outputs:
+#      label: ${{ steps.start-ec2-runner.outputs.label }}
+#      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+#      git-tag:  ${{ steps.git-tag.outputs.git-tag }}
+#    steps:
+#      - uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 0
+#      - name: Configure AWS credentials
+#        uses: aws-actions/configure-aws-credentials@v2
+#        with:
+#          aws-region: eu-central-1
+#          role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
+#      - name: Start EC2 runner
+#        id: start-ec2-runner
+#        uses: machulav/ec2-github-runner@v2
+#        with:
+#          mode: start
+#          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+#          ec2-image-id: ${{ vars.EC2_BUILDER_AMI_ID}}
+##          ec2-instance-type: c5a.2xlarge # cost ~0.16 CHF per build (30min build time)
+#          ec2-instance-type: c5a.8xlarge # cost ~0.24 CHF per build (20min build time)
+#          subnet-id: ${{ vars.EC2_BUILDER_SUBNET_ID}}
+#          security-group-id: sg-02302868ae4943d2c
+#          aws-resource-tags: >
+#            [
+#              {"Key": "Name", "Value": "ec2-github-runner"},
+#              {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
+#            ]
+#      - name: git tag
+#        id: git-tag
+#        run: .github/git-tag.sh
+#      - run: sudo apt-get install build-essential libz-dev zlib1g-dev
 
   build:
     needs: start-runner # required to start the main job when the runner is ready
-    runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
-    env:
-      MAVEN_OPTS: -Xmx4g
-
+#    runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v4
-        with:
-          maven-version: 3.8.2
+#      - name: Set up Maven
+#        uses: stCarolas/setup-maven@v4
+#        with:
+#          maven-version: 3.8.2
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: 'latest'
-          java-version: '17'
-          components: 'native-image'
+          java-version: '17.0.7'
+          distribution: 'graalvm'
           cache: 'maven'
+          components: 'native-image'
       - name: Versions
         run: |
           echo "GRAALVM_HOME: $GRAALVM_HOME"
@@ -71,8 +69,8 @@ jobs:
           mvn --v
           java --version
           native-image --version
-      - name: Build with Maven
-        run: mvn --batch-mode clean package
+#      - name: Build with Maven
+#        run: mvn --batch-mode clean package
       - name: Build native
         run: mvn --batch-mode package -DskipTests -Pnative
       - uses: actions/upload-artifact@v3
@@ -176,23 +174,23 @@ jobs:
             LICENCE
             binaries/*
 
-  stop-runner:
-    name: Stop self-hosted EC2 runner
-    needs:
-      - start-runner
-      - build
-    runs-on: ubuntu-latest
-    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: eu-central-1
-          role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
-      - name: Stop EC2 runner
-        uses: machulav/ec2-github-runner@v2
-        with:
-          mode: stop
-          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-          label: ${{ needs.start-runner.outputs.label }}
-          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
+#  stop-runner:
+#    name: Stop self-hosted EC2 runner
+#    needs:
+#      - start-runner
+#      - build
+#    runs-on: ubuntu-latest
+#    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+#    steps:
+#      - name: Configure AWS credentials
+#        uses: aws-actions/configure-aws-credentials@v2
+#        with:
+#          aws-region: eu-central-1
+#          role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
+#      - name: Stop EC2 runner
+#        uses: machulav/ec2-github-runner@v2
+#        with:
+#          mode: stop
+#          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+#          label: ${{ needs.start-runner.outputs.label }}
+#          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
