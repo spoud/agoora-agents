@@ -71,8 +71,8 @@ jobs:
           mvn --v
           java --version
           native-image --version
-#      - name: Build with Maven
-#        run: mvn --batch-mode clean package
+      - name: Build with Maven
+        run: mvn --batch-mode clean package
       - name: Build native
         run: mvn --batch-mode package -DskipTests -Pnative
       - uses: actions/upload-artifact@v3
