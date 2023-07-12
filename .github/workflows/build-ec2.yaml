@@ -39,6 +39,8 @@ jobs:
               {"Key": "Name", "Value": "ec2-github-runner"},
               {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
             ]
+          pre-runner-script: |
+            sudo apt-get install build-essential libz-dev zlib1g-dev
       - name: git tag
         id: git-tag
         run: .github/git-tag.sh
