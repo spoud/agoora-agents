@@ -6,6 +6,7 @@ permissions:
   id-token: write
   contents: read
 
+
 jobs:
   start-runner:
     name: Start self-hosted EC2 runner
@@ -63,7 +64,6 @@ jobs:
           java-version: '17'
           components: 'native-image'
           cache: 'maven'
-          native-image-musl: 'true'
       - name: Versions
         run: |
           echo "GRAALVM_HOME: $GRAALVM_HOME"
@@ -74,7 +74,7 @@ jobs:
       - name: Build with Maven
         run: mvn --batch-mode clean package
       - name: Build native
-        run: mvn --batch-mode package -DskipTests -Pnative -Dquarkus.native.additional-build-args="-H:-CheckToolchain","--static","--libc=musl"
+        run: mvn --batch-mode package -DskipTests -Pnative
       - uses: actions/upload-artifact@v3
         with:
           name: maven-output
