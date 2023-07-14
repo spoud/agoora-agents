@@ -116,6 +116,10 @@ jobs:
         with:
           files: "${{ matrix.agents }}/Dockerfile.native"
 
+      # restore execute permissions lost in actions/upload-artifact@v3 see https://github.com/actions/upload-artifact/issues/38
+      - name: restore execute permissions
+        run: |
+          chmod +x ./**/target/*-runner
 
       - name: docker build and tag jar
         if: steps.dockerfile_jar_exists.outputs.files_exists == 'true'
