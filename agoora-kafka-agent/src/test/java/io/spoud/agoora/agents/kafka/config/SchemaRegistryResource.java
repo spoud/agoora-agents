@@ -8,7 +8,7 @@ import java.util.Map;
 public class SchemaRegistryResource implements QuarkusTestResourceLifecycleManager {
 
   public static SchemaRegistryContainer schemaRegistry =
-      new SchemaRegistryContainer()
+      new SchemaRegistryContainer("7.4.1")
           .withKafka(KafkaResource.kafka)
           .withNetwork(NetworkConfig.NETWORK);
 

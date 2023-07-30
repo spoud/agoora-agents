@@ -2,12 +2,13 @@ package io.spoud.agoora.agents.kafka.config;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.util.Map;
 
 public class KafkaResource implements QuarkusTestResourceLifecycleManager {
 
-  public static KafkaContainer kafka = new KafkaContainer().withNetwork(NetworkConfig.NETWORK);
+  public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.1")).withNetwork(NetworkConfig.NETWORK);
 
   @Override
   public Map<String, String> start() {

@@ -5,6 +5,8 @@ quarkus:
     category:
       "io.spoud.agoora":
         level: DEBUG
+  devservices:
+    enabled: false
 
 agoora:
   property-templates:

@@ -22,7 +22,7 @@
 
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>3.2.0.Final</quarkus.platform.version>
+        <quarkus.platform.version>3.2.2.Final</quarkus.platform.version>
 
         <sonar.projectKey>spoud_${project.artifactId}</sonar.projectKey>
         <sonar.organization>spoud</sonar.organization>
@@ -46,9 +46,9 @@
             **/io/spoud/agoora/agents/pgsql/config/**/*
         </sonar.coverage.exclusions>
 
-        <lombok.version>1.18.26</lombok.version>
+        <lombok.version>1.18.28</lombok.version>
         <assertj-core.version>3.24.2</assertj-core.version>
-        <slf4j.version>2.0.5</slf4j.version>
+        <slf4j.version>2.0.7</slf4j.version>
         <slf4j-jboss-logmanager.version>2.0.1.Final</slf4j-jboss-logmanager.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <protobuf.version>3.23.0</protobuf.version>
@@ -174,7 +174,7 @@
             <extension>
                 <groupId>kr.motd.maven</groupId>
                 <artifactId>os-maven-plugin</artifactId>
-                <version>1.4.1.Final</version>
+                <version>1.7.0</version>
             </extension>
         </extensions>
         <pluginManagement>
@@ -190,28 +190,28 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.jboss.jandex</groupId>
+                    <groupId>io.smallrye</groupId>
                     <artifactId>jandex-maven-plugin</artifactId>
-                    <version>1.0.7</version>
+                    <version>3.1.2</version>
                     <executions>
                         <execution>
                             <id>make-index</id>
