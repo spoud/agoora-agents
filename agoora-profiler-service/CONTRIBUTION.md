@@ -11,7 +11,7 @@ python3 -m grpc_tools.protoc -I./proto --python_out=./ --grpc_python_out=./ ./pr
 
 ### Docker
 ```
-docker build . -t spoud/agoora-profiler-service:latest
+docker build . -f Dockerfile.jvm -t spoud/agoora-profiler-service:latest
 docker run -it --rm -p 8089:8089 spoud/agoora-profiler-service:latest
 ```
 
@@ -24,10 +24,10 @@ client.profile({id: '1', json_data: '[{"x": 0, "y": 2 }, {"x": 1, "y": 3}]'}, pr
 
 ## Tests
 
-To run the tests for the integration:
+To run the tests for the integration locally:
 
 ```bash
-    python profiler_it.py
+    mkdir -p testresults && python profiler_it.py && rm -rf testresults
 ```
 
 
