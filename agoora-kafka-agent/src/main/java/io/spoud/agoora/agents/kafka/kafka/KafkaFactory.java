@@ -96,6 +96,7 @@ public class KafkaFactory {
 
   private Properties getProducerProperties(KafkaAgentConfig kafkaAgentConfig) {
     final Properties props = getCommonProperties(kafkaAgentConfig);
+    props.put(ProducerConfig.LINGER_MS_CONFIG, "200");
     props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, BytesSerializer.class.getName());
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BytesSerializer.class.getName());
     return props;

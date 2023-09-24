@@ -84,6 +84,21 @@ quarkus:
       "org.apache.kafka":
         level: WARN
 
+
+  micrometer:
+    binder:
+      jvm: true
+      kafka:
+        enabled: true
+      grpc-client:
+        enabled: true
+      system: true
+      http-client:
+        enabled: true
+      mp-metrics:
+        enabled: true
+
+
 rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
 #rest-confluent-registry/mp-rest/trustStore:
 #rest-confluent-registry/mp-rest/trustStorePassword:
@@ -97,9 +112,8 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
   agoora-insecure: true
   agoora-transport-path: /default/kafka/kafka
   agoora:
-    propertyTemplates:
-      kafkaTopic:
-        "kafka.manager.url": https://km.sdm.spoud.io/clusters/sdm/topics/{TOPIC_NAME}
+    property-templates:
+      kafka-topic: '{ "kafka.manager.url": "https://km.sdm.spoud.io/clusters/sdm/topics/{TOPIC_NAME}" }'
     scrapper:
       max-samples: 10
       period: 2M

@@ -54,6 +54,7 @@
             <version>${slf4j-jboss-logmanager.version}</version>
         </dependency>
 
+        <!-- Test -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jacoco</artifactId>

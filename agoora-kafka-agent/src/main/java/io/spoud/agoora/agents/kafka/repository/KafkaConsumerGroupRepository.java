@@ -1,19 +1,19 @@
 package io.spoud.agoora.agents.kafka.repository;
 
+import io.spoud.agoora.agents.api.map.MonitoredConcurrentHashMap;
 import io.spoud.agoora.agents.kafka.data.KafkaConsumerGroup;
 import io.spoud.agoora.agents.kafka.data.KafkaConsumerGroupMapper;
 import io.spoud.agoora.agents.kafka.data.KafkaTopic;
 import io.spoud.sdm.hooks.domain.v1.LogRecord;
 import io.spoud.sdm.hooks.domain.v1.StateChangeAction;
+import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,8 +22,9 @@ import java.util.stream.Collectors;
 public class KafkaConsumerGroupRepository {
 
   private final Map<String, KafkaConsumerGroup> statesByDataSubscriptionStateId =
-      new ConcurrentHashMap<>();
-  private final Map<String, KafkaConsumerGroup> statesByInternalId = new ConcurrentHashMap<>();
+      new MonitoredConcurrentHashMap<>("states_by_data_subscription_state_id", KafkaConsumerGroupRepository.class);
+  private final Map<String, KafkaConsumerGroup> statesByInternalId =
+          new MonitoredConcurrentHashMap<>("states_by_internal_id", KafkaConsumerGroupRepository.class);
   private final KafkaTopicRepository kafkaTopicRepository;
   private final KafkaConsumerGroupMapper consumerGroupMapper;
 

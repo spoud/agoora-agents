@@ -1,26 +1,26 @@
 package io.spoud.agoora.agents.kafka.repository;
 
+import io.spoud.agoora.agents.api.map.MonitoredConcurrentHashMap;
 import io.spoud.agoora.agents.kafka.data.KafkaTopic;
 import io.spoud.agoora.agents.kafka.data.KafkaTopicMapper;
 import io.spoud.sdm.hooks.domain.v1.LogRecord;
 import io.spoud.sdm.hooks.domain.v1.StateChangeAction;
+import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @ApplicationScoped
 @RequiredArgsConstructor
 public class KafkaTopicRepository {
 
-  private final Map<String, KafkaTopic> statesByDataPortId = new ConcurrentHashMap<>();
-  private final Map<String, KafkaTopic> statesByInternalId = new ConcurrentHashMap<>();
+  private final Map<String, KafkaTopic> statesByDataPortId = new MonitoredConcurrentHashMap<>("states_by_data_port_id", KafkaTopicRepository.class);
+  private final Map<String, KafkaTopic> statesByInternalId = new MonitoredConcurrentHashMap<>("states_by_internal_id", KafkaTopicRepository.class);
   private final KafkaTopicMapper topicMapper;
 
   public Collection<KafkaTopic> getStates() {

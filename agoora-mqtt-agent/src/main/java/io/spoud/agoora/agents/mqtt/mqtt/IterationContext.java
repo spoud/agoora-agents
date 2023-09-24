@@ -1,5 +1,6 @@
 package io.spoud.agoora.agents.mqtt.mqtt;
 
+import io.spoud.agoora.agents.api.map.MonitoredConcurrentHashMap;
 import io.spoud.agoora.agents.mqtt.data.TopicDescription;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RequiredArgsConstructor
@@ -21,9 +21,9 @@ public class IterationContext {
   private final Duration waitTimeBeforeCountingRetained;
   private final Instant startTime = Instant.now();
 
-  private final Map<TopicDescription, List<MqttMessage>> messagesBuffer = new ConcurrentHashMap<>();
-  private final Map<TopicDescription, Instant> firstMessageInstant = new ConcurrentHashMap<>();
-  private final Map<TopicDescription, MessageCounter> countMessage = new ConcurrentHashMap<>();
+  private final Map<TopicDescription, List<MqttMessage>> messagesBuffer = new MonitoredConcurrentHashMap<>("messages_buffer", IterationContext.class);
+  private final Map<TopicDescription, Instant> firstMessageInstant = new MonitoredConcurrentHashMap<>("first_message_instant", IterationContext.class);
+  private final Map<TopicDescription, MessageCounter> countMessage = new MonitoredConcurrentHashMap<>("count_message", IterationContext.class);
 
   /** Return true if it's new */
   public synchronized boolean storeMessage(TopicDescription topic, MqttMessage message) {

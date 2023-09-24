@@ -28,7 +28,7 @@ public class HooksService {
 
   void onStart(@Observes StartupEvent ev) {
     if (config.scrapper().hooks().enabled()) {
-      // We delay hooks to let the app starts peacefully
+      // We delay hooks to let the app start peacefully
       Uni.createFrom()
           .item("")
           .runSubscriptionOn(managedExecutor)

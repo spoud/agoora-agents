@@ -1,24 +1,24 @@
 package io.spoud.agoora.agents.kafka.schema.confluent;
 
 import io.quarkus.logging.Log;
+import io.spoud.agoora.agents.api.map.MonitoredConcurrentHashMap;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import io.spoud.agoora.agents.kafka.schema.SchemaRegistryClient;
 import io.spoud.sdm.schema.domain.v1alpha.Schema;
 import io.spoud.sdm.schema.domain.v1alpha.SchemaEncoding;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.WebApplicationException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @ApplicationScoped
@@ -47,7 +47,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
   @ConfigProperty(name = "rest-confluent-registry/mp-rest/url")
   Optional<String> registryUrl;
 
-  private Map<Long, SchemaRegistrySubject> schemaByIdCache = new ConcurrentHashMap<>();
+  private Map<Long, SchemaRegistrySubject> schemaByIdCache = new MonitoredConcurrentHashMap<>("schema_by_id_cache", ConfluentSchemaRegistry.class);
 
   public ConfluentSchemaRegistry(KafkaAgentConfig config) {
     this.publicUrl = config.registry().confluent().publicUrl();

@@ -1,8 +1,11 @@
 package io.spoud.agoora.agents.kafka.utils;
 
 import io.quarkus.runtime.StartupEvent;
+import io.spoud.agoora.agents.api.map.MonitoredConcurrentHashMap;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.agoora.agents.kafka.kafka.KafkaFactory;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -15,15 +18,12 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.utils.Bytes;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static org.awaitility.Awaitility.await;
@@ -35,7 +35,7 @@ public class KafkaUtils {
 
   private final KafkaAgentConfig kafkaAgentConfig;
   private KafkaProducer<Bytes, Bytes> producer;
-  private Map<String, KafkaConsumer<Bytes, Bytes>> consumers = new ConcurrentHashMap<>();
+  private Map<String, KafkaConsumer<Bytes, Bytes>> consumers = new MonitoredConcurrentHashMap<>("consumers", KafkaUtils.class);
   private AdminClient adminClient;
 
   void startup(@Observes StartupEvent event) {
@@ -53,6 +53,19 @@ public class KafkaUtils {
         recordMetadata.partition(),
         recordMetadata.offset());
     return recordMetadata;
+  }
+
+
+  @SneakyThrows
+  public void produceAsync(String topic, byte[] data) {
+    ProducerRecord<Bytes, Bytes> record = new ProducerRecord<>(topic, Bytes.wrap(data));
+    producer.send(record, (recordMetadata, e) -> {
+      LOG.trace(
+              "Produced record for topic {} at partition {} and offset {}",
+              topic,
+              recordMetadata.partition(),
+              recordMetadata.offset());
+    });
   }
 
   public List<byte[]> consume(String topic, String consumerGroup, int count, Duration timeout) {
