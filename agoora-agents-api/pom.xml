@@ -54,6 +54,12 @@
             <version>${slf4j-jboss-logmanager.version}</version>
         </dependency>
 
+        <!-- Metrics -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>io.quarkus</groupId>
