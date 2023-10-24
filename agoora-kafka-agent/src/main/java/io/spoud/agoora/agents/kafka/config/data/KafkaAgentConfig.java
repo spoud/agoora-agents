@@ -9,4 +9,6 @@ public interface KafkaAgentConfig extends AgooraAgentConfig {
   KafkaConfig kafka();
   RegistryConfig registry();
   PropertyTemplatesConfig propertyTemplates();
+
+  SchemaCacheConfig schemaCache();
 }

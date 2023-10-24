@@ -1,12 +1,11 @@
 package io.spoud.agoora.agents.kafka.decoder.avro;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import io.spoud.agoora.agents.kafka.decoder.DataEncoding;
 import io.spoud.agoora.agents.kafka.decoder.DecodedMessages;
 import io.spoud.agoora.agents.kafka.decoder.SampleDecoder;
 import io.spoud.agoora.agents.kafka.schema.KafkaStreamPart;
 import io.spoud.agoora.agents.kafka.schema.confluent.ConfluentSchemaRegistry;
+import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.AvroRuntimeException;
@@ -18,11 +17,9 @@ import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.commons.codec.binary.Hex;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,8 +34,6 @@ public class SampleDecoderAvroConfluent implements SampleDecoder {
   private static final byte CONFLUENT_MAGIC_BYTE = 0;
 
   private final ConfluentSchemaRegistry confluentSchemaRegistry;
-  private final Cache<Long, Schema> schemaCacheById =
-      Caffeine.newBuilder().maximumSize(1000).expireAfterWrite(Duration.ofHours(1)).build();
 
   @Override
   public int getPriority() {
@@ -114,26 +109,21 @@ public class SampleDecoderAvroConfluent implements SampleDecoder {
   }
 
   private Optional<Schema> getCachedSchema(long schemaId, String topic, KafkaStreamPart part) {
-    return Optional.ofNullable(
-        schemaCacheById.get(
-            schemaId,
-            id ->
-                confluentSchemaRegistry
-                    .getSchemaById(schemaId)
-                    .flatMap(
-                        schema -> {
-                          if (schema.getSchemaType() == null
+    return confluentSchemaRegistry
+            .getSchemaById(schemaId)
+            .flatMap(
+                    schema -> {
+                      if (schema.getSchemaType() == null
                               || schema.getSchemaType().equals("AVRO")) {
-                            return parseAvroSchema(schema.getSchema());
-                          } else {
-                            LOG.warn(
+                        return parseAvroSchema(schema.getSchema());
+                      } else {
+                        LOG.warn(
                                 "Unsupported schema type '{}' for topic {} and part {}",
                                 schema.getSchemaType(),
                                 topic,
                                 part);
-                            return Optional.empty();
-                          }
-                        })
-                    .orElse(null)));
+                      }
+                      return Optional.empty();
+                    });
   }
 }

@@ -125,6 +125,12 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
     registry:
       confluent:
         url: http://kafka:8081
+    schema-cache:
+      schemas-by-id: 1000
+      schema-expiration: 1H
+      topic-name-schema-id-cache: 5000
+      topic-name-id-expiration: 12H
+
 
   quarkus:
     log:
