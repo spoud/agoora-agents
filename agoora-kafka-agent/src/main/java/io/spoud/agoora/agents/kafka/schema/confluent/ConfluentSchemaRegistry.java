@@ -2,6 +2,8 @@ package io.spoud.agoora.agents.kafka.schema.confluent;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.binder.cache.CaffeineCacheMetrics;
 import io.quarkus.logging.Log;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.agoora.agents.kafka.config.data.SchemaCacheConfig;
@@ -50,21 +52,23 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
   Optional<String> registryUrl;
 
   private final Cache<Long, SchemaRegistrySubject> schemaByIdCache;
-  private final Cache<String, Long> topciNameSchemaIdCache;
+  private final Cache<String, Long> topicNameSchemaIdCache;
 
   public ConfluentSchemaRegistry(KafkaAgentConfig config) {
     this.publicUrl = config.registry().confluent().publicUrl();
     SchemaCacheConfig schemaCacheConfig = config.schemaCache();
-    topciNameSchemaIdCache = Caffeine.newBuilder()
+    topicNameSchemaIdCache = Caffeine.newBuilder()
             .recordStats()
             .maximumSize(schemaCacheConfig.topicNameSchemaIdCache().orElse(5000L))
             .expireAfterWrite(schemaCacheConfig.topicNameIdExpiration()
                     .orElse(Duration.ofHours(1))).build();
+    CaffeineCacheMetrics.monitor(Metrics.globalRegistry, topicNameSchemaIdCache, "topicNameSchemaIdCache");
     schemaByIdCache = Caffeine.newBuilder()
             .recordStats() // used to export micrometer metrics
             .maximumSize(schemaCacheConfig.SchemaById().orElse(1000L))
             .expireAfterAccess(schemaCacheConfig.schemaExpiration()
                     .orElse(Duration.ofHours(12))).build();
+    CaffeineCacheMetrics.monitor(Metrics.globalRegistry, schemaByIdCache, "schemaByIdCache");
   }
 
   private boolean registryDefined() {
@@ -136,7 +140,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
     LOG.debug("Looking for schema for topic '{}' and type '{}'", topic, part);
 
     try {
-      final Long schemaId = topciNameSchemaIdCache.get(topic + "-" + part.getSubjectPostfix(), k -> {
+      final Long schemaId = topicNameSchemaIdCache.get(topic + "-" + part.getSubjectPostfix(), k -> {
         SchemaRegistrySubject sub = confluentRegistrySubjectResource
                 .get()
                 .getLatestSubject(topic + "-" + part.getSubjectPostfix());
