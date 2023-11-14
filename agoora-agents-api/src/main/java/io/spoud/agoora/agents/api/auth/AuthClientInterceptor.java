@@ -2,6 +2,7 @@ package io.spoud.agoora.agents.api.auth;
 
 import io.grpc.*;
 import io.spoud.agoora.agents.api.config.AgooraAgentClientAuthConfig;
+import jakarta.ws.rs.client.ClientBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -14,7 +15,6 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import jakarta.ws.rs.client.ClientBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -83,7 +83,9 @@ public class AuthClientInterceptor implements ClientInterceptor {
 
     clientBuilder.register(JacksonProvider.class, 100);
 
-    return clientBuilder.build();
+    ResteasyClient client = clientBuilder.build();
+    LOG.info("Using resteasy client {}", client);
+    return client;
   }
 
   protected void configureSslForResteasyClient(ResteasyClientBuilder resteasyClientBuilder) {
