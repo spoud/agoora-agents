@@ -32,10 +32,11 @@ public class SchemaRegistryUtil {
               SchemaRegistryUtil.class.getClassLoader().getResourceAsStream(file), "UTF-8");
       return confluentRegistrySubjectResource.addNewSchemaVersion(subject, content);
     } catch (WebApplicationException ex) {
-      final ByteArrayInputStream entity = (ByteArrayInputStream) ex.getResponse().getEntity();
-      final String message = IOUtils.toString(entity, StandardCharsets.UTF_8);
-      throw new IllegalStateException(
-          "Unable to process schema from file " + file + ". Reason: " + message, ex);
+      try(final ByteArrayInputStream entity = (ByteArrayInputStream) ex.getResponse().getEntity()){
+        final String message = IOUtils.toString(entity, StandardCharsets.UTF_8);
+        throw new IllegalStateException(
+            "Unable to process schema from file " + file + ". Reason: " + message, ex);
+      }
     }
   }
 

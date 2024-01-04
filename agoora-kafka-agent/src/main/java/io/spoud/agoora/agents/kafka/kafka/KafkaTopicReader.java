@@ -42,9 +42,7 @@ public class KafkaTopicReader {
 
     consumer.assign(ranges.keySet());
 
-    ranges
-        .entrySet()
-        .forEach(entry -> consumer.seek(entry.getKey(), entry.getValue().getBeginning()));
+    ranges.forEach((key, value) -> consumer.seek(key, value.getBeginning()));
 
     List<byte[]> samples = new ArrayList<>();
 

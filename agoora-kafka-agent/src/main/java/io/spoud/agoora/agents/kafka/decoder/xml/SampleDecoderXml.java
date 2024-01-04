@@ -58,7 +58,7 @@ public class SampleDecoderXml implements SampleDecoder {
             } else {
               final JsonNode xmlValue = xmlMapper.readTree(decodedString);
 
-              if (xmlValue.size() == 0) {
+              if (xmlValue.isEmpty()) {
                 // empty object or array
                 LOG.warn("Xml value is empty");
               } else {
