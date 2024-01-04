@@ -126,7 +126,7 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
       confluent:
         url: http://kafka:8081
     schema-cache:
-      schemas-by-id: 1000
+      schema-by-id: 1000
       schema-expiration: 1H
       topic-name-schema-id-cache: 5000
       topic-name-id-expiration: 12H
@@ -136,4 +136,4 @@ rest-confluent-registry/mp-rest/url: ${agoora.registry.confluent.url}
     log:
       category:
         "io.spoud.agoora":
-          level: DEBUG
+          level: INFO

@@ -40,34 +40,31 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
   public static final String PUBLIC_URL_SUBJECT_REPLACEMENT = "{SUBJECT}";
 
   private final Optional<String> publicUrl;
-
-  @Inject
-  @RestClient
-  Instance<ConfluentRegistrySubjectResource> confluentRegistrySubjectResource;
-  @Inject
-  @RestClient
-  Instance<ConfluentRegistrySchemaResource> confluentRegistrySchemaResource;
+  private final Cache<Long, SchemaRegistrySubject> schemaByIdCache;
+  private final Cache<String, Long> topicNameSchemaIdCache;
+  @Inject @RestClient Instance<ConfluentRegistrySubjectResource> confluentRegistrySubjectResource;
+  @Inject @RestClient Instance<ConfluentRegistrySchemaResource> confluentRegistrySchemaResource;
 
   @ConfigProperty(name = "rest-confluent-registry/mp-rest/url")
   Optional<String> registryUrl;
 
-  private final Cache<Long, SchemaRegistrySubject> schemaByIdCache;
-  private final Cache<String, Long> topicNameSchemaIdCache;
-
   public ConfluentSchemaRegistry(KafkaAgentConfig config) {
     this.publicUrl = config.registry().confluent().publicUrl();
     SchemaCacheConfig schemaCacheConfig = config.schemaCache();
-    topicNameSchemaIdCache = Caffeine.newBuilder()
+    topicNameSchemaIdCache =
+        Caffeine.newBuilder()
             .recordStats()
             .maximumSize(schemaCacheConfig.topicNameSchemaIdCache().orElse(5000L))
-            .expireAfterWrite(schemaCacheConfig.topicNameIdExpiration()
-                    .orElse(Duration.ofHours(1))).build();
-    CaffeineCacheMetrics.monitor(Metrics.globalRegistry, topicNameSchemaIdCache, "topicNameSchemaIdCache");
-    schemaByIdCache = Caffeine.newBuilder()
+            .expireAfterWrite(schemaCacheConfig.topicNameIdExpiration().orElse(Duration.ofHours(1)))
+            .build();
+    CaffeineCacheMetrics.monitor(
+        Metrics.globalRegistry, topicNameSchemaIdCache, "topicNameSchemaIdCache");
+    schemaByIdCache =
+        Caffeine.newBuilder()
             .recordStats() // used to export micrometer metrics
             .maximumSize(schemaCacheConfig.SchemaById().orElse(1000L))
-            .expireAfterAccess(schemaCacheConfig.schemaExpiration()
-                    .orElse(Duration.ofHours(12))).build();
+            .expireAfterAccess(schemaCacheConfig.schemaExpiration().orElse(Duration.ofHours(12)))
+            .build();
     CaffeineCacheMetrics.monitor(Metrics.globalRegistry, schemaByIdCache, "schemaByIdCache");
   }
 
@@ -92,18 +89,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
     if (!registryDefined()) {
       return Optional.empty();
     }
-    final SchemaRegistrySubject cachedValue = schemaByIdCache.get(id, k -> {
-      try {
-        return confluentRegistrySchemaResource.get().getById(id);
-      } catch (WebApplicationException ex) {
-        if (ex.getResponse().getStatus() == 404) {
-          // not issue, the schema just doesn't exist
-        } else {
-          LOG.error("Exception when querying schema registry for url", ex);
-        }
-      }
-      return null;
-    });
+    final SchemaRegistrySubject cachedValue = schemaByIdCache.get(id, this::requestSchemaForId);
     if (cachedValue != null) {
       return Optional.of(cachedValue);
     }
@@ -130,30 +116,45 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
     } catch (IllegalArgumentException e) {
       Log.error(e);
     }
-    return Schema.newBuilder()
-        .setEncoding(encoding)
-        .setContent(rawSchema.getSchema())
-        .build();
+    return Schema.newBuilder().setEncoding(encoding).setContent(rawSchema.getSchema()).build();
   }
 
   private Optional<SchemaRegistrySubject> getSchema(String topic, KafkaStreamPart part) {
     LOG.debug("Looking for schema for topic '{}' and type '{}'", topic, part);
 
-    try {
-      final Long schemaId = topicNameSchemaIdCache.get(topic + "-" + part.getSubjectPostfix(), k -> {
-        SchemaRegistrySubject sub = confluentRegistrySubjectResource
-                .get()
-                .getLatestSubject(topic + "-" + part.getSubjectPostfix());
+    final Long schemaId =
+        topicNameSchemaIdCache.get(
+            topic + "-" + part.getSubjectPostfix(), this::requestSchemaIdForSubject);
 
-        schemaByIdCache.put(sub.getId(), sub);
-        return sub.getId();
-      });
-
+    if (schemaId != null) {
       return getSchemaById(schemaId);
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  private SchemaRegistrySubject requestSchemaForId(long id) {
+    try {
+      return confluentRegistrySchemaResource.get().getById(id);
     } catch (WebApplicationException ex) {
-      if (ex.getResponse().getStatus() == 404) {
-        // not issue, the schema just doesn't exist
-      } else {
+      // we can safely ignore 404, it just means that the schema doesn't exist
+      if (ex.getResponse().getStatus() != 404) {
+        LOG.error("Exception when querying schema registry for url", ex);
+      }
+    }
+    return null;
+  }
+
+  private Long requestSchemaIdForSubject(String subject) {
+    try {
+      final ConfluentRegistrySubjectResource resourceInstance =
+          confluentRegistrySubjectResource.get();
+      SchemaRegistrySubject sub = resourceInstance.getLatestSubject(subject);
+      schemaByIdCache.put(sub.getId(), sub);
+      return sub.getId();
+    } catch (WebApplicationException ex) {
+      // we can safely ignore 404, it just means that the schema doesn't exist
+      if (ex.getResponse().getStatus() != 404) {
         LOG.error("Exception when querying schema registry for url", ex);
       }
     } catch (ProcessingException ex) {
@@ -161,6 +162,6 @@ public class ConfluentSchemaRegistry implements SchemaRegistryClient {
           "Issue with confluent schema registry, there is good chance that the certificate is not recognized",
           ex);
     }
-    return Optional.empty();
+    return null;
   }
 }
