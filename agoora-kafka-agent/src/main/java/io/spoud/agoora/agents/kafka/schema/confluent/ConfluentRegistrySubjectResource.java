@@ -16,6 +16,7 @@ import jakarta.ws.rs.Produces;
 @RegisterRestClient(configKey = "rest-confluent-registry")
 @Path("/subjects/{subject}")
 @RegisterClientHeaders(ConfluentAuthHeader.class)
+// ! Keep @RequestScoped to avoid memory leak, see https://github.com/spoud/agoora-agents/pull/26#
 @RequestScoped
 public interface ConfluentRegistrySubjectResource {
 

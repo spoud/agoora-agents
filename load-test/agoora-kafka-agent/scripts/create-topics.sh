@@ -18,7 +18,7 @@ do
   TOPIC_NAME="topic-$(printf "%04d" $i)"
   echo "creating topic $TOPIC_NAME"
   kafka-topics --bootstrap-server="$BOOTSTRAP_SERVER" --create --partitions=$PARTITIONS_PER_TOPIC --topic "$TOPIC_NAME"
-  create_schema "${TOPIC_NAME}-key"
+#  create_schema "${TOPIC_NAME}-key"
   create_schema "${TOPIC_NAME}-value"
 done
 
