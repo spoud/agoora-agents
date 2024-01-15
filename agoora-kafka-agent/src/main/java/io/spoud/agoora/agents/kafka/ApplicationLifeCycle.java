@@ -1,13 +1,12 @@
 package io.spoud.agoora.agents.kafka;
 
 import io.quarkus.runtime.StartupEvent;
-import io.quarkus.runtime.configuration.ProfileManager;
+import io.quarkus.runtime.configuration.ConfigUtils;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ApplicationScoped
@@ -19,7 +18,7 @@ public class ApplicationLifeCycle {
   void onStart(@Observes StartupEvent ev) {
     LOG.info(
         "The application is starting with profile {}.\n Config is \n {} ",
-        ProfileManager.getActiveProfile(),
+        ConfigUtils.getProfiles(),
         config);
   }
 }

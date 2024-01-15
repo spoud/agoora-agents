@@ -70,7 +70,7 @@ public class SampleDecoderAvroConfluent implements SampleDecoder {
 
   protected byte[] decodeAvro(byte[] data, Schema schema) {
     try {
-      DatumReader datumReader = new GenericDatumReader(schema);
+      DatumReader<Object> datumReader = new GenericDatumReader<>(schema);
       Decoder decoder =
           DecoderFactory.get()
               .binaryDecoder(
@@ -89,8 +89,7 @@ public class SampleDecoderAvroConfluent implements SampleDecoder {
   protected long getSchemaIdFromBytes(byte[] data) {
     ByteBuffer buffer = ByteBuffer.wrap(data);
     int signedInt = buffer.getInt(1);
-    long unsignedLong = Integer.toUnsignedLong(signedInt);
-    return unsignedLong;
+    return Integer.toUnsignedLong(signedInt);
   }
 
   protected Optional<Schema> parseAvroSchema(String schemaStr) {

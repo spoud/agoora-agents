@@ -60,7 +60,7 @@ class SampleDecoderAvroConfluentTest extends AbstractService {
   @Test
   void testEncodingAndDecodingAvro() throws IOException {
     Schema schema = schemaRegistryUtil.getSchemaFromFile("registry/confluent/randomv1.json");
-    DatumWriter writer = new GenericDatumWriter<>(schema);
+    DatumWriter<Object> writer = new GenericDatumWriter<>(schema);
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     out.write(new byte[] {0, 0, 0, 0, 1}); // confluent magic bytes
     BinaryEncoder encoder = EncoderFactory.get().blockingBinaryEncoder(out, null);

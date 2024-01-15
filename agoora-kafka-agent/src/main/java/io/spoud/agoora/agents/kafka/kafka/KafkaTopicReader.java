@@ -32,63 +32,60 @@ public class KafkaTopicReader {
   }
 
   public List<byte[]> getSamples(String topic) {
-    Consumer<Bytes, Bytes> consumer = KafkaFactory.createConsumer(config);
-    final Instant start = Instant.now();
+    try (Consumer<Bytes, Bytes> consumer = KafkaFactory.createConsumer(config)) {
+      final Instant start = Instant.now();
 
-    final Map<TopicPartition, Range> ranges = getRanges(topic, consumer);
-    if (ranges.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    consumer.assign(ranges.keySet());
-
-    ranges
-        .entrySet()
-        .forEach(entry -> consumer.seek(entry.getKey(), entry.getValue().getBeginning()));
-
-    List<byte[]> samples = new ArrayList<>();
-
-    Map<Integer, Long> endOffsets =
-        ranges.entrySet().stream()
-            .collect(
-                Collectors.toMap(
-                    entry -> entry.getKey().partition(), entry -> entry.getValue().getEnd()));
-
-    final Set<Integer> runningPartitions = new TreeSet<>(endOffsets.keySet());
-
-    while (!runningPartitions.isEmpty()) {
-      if (Duration.between(start, Instant.now()).compareTo(TIMEOUT_PER_TOPIC) > 0) {
-        LOG.warn("Timeout for topic {}, ranges={}", topic, ranges);
-        break;
+      final Map<TopicPartition, Range> ranges = getRanges(topic, consumer);
+      if (ranges.isEmpty()) {
+        return Collections.emptyList();
       }
 
-      final ConsumerRecords<Bytes, Bytes> poll = consumer.poll(Duration.ofSeconds(10));
+      consumer.assign(ranges.keySet());
 
-      poll.forEach(
-          rec -> {
-            final Long endOffset = endOffsets.get(rec.partition());
-            if (rec.offset() >= endOffset) {
-              // we reached the end, remove partition
-              runningPartitions.remove(rec.partition());
-            }
-            if (rec.offset() <= endOffset) {
-              if (rec.value() != null) {
-                samples.add(rec.value().get());
+      ranges.forEach((key, value) -> consumer.seek(key, value.getBeginning()));
+
+      List<byte[]> samples = new ArrayList<>();
+
+      Map<Integer, Long> endOffsets =
+          ranges.entrySet().stream()
+              .collect(
+                  Collectors.toMap(
+                      entry -> entry.getKey().partition(), entry -> entry.getValue().getEnd()));
+
+      final Set<Integer> runningPartitions = new TreeSet<>(endOffsets.keySet());
+
+      while (!runningPartitions.isEmpty()) {
+        if (Duration.between(start, Instant.now()).compareTo(TIMEOUT_PER_TOPIC) > 0) {
+          LOG.warn("Timeout for topic {}, ranges={}", topic, ranges);
+          break;
+        }
+
+        final ConsumerRecords<Bytes, Bytes> poll = consumer.poll(Duration.ofSeconds(10));
+
+        poll.forEach(
+            rec -> {
+              final Long endOffset = endOffsets.get(rec.partition());
+              if (rec.offset() >= endOffset) {
+                // we reached the end, remove partition
+                runningPartitions.remove(rec.partition());
               }
-            }
-          });
+              if (rec.offset() <= endOffset) {
+                if (rec.value() != null) {
+                  samples.add(rec.value().get());
+                }
+              }
+            });
+      }
+      consumer.assign(Collections.emptyList());
+      LOG.debug(
+          "Topic '{}', partition count={}, samples count={}, duration={}, ranges={}",
+          topic,
+          ranges.keySet().size(),
+          samples.size(),
+          Duration.between(start, Instant.now()),
+          ranges);
+      return samples;
     }
-    consumer.assign(Collections.emptyList());
-    LOG.debug(
-        "Topic '{}', partition count={}, samples count={}, duration={}, ranges={}",
-        topic,
-        ranges.keySet().size(),
-        samples.size(),
-        Duration.between(start, Instant.now()),
-        ranges);
-
-    consumer.close();
-    return samples;
   }
 
   public Map<TopicPartition, Long> getEndOffsetByTopic(final String topic) {

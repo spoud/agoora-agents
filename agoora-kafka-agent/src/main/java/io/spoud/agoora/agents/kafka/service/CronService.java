@@ -45,7 +45,7 @@ public class CronService {
 
     Multi.createFrom()
         .ticks()
-        .startingAfter(Duration.ofSeconds(5)) // wait for the complete initi
+        .startingAfter(Duration.ofSeconds(5)) // wait for the complete init
         .every(scrapperConfig.period())
         .runSubscriptionOn(managedExecutor)
         .subscribe()

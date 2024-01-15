@@ -26,7 +26,7 @@ services:
     image: spoud/agoora-kafka-agent
     build:
       context: agoora-kafka-agent
-      dockerfile: Dockerfile.jar
+      dockerfile: Dockerfile.jvm
     environment:
       - "AGOORA_PROFILER_ENDPOINT=agoora-profiler-service:8089"
       - "AGOORA_ENDPOINT"
