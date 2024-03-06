@@ -47,6 +47,17 @@ AGOORA_KAFKA_KEY=
 AGOORA_KAFKA_SECRET=
 ```
 
+### Schema cache settings
+
+The schema by id cache holds the full schema by id. This can become a big object in agents memory.
+The topic name and schema id cache holds the schema id by topic name. This is a smaller object in agents memory.
+
+Configuration:
+```
+AGOORA_SCHEMA_CACHE_SCHEMA_BY_ID= number of schemas to cache by id default 1000
+AGOORA_SCHEMA_CACHE_TOPIC_NAME_SCHEMA_ID_CACHE: number of schemas to cache by topic name and schema id default 1000
+```
+
 ### Kafka ACLs (`bin/kafka-acls.sh`)
 
 ```bash
