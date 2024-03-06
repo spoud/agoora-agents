@@ -43,13 +43,6 @@ jobs:
       - name: git tag
         id: git-tag
         run: .github/git-tag.sh
-        # workaound for node 20 issue: https://github.com/actions/upload-artifact/issues/489#issuecomment-1878350926
-      - name: make sure node 20 is installed
-        id: node20
-        run: |
-          sudo yum -y install nodejs20
-          mv /opt/actions-runner/externals/node20/bin/node /opt/actions-runner/externals/node20/bin/node-bak
-          ln -s /usr/bin/node-20 /opt/actions-runner/externals/node20/bin/node
 
   build:
     needs: start-runner # required to start the main job when the runner is ready
