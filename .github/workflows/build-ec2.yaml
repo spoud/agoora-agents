@@ -74,7 +74,7 @@ jobs:
           name: maven-output
           path: |
             ./**/target/quarkus-app/**/*
-      - uses: graalvm/setup-graalvm@v1
+      - uses: graalvm/setup-graalvm@v1.1.5.1 # lock to this version because of node 20 is currently not working causing error /actions-runner/externals/node20/bin/node: /lib64/libm.so.6: version `GLIBC_2.27' not found (required by /actions-runner/externals/node20/bin/node)
         with:
           distribution: 'graalvm'
           java-version: '17.0.7'
