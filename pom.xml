@@ -22,7 +22,7 @@
 
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>3.5.1</quarkus.platform.version>
+        <quarkus.platform.version>3.8.1</quarkus.platform.version>
 
         <sonar.projectKey>spoud_${project.artifactId}</sonar.projectKey>
         <sonar.organization>spoud</sonar.organization>
@@ -46,14 +46,14 @@
             **/io/spoud/agoora/agents/pgsql/config/**/*
         </sonar.coverage.exclusions>
 
-        <lombok.version>1.18.28</lombok.version>
-        <assertj-core.version>3.24.2</assertj-core.version>
+        <lombok.version>1.18.30</lombok.version>
+        <assertj-core.version>3.25.3</assertj-core.version>
         <slf4j.version>2.0.7</slf4j.version>
         <slf4j-jboss-logmanager.version>2.0.1.Final</slf4j-jboss-logmanager.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
-        <protobuf.version>3.23.0</protobuf.version>
-        <mockito.version>5.3.1</mockito.version>
-        <test-container.version>1.17.6</test-container.version>
+        <protobuf.version>3.25.0</protobuf.version>
+        <mockito.version>5.11.0</mockito.version>
+        <test-container.version>1.19.7</test-container.version>
 
         <surefire-plugin.version>3.1.2</surefire-plugin.version>
         <compiler-plugin.version>3.10.1</compiler-plugin.version>
@@ -112,7 +112,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.12.0</version>
+                <version>3.14.0</version>
             </dependency>
 
             <!-- GRPC -->
