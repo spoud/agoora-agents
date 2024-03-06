@@ -43,6 +43,13 @@ jobs:
       - name: git tag
         id: git-tag
         run: .github/git-tag.sh
+        # workaound for node 20 issue: https://github.com/actions/upload-artifact/issues/489#issuecomment-1878350926
+      - name: make sure node 20 is installed
+        id: node20
+        run: |
+          sudo dnf -y install nodejs20
+          mv /opt/actions-runner/externals/node20/bin/node /opt/actions-runner/externals/node20/bin/node-bak
+          ln -s /usr/bin/node-20 /opt/actions-runner/externals/node20/bin/node
 
   build:
     needs: start-runner # required to start the main job when the runner is ready
@@ -74,7 +81,7 @@ jobs:
           name: maven-output
           path: |
             ./**/target/quarkus-app/**/*
-      - uses: graalvm/setup-graalvm@v1.1.5.1 # lock to this version because of node 20 is currently not working causing error /actions-runner/externals/node20/bin/node: /lib64/libm.so.6: version `GLIBC_2.27' not found (required by /actions-runner/externals/node20/bin/node)
+      - uses: graalvm/setup-graalvm@v1
         with:
           distribution: 'graalvm'
           java-version: '17.0.7'
