@@ -69,11 +69,6 @@ jobs:
           java --version
       - name: Build with Maven
         run: mvn --batch-mode clean package
-      - uses: actions/upload-artifact@v4
-        with:
-          name: maven-output
-          path: |
-            ./**/target/quarkus-app/**/*
       - name: Build native
         run: mvn --batch-mode package -DskipTests -Pnative
       - uses: actions/upload-artifact@v4
@@ -81,6 +76,7 @@ jobs:
           name: maven-output
           path: |
             ./**/target/*-runner
+            ./**/target/quarkus-app/**/*
 
   docker-build:
     needs:
