@@ -16,11 +16,11 @@ jobs:
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
       git-tag:  ${{ steps.git-tag.outputs.git-tag }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-central-1
           role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
@@ -51,7 +51,7 @@ jobs:
       MAVEN_OPTS: -Xmx4g
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up Maven
@@ -61,41 +61,22 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - name: Versions
         run: |
           echo "JAVA_HOME: $JAVA_HOME"
           mvn --v
           java --version
-      - name: Build with Maven
-        run: mvn --batch-mode clean package
-      - uses: actions/upload-artifact@v3
-        with:
-          name: maven-output
-          path: |
-            ./**/target/quarkus-app/**/*
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          distribution: 'graalvm'
-          java-version: '17.0.7'
-          components: 'native-image'
-          cache: 'maven'
-      - name: Versions
-        run: |
-          echo "GRAALVM_HOME: $GRAALVM_HOME"
-          echo "JAVA_HOME: $JAVA_HOME"
-          mvn --v
-          java --version
-          native-image --version
       - name: Build with Maven
         run: mvn --batch-mode clean package
       - name: Build native
         run: mvn --batch-mode package -DskipTests -Pnative
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: maven-output
           path: |
             ./**/target/*-runner
+            ./**/target/quarkus-app/**/*
 
   docker-build:
     needs:
@@ -114,24 +95,24 @@ jobs:
           - agoora-pgsql-agent
           - agoora-profiler-service
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: maven-output
 
       - name: Check if docker file exist for jar
         id: dockerfile_jvm_exists
-        uses: andstor/file-existence-action@v2
+        uses: andstor/file-existence-action@v3
         with:
           files: "${{ matrix.agents }}/Dockerfile.jvm"
 
       - name: Check if docker file exist for native
         id: dockerfile_native_exists
-        uses: andstor/file-existence-action@v2
+        uses: andstor/file-existence-action@v3
         with:
           files: "${{ matrix.agents }}/Dockerfile.native"
 
-      # restore execute permissions lost in actions/upload-artifact@v3 see https://github.com/actions/upload-artifact/issues/38
+      # restore execute permissions lost in actions/upload-artifact@v4 see https://github.com/actions/upload-artifact/issues/38
       - name: restore execute permissions
         run: |
           chmod +x ./**/target/*-runner
@@ -150,7 +131,7 @@ jobs:
           docker tag spoud/${{ matrix.agents }}:dev-native spoud/${{ matrix.agents }}:latest-native
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -177,8 +158,8 @@ jobs:
       - build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: maven-output
       - name: prepare-binaries
@@ -204,7 +185,7 @@ jobs:
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-central-1
           role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents

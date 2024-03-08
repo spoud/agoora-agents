@@ -14,7 +14,7 @@
     <version>999-SNAPSHOT</version>
 
     <properties>
-        <avro.version>1.11.1</avro.version>
+        <avro.version>1.11.3</avro.version>
         <jackson-xml.version>2.14.2</jackson-xml.version>
     </properties>
 
