@@ -73,6 +73,7 @@ quarkus:
   ssl:
     native: true
   native:
+    container-build: true
     additional-build-args:
       - --allow-incomplete-classpath
       - --report-unsupported-elements-at-runtime

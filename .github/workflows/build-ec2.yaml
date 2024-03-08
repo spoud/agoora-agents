@@ -51,7 +51,7 @@ jobs:
       MAVEN_OPTS: -Xmx4g
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up Maven
@@ -61,32 +61,12 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - name: Versions
         run: |
           echo "JAVA_HOME: $JAVA_HOME"
           mvn --v
           java --version
-      - name: Build with Maven
-        run: mvn --batch-mode clean package
-      - uses: actions/upload-artifact@v4
-        with:
-          name: maven-output
-          path: |
-            ./**/target/quarkus-app/**/*
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          distribution: 'graalvm'
-          java-version: '17.0.7'
-          components: 'native-image'
-          cache: 'maven'
-      - name: Versions
-        run: |
-          echo "GRAALVM_HOME: $GRAALVM_HOME"
-          echo "JAVA_HOME: $JAVA_HOME"
-          mvn --v
-          java --version
-          native-image --version
       - name: Build with Maven
         run: mvn --batch-mode clean package
       - name: Build native
@@ -96,6 +76,7 @@ jobs:
           name: maven-output
           path: |
             ./**/target/*-runner
+            ./**/target/quarkus-app/**/*
 
   docker-build:
     needs:
