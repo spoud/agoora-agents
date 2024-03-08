@@ -11,7 +11,7 @@ matplotlib<3.8.0
 idna
 genson
 numba
-pandas>1.1, <1.6, !=1.4.0
+pandas>1.1, !=1.4.0, <2.3
 ydata-profiling
 func-timeout
 great_expectations
