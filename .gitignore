@@ -38,6 +38,7 @@ nb-configuration.xml
 *.log
 
 .env
+.env*
 binaries/
 
 # Others
