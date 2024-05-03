@@ -63,6 +63,8 @@ services:
 
   profiler-service:
     image: spoud/agoora-profiler-service
-    build: agoora-profiler-service/
+    build:
+      context: agoora-profiler-service/
+      dockerfile: Dockerfile.jvm
     ports:
       - '8089:8089'
