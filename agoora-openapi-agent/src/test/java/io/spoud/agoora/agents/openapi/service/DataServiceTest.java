@@ -40,6 +40,9 @@ import static org.mockito.Mockito.*;
 @QuarkusTest()
 class DataServiceTest {
 
+  // using external service to test
+  // changes there may break tests
+  // https://github.com/swagger-api/swagger-petstore
   private static final String SCHEMA_1 =
       "{\"properties\":{\"produces\":{\"properties\":{\"application/json\":{},\"application/xml\":{},\"application/x-www-form-urlencoded\":{}}},\"requestBody\":{\"type\":\"object\",\"properties\":{\"photoUrls\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"},\"category\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}},\"tags\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}}},\"status\":{\"type\":\"string\"}}},\"responses\":{\"properties\":{\"200\":{\"type\":\"object\",\"properties\":{\"photoUrls\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"},\"category\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}},\"tags\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}}},\"status\":{\"type\":\"string\"}}},\"405\":{\"type\":\"object\"}}}}}";
   private static final String SCHEMA_2 =
@@ -103,6 +106,7 @@ class DataServiceTest {
             eq(ResourceEntity.Type.DATA_ITEM),
             eq(putDataItem),
             eq("/default/"),
+            // we are using an external service for testing. changes there may break tests
             eq(SCHEMA_1),
             eq(SchemaSource.Type.REGISTRY),
             eq(SchemaEncoding.Type.JSON),
@@ -114,6 +118,7 @@ class DataServiceTest {
             eq(ResourceEntity.Type.DATA_ITEM),
             eq(getDataItem),
             eq("/default/"),
+            // we are using an external service for testing. changes there may break tests
             eq(SCHEMA_2),
             eq(SchemaSource.Type.REGISTRY),
             eq(SchemaEncoding.Type.JSON),
