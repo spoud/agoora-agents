@@ -2,12 +2,12 @@ htmlmin
 enum34
 grpcio
 grpcio-tools
-numpy>=1.16.0,<1.24
+numpy>=1.16.0,<1.27
 papermill
 python-dateutil
 requests
 pytz
-matplotlib<3.8.0
+matplotlib<3.9.0
 idna
 genson
 numba==0.58.1

@@ -126,7 +126,7 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>4.2.0</version>
+            <version>4.2.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -194,7 +194,7 @@
                     <plugin>
                         <groupId>io.smallrye</groupId>
                         <artifactId>jandex-maven-plugin</artifactId>
-                        <version>3.1.2</version>
+                        <version>3.1.7</version>
                         <executions>
                             <execution>
                                 <id>make-index</id>
