@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   start-runner:
+    permissions: write-all
     name: Start self-hosted EC2 runner
     runs-on: ubuntu-latest
     outputs:
