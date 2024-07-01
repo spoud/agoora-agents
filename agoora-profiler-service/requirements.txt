@@ -10,7 +10,7 @@ pytz
 matplotlib<3.10.0
 idna
 genson
-numba==0.58.1
+numba==0.60.0
 pandas>1.1, <1.6, !=1.4.0
 ydata-profiling
 func-timeout
