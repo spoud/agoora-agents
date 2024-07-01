@@ -30,7 +30,7 @@ jobs:
         uses: machulav/ec2-github-runner@v2
         with:
           mode: start
-          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github-token: ${{ secrets.REPOS_ACCESS_TOKEN }}
           ec2-image-id: ${{ vars.EC2_BUILDER_AMI_ID}}
 #          ec2-instance-type: c5a.2xlarge # cost ~0.16 CHF per build (30min build time)
           ec2-instance-type: c5a.8xlarge # cost ~0.24 CHF per build (20min build time)
@@ -168,7 +168,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPOS_ACCESS_TOKEN }}
           GIT_TAG: ${{ needs.start-runner.outputs.git-tag }}
         with:
           body_path: .github/release-body.md
@@ -194,6 +194,6 @@ jobs:
         uses: machulav/ec2-github-runner@v2
         with:
           mode: stop
-          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github-token: ${{ secrets.REPOS_ACCESS_TOKEN }}
           label: ${{ needs.start-runner.outputs.label }}
           ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
