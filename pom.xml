@@ -55,7 +55,7 @@
         <mockito.version>5.12.0</mockito.version>
         <test-container.version>1.19.8</test-container.version>
 
-        <surefire-plugin.version>3.2.5</surefire-plugin.version>
+        <surefire-plugin.version>3.3.0</surefire-plugin.version>
         <compiler-plugin.version>3.10.1</compiler-plugin.version>
         <jacoco.version>0.8.9</jacoco.version>
     </properties>
