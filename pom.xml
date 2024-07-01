@@ -46,7 +46,7 @@
             **/io/spoud/agoora/agents/pgsql/config/**/*
         </sonar.coverage.exclusions>
 
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.34</lombok.version>
         <assertj-core.version>3.26.0</assertj-core.version>
         <slf4j.version>2.0.13</slf4j.version>
         <slf4j-jboss-logmanager.version>2.0.1.Final</slf4j-jboss-logmanager.version>
