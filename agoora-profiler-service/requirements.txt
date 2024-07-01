@@ -2,7 +2,7 @@ htmlmin
 enum34
 grpcio
 grpcio-tools
-numpy>=1.16.0,<1.27
+numpy>=2.0.0,<2.1
 papermill
 python-dateutil
 requests
