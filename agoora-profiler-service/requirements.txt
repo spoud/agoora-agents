@@ -7,7 +7,7 @@ papermill
 python-dateutil
 requests
 pytz
-matplotlib>=3.2, <3.9
+matplotlib>=3.2, <3.10
 idna
 genson
 numba>=0.56.0, <1
