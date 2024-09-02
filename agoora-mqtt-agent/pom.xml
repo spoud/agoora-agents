@@ -155,7 +155,7 @@
                     <plugin>
                         <groupId>io.smallrye</groupId>
                         <artifactId>jandex-maven-plugin</artifactId>
-                        <version>3.1.7</version>
+                        <version>3.2.1</version>
                         <executions>
                             <execution>
                                 <id>make-index</id>
@@ -168,7 +168,8 @@
                 </plugins>
             </build>
             <properties>
-                <quarkus.package.type>native</quarkus.package.type>
+                <quarkus.native.enabled>true</quarkus.native.enabled>
+                <quarkus.package.jar.enabled>false</quarkus.package.jar.enabled>
             </properties>
         </profile>
     </profiles>
