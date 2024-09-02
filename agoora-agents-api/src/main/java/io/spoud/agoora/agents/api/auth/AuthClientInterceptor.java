@@ -1,7 +1,9 @@
 package io.spoud.agoora.agents.api.auth;
 
 import io.grpc.*;
+import io.quarkus.grpc.GlobalInterceptor;
 import io.spoud.agoora.agents.api.config.AgooraAgentClientAuthConfig;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.client.ClientBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +26,7 @@ import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@GlobalInterceptor
 public class AuthClientInterceptor implements ClientInterceptor {
   public static final String PROXY_HOST = "http.proxyHost";
   public static final String PROXY_PORT = "http.proxyPort";
