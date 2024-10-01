@@ -14,7 +14,7 @@ numba>=0.56.0, <1
 pandas>1.1, <3, !=1.4.0
 ydata-profiling
 func-timeout
-great_expectations==0.18.19
+great_expectations==0.18.21
 future
 pyspark
 # for some reason this is needed for great_expectations to work
