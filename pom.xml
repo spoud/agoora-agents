@@ -47,12 +47,12 @@
         </sonar.coverage.exclusions>
 
         <lombok.version>1.18.36</lombok.version>
-        <assertj-core.version>3.27.0</assertj-core.version>
+        <assertj-core.version>3.27.2</assertj-core.version>
         <slf4j.version>2.0.16</slf4j.version>
         <slf4j-jboss-logmanager.version>2.0.1.Final</slf4j-jboss-logmanager.version>
         <junit-jupiter.version>5.11.4</junit-jupiter.version>
         <protobuf.version>3.25.5</protobuf.version>
-        <mockito.version>5.14.2</mockito.version>
+        <mockito.version>5.15.2</mockito.version>
         <test-container.version>1.20.4</test-container.version>
 
         <surefire-plugin.version>3.5.2</surefire-plugin.version>
