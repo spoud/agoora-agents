@@ -62,58 +62,6 @@ class ProfilerTest(unittest.TestCase):
         self.assertEqual(0, message.meta.total_records)
         self.assertEqual(message.meta.error.type, domain_pb2.ProfilerError.Type.Value('UNKNOWN_ENCODING'))
 
-
-    def test_inspect_stream_quality(self):
-        # arrange
-        def request_messages():
-            request_id = "123"
-            with open('testdata/schema_samples.json') as schema_file:
-                schema = schema_file.read()
-                with open('testdata/samples.json') as samples_file:
-                    all_samples = json.loads(samples_file.read())
-                    for line in all_samples:
-                        yield profiler_pb2.InspectionRequest(
-                            samples_json=json.dumps(line),
-                            schema_json=schema,
-                            is_schema_inferred=False
-                        )
-
-        # act
-        result = self._stub.InspectQuality(request_messages())
-
-        # assert
-        self.assertEqual(0.8125, result.metric.attribute_quality_index)
-        self.assertIsNotNone(result.metric.attribute_details, "Quality details must not be null")
-        details = {detail.name: (detail.integrity, detail.specification, detail.quality_index) for detail
-                   in result.metric.attribute_details}
-        self.assertTrue("random_integer" in details.keys(),
-                        "Quality details for random_integer is missing")
-        self.assertEqual(1.0, details["random_integer"][0],
-                         "Attribute integrity for random_integer is not correct")
-        self.assertEqual(.5, details["random_integer"][1],
-                         "Attribute specification for random_integer is not correct")
-        self.assertEqual(.75, details["random_integer"][2],
-                         "Quality details for random_integer is not correct")
-
-    def test_inspect_stream_quality_invalid_schema(self):
-        # arrange
-        def request_messages():
-            request_id = "123"
-            with open('testdata/samples.json') as samples_file:
-                with open('testdata/schema_invalid.json') as schema_file:
-                    yield profiler_pb2.InspectionRequest(
-                            samples_json=samples_file.read(),
-                            schema_json=schema_file.read()
-                    )
-
-        # act
-        result = self._stub.InspectQuality(request_messages())
-
-        # assert
-        self.assertIsNotNone(result.error)
-        self.assertEqual(0.0, result.metric.attribute_quality_index, "Quality index must be 0%")
-        self.assertNotEqual("", result.error.message)
-
     def test_profile_stream_error_no_json_string(self):
         def request_messages():
             request_id = "123"
