@@ -19,10 +19,6 @@ from profiler.service.v1alpha1 import profiler_pb2 as profiler_pb2
 from profiler.service.v1alpha1 import profiler_pb2_grpc as profiler_pb2_grpc
 from profiler.domain.v1alpha1 import domain_pb2 as domain_pb2
 
-from quality_inspection.quality_inspector import QualityInspector
-from quality_inspection.quality_metrics import QualityMetrics
-from quality_inspection.schema_definition import SchemaDefinition
-
 logging.basicConfig(
     format='%(asctime)s: %(levelname)s: %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
@@ -51,45 +47,6 @@ class ProfilerServicer(profiler_pb2_grpc.ProfilerServicer):
             logging.info('did not find config for the pandas profiler at ' + config_path_custom +
                          ' will use the default config.')
 
-
-    def InspectQuality(self, request_iterator, context: typing.Any) -> QualityMetrics:
-
-        all_samples = list()
-        schema = None
-        first_samples = None
-        is_schema_inferred = True
-        for batch in request_iterator:
-            samples = json.loads(batch.samples_json)
-            all_samples.append(samples)
-            schema = batch.schema_json
-            if not first_samples:
-                is_schema_inferred = batch.is_schema_inferred
-                first_samples = samples
-
-        message = profiler_pb2.InspectionDataStreamResponse()
-
-        inspector = QualityInspector()
-        schema_definition = SchemaDefinition.create(schema, is_schema_inferred)
-        try:
-            result = inspector.inspect(all_samples, schema_definition)
-            message.metric.attribute_quality_index = result.attribute_quality_index
-            message.metric.attribute_integrity = result.attribute_integrity
-            message.metric.attribute_specification = result.attribute_specification
-            for k, v in result.attribute_details.items():
-                message.metric.attribute_details.append(
-                    domain_pb2.AttributeDetail(
-                        name=k,
-                        integrity=v.attribute_integrity,
-                        specification=v.attribute_specification,
-                        quality_index=v.attribute_quality_index
-                    ))
-        except Exception as e:
-            logging.error(
-                f'Exception in inspection of quality (samples: {first_samples}, schema: {schema}, exception: {e})')
-            message.error.message = repr(e)
-            message.error.type = domain_pb2.InspectionError.Type.Value('UNKNOWN')
-
-        return message
 
     def ProfileDataStream(self, request_iterator, context):
         request_id = "none"

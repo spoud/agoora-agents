@@ -14,11 +14,4 @@ numba
 pandas
 ydata-profiling
 func-timeout
-great_expectations<1.0
 future
-# for some reason this is needed for great_expectations to work
-azure-storage-blob
-azure-identity
-azure-keyvault-secrets
-google-cloud-storage
-google-cloud-secret-manager
