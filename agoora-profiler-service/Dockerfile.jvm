@@ -26,11 +26,9 @@ RUN python3 -m grpc_tools.protoc -I./proto --python_out=./ --grpc_python_out=./ 
 COPY config/* ./config/
 COPY profiler_app.py ./
 COPY profiler_it.py ./
-COPY quality_inspection/ ./quality_inspection/
 COPY testdata/* ./testdata/
 RUN mkdir testresults \
     && PROFILER_TIMEOUT=60 python3 profiler_it.py \
-    && python3 -m unittest quality_inspection/tests/*.py \
     && rm -rf testresults
 
 
@@ -50,7 +48,6 @@ COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /build/profiler ./profiler
 COPY --from=builder /build/*.py ./
 COPY config/* ./config/
-COPY quality_inspection/ ./quality_inspection/
 COPY profiler_app.py ./
 COPY template/wrapper.html /opt/venv/lib/python3.7/site-packages/pandas_profiling/view/templates
 
