@@ -662,8 +662,8 @@ class QualityInspectorTest(unittest.TestCase):
         attribute_details = result.attribute_details
         self.assertTrue('random_int' in attribute_details.keys())
         self.assertTrue('random_string' in attribute_details.keys())
-        self.assertAlmostEquals(((1 / 3) + 1) / 2, attribute_details['random_int'].attribute_quality_index, 3)
-        self.assertAlmostEquals((1 + 0) / 2, attribute_details['random_string'].attribute_quality_index, 3)
+        self.assertAlmostEqual(((1 / 3) + 1) / 2, attribute_details['random_int'].attribute_quality_index, 3)
+        self.assertAlmostEqual((1 + 0) / 2, attribute_details['random_string'].attribute_quality_index, 3)
 
     def test_inspect_with_non_unique_types_does_not_throw_exception(self) -> None:
         # arrange
@@ -684,7 +684,7 @@ class QualityInspectorTest(unittest.TestCase):
 
         # assert
         attribute_details = result.attribute_details
-        self.assertAlmostEquals((1 / 3),
+        self.assertAlmostEqual((1 / 3),
                                 attribute_details['random_int'].attribute_integrity, 3)
 
     def test_integrity_on_attribute_level_with_expectations(self):

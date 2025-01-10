@@ -153,8 +153,9 @@ class ProfilerServicer(profiler_pb2_grpc.ProfilerServicer):
             profile_stream = []
 
             # The max message size of a GRPC call in bytes is 4194304. The header includes 5 bytes, 1 for
-            # the compressed flag and 4 for the unsigned integer. Therefore should be 4194299
-            MAX_MESSAGE_SIZE = 4194299
+            # the compressed flag and 4 for the unsigned integer. Therefore should be 4194296
+            # and there 3 more bytes in newer versions of grpc
+            MAX_MESSAGE_SIZE = 4194296
 
             if report_length == 0 or html is None:
                 profile_stream.append('')

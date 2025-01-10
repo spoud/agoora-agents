@@ -8,8 +8,59 @@ updates:
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
+    groups:
+      maven-version:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "pip"
     directory: "/agoora-profiler-service"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
+    groups:
+      pip-profiler-version:
+        patterns:
+          - "*"
+  - package-ecosystem: "docker"
+    directory: "/agoora-kafka-agent"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-kafka-version:
+        patterns:
+          - "*"
+  - package-ecosystem: "docker"
+    directory: "/agoora-mqtt-agent"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-mqtt-version:
+        patterns:
+          - "*"
+  - package-ecosystem: "docker"
+    directory: "/agoora-openapi-agent"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-openapi-version:
+        patterns:
+          - "*"
+  - package-ecosystem: "docker"
+    directory: "/agoora-pgsql-agent"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-pgsql-version:
+        patterns:
+          - "*"
+  - package-ecosystem: "docker"
+    directory: "/agoora-profiler-service"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-profiler-version:
+        patterns:
+          - "*"
