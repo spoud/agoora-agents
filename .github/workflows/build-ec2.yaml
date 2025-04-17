@@ -27,7 +27,7 @@ jobs:
           role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
       - name: Start EC2 runner
         id: start-ec2-runner
-        uses: machulav/ec2-github-runner@v3
+        uses: machulav/ec2-github-runner@v2
         with:
           mode: start
           github-token: ${{ secrets.REPOS_ACCESS_TOKEN }}
@@ -192,7 +192,7 @@ jobs:
           aws-region: eu-central-1
           role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
       - name: Stop EC2 runner
-        uses: machulav/ec2-github-runner@v3
+        uses: machulav/ec2-github-runner@v2
         with:
           mode: stop
           github-token: ${{ secrets.REPOS_ACCESS_TOKEN }}
