@@ -22,7 +22,7 @@
 
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>3.18.1</quarkus.platform.version>
+        <quarkus.platform.version>3.21.3</quarkus.platform.version>
 
         <sonar.projectKey>spoud_${project.artifactId}</sonar.projectKey>
         <sonar.organization>spoud</sonar.organization>
@@ -46,16 +46,16 @@
             **/io/spoud/agoora/agents/pgsql/config/**/*
         </sonar.coverage.exclusions>
 
-        <lombok.version>1.18.36</lombok.version>
+        <lombok.version>1.18.38</lombok.version>
         <assertj-core.version>3.27.3</assertj-core.version>
         <slf4j.version>2.0.17</slf4j.version>
         <slf4j-jboss-logmanager.version>2.0.1.Final</slf4j-jboss-logmanager.version>
-        <junit-jupiter.version>5.12.1</junit-jupiter.version>
-        <protobuf.version>4.30.1</protobuf.version>
-        <mockito.version>5.16.1</mockito.version>
+        <junit-jupiter.version>5.12.2</junit-jupiter.version>
+        <protobuf.version>4.30.2</protobuf.version>
+        <mockito.version>5.17.0</mockito.version>
         <test-container.version>1.20.6</test-container.version>
 
-        <surefire-plugin.version>3.5.2</surefire-plugin.version>
+        <surefire-plugin.version>3.5.3</surefire-plugin.version>
         <compiler-plugin.version>3.14.0</compiler-plugin.version>
         <jacoco.version>0.8.12</jacoco.version>
     </properties>
@@ -218,7 +218,7 @@
                 <plugin>
                     <groupId>io.smallrye</groupId>
                     <artifactId>jandex-maven-plugin</artifactId>
-                    <version>3.2.7</version>
+                    <version>3.3.0</version>
                     <executions>
                         <execution>
                             <id>make-index</id>

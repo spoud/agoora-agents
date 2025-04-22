@@ -33,8 +33,8 @@ import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.Map;
 
+import static io.spoud.sdm.global.domain.v1.ResourceEntity.Type.DATA_ITEM;
 import static org.awaitility.Awaitility.await;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @QuarkusTest()
@@ -44,9 +44,9 @@ class DataServiceTest {
   // changes there may break tests
   // https://github.com/swagger-api/swagger-petstore
   private static final String SCHEMA_1 =
-      "{\"properties\":{\"produces\":{\"properties\":{\"application/json\":{},\"application/xml\":{},\"application/x-www-form-urlencoded\":{}}},\"requestBody\":{\"type\":\"object\",\"properties\":{\"photoUrls\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"},\"category\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}},\"tags\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}}},\"status\":{\"type\":\"string\"}}},\"responses\":{\"properties\":{\"200\":{\"type\":\"object\",\"properties\":{\"photoUrls\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"},\"category\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}},\"tags\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}}},\"status\":{\"type\":\"string\"}}},\"405\":{\"type\":\"object\"}}}}}";
+      "{\"properties\":{\"produces\":{\"properties\":{\"application/json\":{},\"application/xml\":{},\"application/x-www-form-urlencoded\":{}}},\"requestBody\":{\"type\":\"object\",\"properties\":{\"photoUrls\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"},\"category\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}},\"tags\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}}},\"status\":{\"type\":\"string\"}}},\"responses\":{\"properties\":{\"200\":{\"type\":\"object\",\"properties\":{\"photoUrls\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"},\"category\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}},\"tags\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"id\":{\"type\":\"integer\"}}}},\"status\":{\"type\":\"string\"}}},\"400\":{\"type\":\"object\"},\"422\":{\"type\":\"object\"},\"default\":{\"type\":\"object\"}}}}}";
   private static final String SCHEMA_2 =
-      "{\"properties\":{\"parameters\":{\"properties\":{\"api_key\":{\"type\":\"string\"},\"petId\":{\"type\":\"integer\"}}},\"responses\":{\"properties\":{\"400\":{\"type\":\"object\"}}}}}";
+      "{\"properties\":{\"parameters\":{\"properties\":{\"api_key\":{\"type\":\"string\"},\"petId\":{\"type\":\"integer\"}}},\"responses\":{\"properties\":{\"200\":{\"type\":\"object\"},\"400\":{\"type\":\"object\"},\"default\":{\"type\":\"object\"}}}}}";
 
   @Inject
   DataService dataService;
@@ -81,21 +81,21 @@ class DataServiceTest {
   void testStateService() {
     dataService.updateStates();
 
-    // State Service should starts after a few seconds
+    // State Service should start after a few seconds
     await()
         .atMost(Duration.ofSeconds(5))
-        .until(() -> mockingDetails(dataPortClient).getInvocations().size() >= 1);
+        .until(() -> !mockingDetails(dataPortClient).getInvocations().isEmpty());
     await()
         .atMost(Duration.ofSeconds(5))
         .until(() -> mockingDetails(dataItemClient).getInvocations().size() >= 3);
 
     verify(dataPortClient)
-        .save(eq(createDataPortRequestFor("pet", "/default/", "/default/openapi")));
+        .save(createDataPortRequestFor("pet", "/default/", "/default/openapi"));
 
     final String dataPortUuid = DataPortClientMockProvider.uuidByLabel.get("pet").toString();
 
-    verify(dataItemClient).save(eq(createDataItemRequestFor("PUT", "/pet", dataPortUuid)));
-    verify(dataItemClient).save(eq(createDataItemRequestFor("GET", "/pet/{petId}", dataPortUuid)));
+    verify(dataItemClient).save(createDataItemRequestFor("PUT", "/pet", dataPortUuid));
+    verify(dataItemClient).save(createDataItemRequestFor("GET", "/pet/{petId}", dataPortUuid));
 
     final String putDataItem = DataItemClientMockProvider.uuidByTransportUrl.get("/pet").toString();
     final String getDataItem =
@@ -103,27 +103,27 @@ class DataServiceTest {
 
     verify(schemaClient)
         .saveSchema(
-            eq(ResourceEntity.Type.DATA_ITEM),
-            eq(putDataItem),
-            eq("/default/"),
+            ResourceEntity.Type.DATA_ITEM,
+            putDataItem,
+            "/default/",
             // we are using an external service for testing. changes there may break tests
-            eq(SCHEMA_1),
-            eq(SchemaSource.Type.REGISTRY),
-            eq(SchemaEncoding.Type.JSON),
-            eq(""),
-            eq(SchemaEncoding.Type.UNKNOWN)
+            SCHEMA_1,
+            SchemaSource.Type.REGISTRY,
+            SchemaEncoding.Type.JSON,
+            "",
+            SchemaEncoding.Type.UNKNOWN
         );
     verify(schemaClient)
         .saveSchema(
-            eq(ResourceEntity.Type.DATA_ITEM),
-            eq(getDataItem),
-            eq("/default/"),
+            ResourceEntity.Type.DATA_ITEM,
+            getDataItem,
+            "/default/",
             // we are using an external service for testing. changes there may break tests
-            eq(SCHEMA_2),
-            eq(SchemaSource.Type.REGISTRY),
-            eq(SchemaEncoding.Type.JSON),
-            eq(""),
-            eq(SchemaEncoding.Type.UNKNOWN));
+            SCHEMA_2,
+            SchemaSource.Type.REGISTRY,
+            SchemaEncoding.Type.JSON,
+            "",
+            SchemaEncoding.Type.UNKNOWN);
   }
 
   private SaveDataPortRequest createDataPortRequestFor(
