@@ -53,7 +53,7 @@
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
         <protobuf.version>4.30.2</protobuf.version>
         <mockito.version>5.17.0</mockito.version>
-        <test-container.version>1.20.6</test-container.version>
+        <test-container.version>1.21.0</test-container.version>
 
         <surefire-plugin.version>3.5.3</surefire-plugin.version>
         <compiler-plugin.version>3.14.0</compiler-plugin.version>
