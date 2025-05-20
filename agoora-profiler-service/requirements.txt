@@ -1,4 +1,4 @@
-htmlmin
+htmlmin4 @ git+https://github.com/tatianass/htmlmin.git@master
 enum34
 grpcio
 grpcio-tools
