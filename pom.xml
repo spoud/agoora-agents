@@ -50,7 +50,7 @@
         <assertj-core.version>3.27.3</assertj-core.version>
         <slf4j.version>2.0.17</slf4j.version>
         <slf4j-jboss-logmanager.version>2.0.1.Final</slf4j-jboss-logmanager.version>
-        <junit-jupiter.version>5.13.0</junit-jupiter.version>
+        <junit-jupiter.version>5.13.1</junit-jupiter.version>
         <protobuf.version>4.31.1</protobuf.version>
         <mockito.version>5.18.0</mockito.version>
         <test-container.version>1.21.1</test-container.version>

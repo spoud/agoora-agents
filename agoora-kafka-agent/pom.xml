@@ -15,7 +15,7 @@
 
     <properties>
         <avro.version>1.12.0</avro.version>
-        <jackson-xml.version>2.18.3</jackson-xml.version>
+        <jackson-xml.version>2.19.1</jackson-xml.version>
     </properties>
 
     <dependencies>
