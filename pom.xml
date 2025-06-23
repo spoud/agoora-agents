@@ -53,7 +53,7 @@
         <junit-jupiter.version>5.13.1</junit-jupiter.version>
         <protobuf.version>4.31.1</protobuf.version>
         <mockito.version>5.18.0</mockito.version>
-        <test-container.version>1.21.1</test-container.version>
+        <test-container.version>1.21.2</test-container.version>
 
         <surefire-plugin.version>3.5.3</surefire-plugin.version>
         <compiler-plugin.version>3.14.0</compiler-plugin.version>
@@ -274,7 +274,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>2.5.0</version>
+                <version>2.6.0</version>
                 <configuration>
                     <excludedScopes>test</excludedScopes>
                     <fileTemplate>./license/third-party-template.ftl</fileTemplate>
