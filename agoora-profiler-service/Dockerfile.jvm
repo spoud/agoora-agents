@@ -5,10 +5,9 @@ WORKDIR /build
 RUN apt-get update && \
     apt-get install -y \
     libpng-dev \
-    freetype* \
+    libfreetype6-dev \
     libblas-dev \
     liblapack-dev \
-    libatlas-base-dev \
     gfortran \
     git \
     fonts-liberation && \
