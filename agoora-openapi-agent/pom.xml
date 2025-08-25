@@ -97,13 +97,13 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-models</artifactId>
-            <version>2.2.35</version>
+            <version>2.2.36</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>
             <artifactId>swagger-parser-v3</artifactId>
-            <version>2.1.31</version>
+            <version>2.1.32</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
