@@ -51,11 +51,11 @@
         <slf4j.version>2.0.17</slf4j.version>
         <slf4j-jboss-logmanager.version>2.0.1.Final</slf4j-jboss-logmanager.version>
         <junit-jupiter.version>5.13.4</junit-jupiter.version>
-        <protobuf.version>4.32.0</protobuf.version>
+        <protobuf.version>4.32.1</protobuf.version>
         <mockito.version>5.19.0</mockito.version>
         <test-container.version>1.21.3</test-container.version>
 
-        <surefire-plugin.version>3.5.3</surefire-plugin.version>
+        <surefire-plugin.version>3.5.4</surefire-plugin.version>
         <compiler-plugin.version>3.14.0</compiler-plugin.version>
         <jacoco.version>0.8.12</jacoco.version>
     </properties>
@@ -218,7 +218,7 @@
                 <plugin>
                     <groupId>io.smallrye</groupId>
                     <artifactId>jandex-maven-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.5.0</version>
                     <executions>
                         <execution>
                             <id>make-index</id>
