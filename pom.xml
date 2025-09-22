@@ -46,17 +46,17 @@
             **/io/spoud/agoora/agents/pgsql/config/**/*
         </sonar.coverage.exclusions>
 
-        <lombok.version>1.18.40</lombok.version>
-        <assertj-core.version>3.27.4</assertj-core.version>
+        <lombok.version>1.18.42</lombok.version>
+        <assertj-core.version>3.27.5</assertj-core.version>
         <slf4j.version>2.0.17</slf4j.version>
         <slf4j-jboss-logmanager.version>2.0.1.Final</slf4j-jboss-logmanager.version>
         <junit-jupiter.version>5.13.4</junit-jupiter.version>
         <protobuf.version>4.32.1</protobuf.version>
-        <mockito.version>5.19.0</mockito.version>
+        <mockito.version>5.20.0</mockito.version>
         <test-container.version>1.21.3</test-container.version>
 
         <surefire-plugin.version>3.5.4</surefire-plugin.version>
-        <compiler-plugin.version>3.14.0</compiler-plugin.version>
+        <compiler-plugin.version>3.14.1</compiler-plugin.version>
         <jacoco.version>0.8.12</jacoco.version>
     </properties>
 
