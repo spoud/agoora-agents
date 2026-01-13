@@ -24,28 +24,6 @@
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.version>3.23.3</quarkus.platform.version>
 
-        <sonar.projectKey>spoud_${project.artifactId}</sonar.projectKey>
-        <sonar.organization>spoud</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
-        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-        <sonar.coverage.jacoco.xmlReportPaths>target/jacoco-report/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
-        <sonar.coverage.exclusions>
-            **/*Reflection.*,
-            **/*Configuration.*,
-            **/*CronService.*,
-            **/*Application.*,
-            **/*Config*.*,
-            **/*ErrorInterceptor.*,
-            **/*LogInterceptor.*,
-            **/*AuthHeaderInterceptor.*,
-            **/io/spoud/agoora/agents/api/config/**/*
-            **/io/spoud/agoora/agents/kafka/config/**/*
-            **/io/spoud/agoora/agents/mqtt/config/**/*
-            **/io/spoud/agoora/agents/openapi/config/**/*
-            **/io/spoud/agoora/agents/pgsql/config/**/*
-        </sonar.coverage.exclusions>
-
         <lombok.version>1.18.42</lombok.version>
         <assertj-core.version>3.27.6</assertj-core.version>
         <slf4j.version>2.0.17</slf4j.version>
@@ -57,7 +35,6 @@
 
         <surefire-plugin.version>3.5.4</surefire-plugin.version>
         <compiler-plugin.version>3.14.1</compiler-plugin.version>
-        <jacoco.version>0.8.12</jacoco.version>
     </properties>
 
     <modules>
@@ -130,12 +107,7 @@
             </dependency>
 
             <!-- Tests -->
-            <dependency>
-                <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-jacoco</artifactId>
-                <version>${quarkus.platform.version}</version>
-                <scope>test</scope>
-            </dependency>
+
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>

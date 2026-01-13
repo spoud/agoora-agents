@@ -1,6 +1,4 @@
 [![Java build EC2](https://github.com/spoud/agoora-agents/actions/workflows/build-ec2.yaml/badge.svg)](https://github.com/spoud/agoora-agents/actions/workflows/build-ec2.yaml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=spoud_agoora-agents&metric=alert_status)](https://sonarcloud.io/dashboard?id=spoud_agoora-agents)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=spoud_agoora-agents&metric=coverage)](https://sonarcloud.io/dashboard?id=spoud_agoora-agents)
 # Agoora agents
 
 This repository contains all the open source Agoora agents developed by SPOUD AG. An agent is a piece of software that
