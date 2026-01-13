@@ -28,8 +28,8 @@
         <assertj-core.version>3.27.6</assertj-core.version>
         <slf4j.version>2.0.17</slf4j.version>
         <slf4j-jboss-logmanager.version>2.0.2.Final</slf4j-jboss-logmanager.version>
-        <junit-jupiter.version>6.0.1</junit-jupiter.version>
-        <protobuf.version>4.33.2</protobuf.version>
+        <junit-jupiter.version>6.0.2</junit-jupiter.version>
+        <protobuf.version>4.33.4</protobuf.version>
         <mockito.version>5.21.0</mockito.version>
         <test-container.version>1.21.4</test-container.version>
 
@@ -246,7 +246,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>2.7.0</version>
+                <version>2.7.1</version>
                 <configuration>
                     <excludedScopes>test</excludedScopes>
                     <fileTemplate>./license/third-party-template.ftl</fileTemplate>
