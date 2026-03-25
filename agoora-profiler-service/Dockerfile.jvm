@@ -55,4 +55,4 @@ ENV PATH="/opt/venv/bin:$PATH"
 # set home so that any user is able to write into. The profiler builds some cache etc. and wants to store in home.
 ARG VERSION=default
 ENV SDM_PROFILER_SERVICE_VERSION=${VERSION}
-ENTRYPOINT python profiler_app.py
+ENTRYPOINT ["python", "profiler_app.py"]
