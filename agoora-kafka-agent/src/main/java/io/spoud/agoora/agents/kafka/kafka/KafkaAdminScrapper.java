@@ -47,12 +47,12 @@ public class KafkaAdminScrapper {
               .filter(t -> !t.startsWith("_")) // remove internal topics
               .filter(t -> this.topicFilterRegex.matcher(t).matches())
               .collect(Collectors.toList());
-      return adminClient.describeTopics(topicNames).all().get().values().stream()
+      return adminClient.describeTopics(topicNames).allTopicNames().get().values().stream()
           .map(
               topicDescription ->
                   kafkaTopicMapper.create(
                       topicDescription.name(), topicDescription.partitions().size()))
-          .collect(Collectors.toList());
+          .toList();
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new IllegalStateException(e);
