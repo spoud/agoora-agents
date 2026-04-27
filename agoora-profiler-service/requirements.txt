@@ -11,6 +11,6 @@ idna
 genson
 numba
 pandas
-setuptools<81
+setuptools<83
 ydata-profiling
 func-timeout
