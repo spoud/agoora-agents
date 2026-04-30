@@ -24,14 +24,14 @@
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.version>3.34.1</quarkus.platform.version>
 
-        <lombok.version>1.18.44</lombok.version>
+        <lombok.version>1.18.46</lombok.version>
         <assertj-core.version>3.27.7</assertj-core.version>
         <slf4j.version>2.0.17</slf4j.version>
         <slf4j-jboss-logmanager.version>2.1.0.Final</slf4j-jboss-logmanager.version>
         <junit-jupiter.version>6.0.3</junit-jupiter.version>
         <protobuf.version>4.34.1</protobuf.version>
         <mockito.version>5.23.0</mockito.version>
-        <test-container.version>2.0.4</test-container.version>
+        <test-container.version>2.0.5</test-container.version>
 
         <surefire-plugin.version>3.5.5</surefire-plugin.version>
         <compiler-plugin.version>3.15.0</compiler-plugin.version>
