@@ -10,16 +10,17 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      # Isolate the core framework platform to guarantee atomic upgrades
+      # Explicit coordinate matching ensures the BOM itself is evaluated
       quarkus-platform:
         patterns:
-          - "io.quarkus*"
-          - "io.quarkus.platform*"
-      # Catch-all for secondary utilities, excluding Quarkus to prevent overlap
+          - "io.quarkus.platform:quarkus-bom"
+          - "io.quarkus:*"
+          - "io.quarkus.platform:*"
       utility-dependencies:
         exclude-patterns:
-          - "io.quarkus*"
-          - "io.quarkus.platform*"
+          - "io.quarkus:*"
+          - "io.quarkus.platform:*"
+          - "io.quarkus.platform:quarkus-bom"
         patterns:
           - "*"
 
