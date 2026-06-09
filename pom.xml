@@ -99,15 +99,7 @@
                 <version>${protobuf.version}</version>
             </dependency>
 
-            <!-- Metrics -->
-            <dependency>
-                <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
-                <version>${quarkus.platform.version}</version>
-            </dependency>
-
             <!-- Tests -->
-
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
@@ -220,6 +212,7 @@
                     <groupId>io.quarkus</groupId>
                     <artifactId>quarkus-maven-plugin</artifactId>
                     <version>${quarkus.platform.version}</version>
+                    <extensions>true</extensions>
                     <executions>
                         <execution>
                             <goals>
