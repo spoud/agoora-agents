@@ -20,7 +20,7 @@
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
-        <quarkus.platform.version>3.34.1</quarkus.platform.version>
+        <quarkus.platform.version>3.36.1</quarkus.platform.version>
 
         <lombok.version>1.18.46</lombok.version>
         <assertj-core.version>3.27.7</assertj-core.version>
