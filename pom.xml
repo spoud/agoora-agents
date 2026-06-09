@@ -20,8 +20,6 @@
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
-        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.version>3.34.1</quarkus.platform.version>
 
         <lombok.version>1.18.46</lombok.version>
@@ -49,8 +47,8 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>${quarkus.platform.group-id}</groupId>
-                <artifactId>${quarkus.platform.artifact-id}</artifactId>
+                <groupId>io.quarkus.platform</groupId>
+                <artifactId>quarkus-bom</artifactId>
                 <version>${quarkus.platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>

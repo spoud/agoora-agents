@@ -10,13 +10,19 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      maven-version:
+      # Isolate the core framework platform to guarantee atomic upgrades
+      quarkus-platform:
+        patterns:
+          - "io.quarkus*"
+          - "io.quarkus.platform*"
+      # Catch-all for secondary utilities, excluding Quarkus to prevent overlap
+      utility-dependencies:
+        exclude-patterns:
+          - "io.quarkus*"
+          - "io.quarkus.platform*"
         patterns:
           - "*"
-        update-types:
-          - "minor"
-          - "patch"
-          - "major"
+
   - package-ecosystem: "pip"
     directory: "/agoora-profiler-service"
     schedule:
