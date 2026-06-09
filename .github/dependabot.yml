@@ -16,6 +16,7 @@ updates:
         update-types:
           - "minor"
           - "patch"
+          - "major"
   - package-ecosystem: "pip"
     directory: "/agoora-profiler-service"
     schedule:
