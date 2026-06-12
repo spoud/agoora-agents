@@ -49,7 +49,7 @@ COPY --from=builder /build/profiler ./profiler
 COPY --from=builder /build/*.py ./
 COPY config/* ./config/
 COPY profiler_app.py ./
-COPY template/wrapper.html /opt/venv/lib/python3.7/site-packages/pandas_profiling/view/templates
+COPY template/wrapper.html /opt/venv/lib/python3.13/site-packages/pandas_profiling/view/templates
 
 
 ENV PATH="/opt/venv/bin:$PATH"

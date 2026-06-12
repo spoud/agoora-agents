@@ -12,7 +12,7 @@ genson
 numba
 pandas
 setuptools<81
-ydata-profiling
+fg-data-profiling
 func-timeout
 pillow>=12.2.0
 tornado>=6.5.5
