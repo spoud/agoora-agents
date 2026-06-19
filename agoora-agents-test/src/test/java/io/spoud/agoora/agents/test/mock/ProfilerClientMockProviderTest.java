@@ -26,7 +26,7 @@ class ProfilerClientMockProviderTest {
         result = profilerClient.profileData("requestId", Collections.emptyList());
         assertThat(result).isNotNull();
         assertThat(result.getError()).isEmpty();
-        assertThat(result.getHtml()).isEqualTo("<html/>");
+        assertThat(result.getProfileJson()).isEqualTo("{}");
     }
 
 }

@@ -1,0 +1,35 @@
+quarkus:
+  grpc:
+    server:
+      port: 8089
+  http:
+    port: 8280
+  arc:
+    remove-unused-beans: fwk
+  ssl:
+    native: true
+  native:
+    container-build: true
+    additional-build-args:
+      - --allow-incomplete-classpath
+      - --report-unsupported-elements-at-runtime
+  log:
+    category:
+      "io.spoud.agoora":
+        level: INFO
+  micrometer:
+    binder:
+      jvm: true
+      grpc-server:
+        enabled: true
+      system: true
+
+profiler:
+  timeout: 30
+  service-version: default
+
+"%dev":
+  quarkus:
+    grpc:
+      server:
+        use-separate-server: false

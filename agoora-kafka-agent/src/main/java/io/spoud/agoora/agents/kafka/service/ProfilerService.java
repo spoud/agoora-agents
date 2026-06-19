@@ -1,13 +1,15 @@
 package io.spoud.agoora.agents.kafka.service;
 
-import io.spoud.agoora.agents.api.client.BlobClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.spoud.agoora.agents.api.client.LookerClient;
 import io.spoud.agoora.agents.api.client.ProfilerClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.api.mapper.StandardProtoMapper;
+import io.spoud.agoora.agents.api.model.DataProfileEnvelope;
 import io.spoud.agoora.agents.api.observers.ProfileResponseObserver;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
-import io.spoud.agoora.agents.kafka.data.KafkaTopic;
+import io.spoud.agoora.agents.kafka.data.*;
+import io.spoud.agoora.agents.kafka.decoder.DecodedMessages;
 import io.spoud.agoora.agents.kafka.decoder.DecoderService;
 import io.spoud.agoora.agents.kafka.kafka.KafkaTopicReader;
 import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
@@ -22,24 +24,29 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @ApplicationScoped
 @RequiredArgsConstructor
 public class ProfilerService {
 
+  private static final int KEY_SAMPLE_LIMIT = 5;
+
   private final KafkaTopicRepository kafkaTopicRepository;
   private final KafkaTopicReader kafkaTopicReader;
-  private final BlobClient blobClient;
   private final ProfilerClient profilerClient;
   private final LookerClient lookerClient;
   private final SchemaClient schemaClient;
   private final KafkaAgentConfig config;
   private final DecoderService decoderService;
+  private final PartitionAnalysisService partitionAnalysisService;
+  private final EncodingDetectionService encodingDetectionService;
+  private final ObjectMapper objectMapper;
 
   public void profileData() {
     kafkaTopicRepository.getStates().stream()
@@ -47,11 +54,20 @@ public class ProfilerService {
         .forEach(
             kafkaTopic -> {
               try {
-                List<byte[]> samples = kafkaTopicReader.getSamples(kafkaTopic.getTopicName());
+                KafkaSampleResult sampleResult = kafkaTopicReader.getSamples(kafkaTopic.getTopicName());
 
-                samples = decodeMessages(kafkaTopic, samples);
+                List<byte[]> rawValueBytes = sampleResult.getValueBytes();
 
-                profileSamples(kafkaTopic, samples);
+                EncodingDetectionService.EncodingResult encodingResult =
+                    encodingDetectionService.detectEncoding(rawValueBytes);
+
+                List<byte[]> decodedSamples = decodeMessages(kafkaTopic, rawValueBytes);
+
+                PartitionAnalysis partitionAnalysis = partitionAnalysisService.analyze(sampleResult);
+
+                KeyAnalysisResult keyAnalysis = analyzeKeys(kafkaTopic, sampleResult);
+
+                profileSamples(kafkaTopic, decodedSamples, encodingResult, partitionAnalysis, keyAnalysis);
               } catch (Exception ex) {
                 if (LOG.isDebugEnabled()) {
                   LOG.warn("Unable to profile topic '{}'", kafkaTopic.getTopicName(), ex);
@@ -80,7 +96,74 @@ public class ProfilerService {
     return decoderService.decodeValue(kafkaTopic.getTopicName(), samples).getMessages();
   }
 
-  private void profileSamples(KafkaTopic kafkaTopic, List<byte[]> samples) {
+  private KeyAnalysisResult analyzeKeys(KafkaTopic kafkaTopic, KafkaSampleResult sampleResult) {
+    List<byte[]> keyBytes = sampleResult.getKeyBytes();
+    int totalRecords = sampleResult.getRecords().size();
+    int keysPresent = keyBytes.size();
+
+    if (keysPresent == 0) {
+      return KeyAnalysisResult.builder()
+              .keyFormat("NONE")
+              .presenceRate(0.0)
+              .totalRecords(totalRecords)
+              .keysPresent(0)
+              .build();
+    }
+
+    double presenceRate = (double) keysPresent / totalRecords;
+
+    LongSummaryStatistics sizeStats = keyBytes.stream()
+            .mapToLong(b -> b.length)
+            .summaryStatistics();
+
+    Set<String> uniqueKeys = keyBytes.stream()
+            .map(b -> new String(b, StandardCharsets.UTF_8))
+            .collect(Collectors.toSet());
+
+    List<String> sampleValues = keyBytes.stream()
+            .limit(KEY_SAMPLE_LIMIT)
+            .map(b -> new String(b, StandardCharsets.UTF_8))
+            .toList();
+
+    String fullProfileJson = null;
+    String keyFormat;
+
+    try {
+      DecodedMessages decodedKeys = decoderService.decodeKey(kafkaTopic.getTopicName(), keyBytes);
+      keyFormat = decodedKeys.getEncoding().name();
+
+      if (decodedKeys.getEncoding().name().equals("JSON")) {
+        ProfileResponseObserver.ProfilerResponse keyProfileResponse =
+                profilerClient.profileData(kafkaTopic.getTopicName() + "-key", decodedKeys.getMessages());
+        if (keyProfileResponse.getError().isEmpty() && keyProfileResponse.hasProfileJson()) {
+          fullProfileJson = keyProfileResponse.getProfileJson();
+        }
+      }
+    } catch (Exception e) {
+      LOG.debug("Key decoding failed for topic {}: {}", kafkaTopic.getTopicName(), e.getMessage());
+      keyFormat = "BINARY";
+    }
+
+    return KeyAnalysisResult.builder()
+            .keyFormat(keyFormat)
+            .presenceRate(Math.round(presenceRate * 10000.0) / 10000.0)
+            .totalRecords(totalRecords)
+            .keysPresent(keysPresent)
+            .uniqueCount(uniqueKeys.size())
+            .minByteSize(sizeStats.getMin())
+            .maxByteSize(sizeStats.getMax())
+            .avgByteSize(Math.round(sizeStats.getAverage() * 100.0) / 100.0)
+            .sampleValues(sampleValues)
+            .fullProfileJson(fullProfileJson)
+            .build();
+  }
+
+  private void profileSamples(
+          KafkaTopic kafkaTopic,
+          List<byte[]> samples,
+          EncodingDetectionService.EncodingResult encodingResult,
+          PartitionAnalysis partitionAnalysis,
+          KeyAnalysisResult keyAnalysis) {
     Instant start = Instant.now();
     String requestId = kafkaTopic.getTopicName();
     LOG.debug("Start profile topic {} with {} samples", kafkaTopic, samples.size());
@@ -112,28 +195,32 @@ public class ProfilerService {
           dataProfileRequest.setError(
               DataProfilingError.newBuilder()
                   .setMessage(profilerError.getMessage())
-                  .setType(
-                      DataProfilingError.Type.UNKNOWN_ENCODING) // TODO map profilerError.type ?
+                  .setType(DataProfilingError.Type.UNKNOWN_ENCODING)
                   .buildPartial());
         } else {
-          // upload schema
           uploadSchema(kafkaTopic, profilerResponse);
 
-          // take care of profiler result
-          String html = profilerResponse.getHtml();
+          if (profilerResponse.hasProfileJson()) {
+            String valueProfileJson = profilerResponse.getProfileJson();
+            LOG.debug("Profile received for topic {}: {}bytes", kafkaTopic, valueProfileJson.length());
 
-          if (html != null) {
-            LOG.debug("Profile received for table {}: {}bytes", kafkaTopic, html.length());
-            String htmlId =
-                blobClient.uploadBlobUtf8(
-                    html,
-                    config.transport().getAgooraPathObject().getResourceGroupPath(),
-                    ResourceEntity.Type.DATA_PORT);
-            if (htmlId != null) {
-              dataProfileRequest.setProfileHtmlBlobId(htmlId);
-            }
+            Map<String, Object> sourceMetadata = new LinkedHashMap<>();
+            sourceMetadata.put("detectedEncoding", encodingResult.getCharset());
+            sourceMetadata.put("encodingConfidence", encodingResult.getConfidence());
+            sourceMetadata.put("partitionAnalysis", partitionAnalysis);
+            sourceMetadata.put("keyAnalysis", keyAnalysis);
+
+            DataProfileEnvelope envelope = DataProfileEnvelope.builder()
+                    .version("3")
+                    .valueProfile(valueProfileJson)
+                    .keyProfile(keyAnalysis.getFullProfileJson())
+                    .sourceMetadata(sourceMetadata)
+                    .build();
+
+            String enrichedJson = objectMapper.writeValueAsString(envelope);
+            dataProfileRequest.setProfileJson(enrichedJson);
           } else {
-            LOG.warn("Html content is null");
+            LOG.warn("Profile JSON content is null or blank for topic {}", kafkaTopic);
           }
         }
       }
@@ -170,7 +257,7 @@ public class ProfilerService {
                     schemaContent,
                     SchemaSource.Type.INFERRED,
                     SchemaEncoding.Type.JSON,
-                    "", // TODO: add schema key content from profile
+                    "",
                     SchemaEncoding.Type.UNKNOWN
                 )
                 .getId();

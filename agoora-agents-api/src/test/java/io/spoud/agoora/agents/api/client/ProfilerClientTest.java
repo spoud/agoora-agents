@@ -50,6 +50,6 @@ class ProfilerClientTest {
         profilerClient.profileData("requestId", Collections.emptyList());
 
     assertThat(response.getSchema()).isEqualTo("schema");
-    assertThat(response.getHtml()).isEqualTo("profile");
+    assertThat(response.getProfileJson()).isEqualTo("profile");
   }
 }

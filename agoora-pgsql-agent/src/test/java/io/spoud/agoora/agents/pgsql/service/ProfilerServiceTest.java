@@ -1,15 +1,13 @@
 package io.spoud.agoora.agents.pgsql.service;
 
 import io.quarkus.test.junit.QuarkusTest;
-import io.spoud.agoora.agents.api.client.BlobClient;
 import io.spoud.agoora.agents.api.client.LookerClient;
 import io.spoud.agoora.agents.api.client.ProfilerClient;
-import io.spoud.agoora.agents.test.mock.BlobClientMockProvider;
 import io.spoud.agoora.agents.test.mock.LookerClientMockProvider;
 import io.spoud.agoora.agents.test.mock.ProfilerClientMockProvider;
 import io.spoud.agoora.agents.pgsql.repository.DataItemRepository;
-import io.spoud.sdm.global.domain.v1.ResourceEntity;
 import io.spoud.sdm.logistics.domain.v1.DataItem;
+import io.spoud.sdm.looker.v1alpha1.AddDataProfileRequest;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,16 +32,16 @@ import static org.mockito.Mockito.verify;
 class ProfilerServiceTest {
 
   ArgumentCaptor<List<byte[]>> samplesCaptor = ArgumentCaptor.forClass(List.class);
+  ArgumentCaptor<AddDataProfileRequest> profileCaptor =
+      ArgumentCaptor.forClass(AddDataProfileRequest.class);
   @Inject ProfilerService profilerService;
   @Inject DataItemRepository dataItemRepository;
-  @Inject BlobClient blobClient;
   @Inject ProfilerClient profilerClient;
   @Inject LookerClient lookerClient;
   ObjectMapper objectMapper = new ObjectMapper();
 
   @BeforeEach
   void setup() {
-    BlobClientMockProvider.defaultMock(blobClient);
     ProfilerClientMockProvider.defaultMock(profilerClient);
     LookerClientMockProvider.defaultMock(lookerClient);
     clearInvocations(lookerClient);
@@ -55,6 +53,7 @@ class ProfilerServiceTest {
   }
 
   @Test
+  @SneakyThrows
   void testProfiler() {
     dataItemRepository.update(
         DataItem.newBuilder().setId("dataPortId1").setTransportUrl("t_city").build());
@@ -81,8 +80,12 @@ class ProfilerServiceTest {
                 "created_by", "script",
                 "updated_by", "script"));
 
-    verify(blobClient)
-        .uploadBlobUtf8(eq("<html/>"), eq("/default/"), eq(ResourceEntity.Type.DATA_ITEM));
+    verify(lookerClient).addDataProfile(profileCaptor.capture());
+    String profileJson = profileCaptor.getValue().getProfileJson();
+    Map<String, Object> envelope = objectMapper.readValue(profileJson, Map.class);
+    assertThat(envelope).containsKey("version");
+    assertThat(envelope.get("version")).isEqualTo("3");
+    assertThat(envelope).containsKey("valueProfile");
   }
 
   @SneakyThrows

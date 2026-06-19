@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 @UtilityClass
 public class ProfilerClientMockProvider {
 
-  public static final String PROFILE = "<html/>";
+  public static final String PROFILE = "{}";
   public static final String SCHEMA = "Whatever";
 
   public static void defaultMock(ProfilerClient mock) {
@@ -23,7 +23,7 @@ public class ProfilerClientMockProvider {
             ProfileResponseObserver.ProfilerResponse.builder()
                 .error(Optional.empty())
                 .schema(SCHEMA)
-                .html(PROFILE)
+                .profileJson(PROFILE)
                 .build());
   }
 }

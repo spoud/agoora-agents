@@ -36,7 +36,7 @@ public class ProfileResponseObserver extends AbstractResponseObserver<ProfileDat
   @Override
   public void onCompleted() {
     super.onCompleted();
-    response.setHtml(profile);
+    response.setProfileJson(profile);
     response.setSchema(schema);
 
     if (!response
@@ -54,7 +54,11 @@ public class ProfileResponseObserver extends AbstractResponseObserver<ProfileDat
   public static class ProfilerResponse {
     private Meta meta;
     private Optional<ProfilerError> error = Optional.empty();
-    private String html;
+    private String profileJson;
     private String schema;
+
+    public boolean hasProfileJson() {
+      return profileJson != null && !profileJson.isBlank();
+    }
   }
 }

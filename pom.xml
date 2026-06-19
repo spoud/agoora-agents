@@ -42,6 +42,7 @@
         <module>agoora-mqtt-agent</module>
         <module>agoora-openapi-agent</module>
         <module>agoora-pgsql-agent</module>
+        <module>agoora-profiler-service</module>
     </modules>
 
     <dependencyManagement>

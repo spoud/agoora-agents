@@ -1,0 +1,5 @@
+# False positives from the Red Hat UBI base image's default Maven settings template.
+# /etc/maven/settings.xml contains commented-out XML examples with placeholder values
+# (proxypass, repopwd, etc.) — no real credentials are present.
+maven-settings-passphrase
+maven-settings-password

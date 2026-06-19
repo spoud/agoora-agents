@@ -1,59 +1,32 @@
-FROM python:3.13-slim-trixie AS builder
+####
+# This Dockerfile is used in order to build a container that runs the Quarkus application in JVM mode.
+#
+# Before building the container image run:
+#
+# ./mvnw package
+#
+# Then, build the image with:
+#
+# docker build -f Dockerfile.jvm -t spoud/agoora-profiler-service .
+#
+# Then run the container using:
+#
+# docker run -i --rm -p 8089:8089 -p 8280:8280 spoud/agoora-profiler-service
+#
+###
+FROM registry.access.redhat.com/ubi8/openjdk-21
 
-WORKDIR /build
+ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y \
-    libpng-dev \
-    libfreetype6-dev \
-    libblas-dev \
-    liblapack-dev \
-    gfortran \
-    git \
-    fonts-liberation && \
-    apt-get install -y --no-install-recommends build-essential gcc && \
-    python -m venv /opt/venv
+# We make four distinct layers so if there are application changes the library layers can be re-used
+COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
+COPY --chown=185 target/quarkus-app/*.jar /deployments/
+COPY --chown=185 target/quarkus-app/app/ /deployments/app/
+COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
 
-ENV PATH="/opt/venv/bin:$PATH"
-COPY requirements.txt ./
-RUN  /opt/venv/bin/python -m pip install --upgrade pip && pip install -Ur requirements.txt
+EXPOSE 8089 8280 5005
+USER 185
+ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
 
-
-
-COPY proto/ ./proto/
-RUN python3 -m grpc_tools.protoc -I./proto --python_out=./ --grpc_python_out=./ ./proto/profiler/domain/v1alpha1/domain.proto ./proto/profiler/service/v1alpha1/profiler.proto
-COPY config/* ./config/
-COPY profiler_app.py ./
-COPY profiler_it.py ./
-COPY testdata/* ./testdata/
-RUN mkdir testresults \
-    && PROFILER_TIMEOUT=60 python3 profiler_it.py \
-    && rm -rf testresults
-
-
-FROM python:3.13-slim-trixie
-
-RUN apt update && apt upgrade -y && apt install -y fonts-liberation
-
-RUN groupadd -r profiler && useradd --no-log-init -r -m -g profiler profiler
-USER profiler
-ENV HOME="/tmp"
-
-EXPOSE 8089
-
-WORKDIR /app
-
-COPY --from=builder /opt/venv /opt/venv
-COPY --from=builder /build/profiler ./profiler
-COPY --from=builder /build/*.py ./
-COPY config/* ./config/
-COPY profiler_app.py ./
-COPY template/wrapper.html /opt/venv/lib/python3.13/site-packages/pandas_profiling/view/templates
-
-
-ENV PATH="/opt/venv/bin:$PATH"
-# set home so that any user is able to write into. The profiler builds some cache etc. and wants to store in home.
-ARG VERSION=default
-ENV SDM_PROFILER_SERVICE_VERSION=${VERSION}
-ENTRYPOINT ["python", "profiler_app.py"]
+ENTRYPOINT [ "/opt/jboss/container/java/run/run-java.sh" ]

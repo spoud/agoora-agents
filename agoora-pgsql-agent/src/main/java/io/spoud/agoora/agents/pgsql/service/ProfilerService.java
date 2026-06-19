@@ -2,9 +2,9 @@ package io.spoud.agoora.agents.pgsql.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.Timestamp;
-import io.spoud.agoora.agents.api.client.BlobClient;
 import io.spoud.agoora.agents.api.client.LookerClient;
 import io.spoud.agoora.agents.api.client.ProfilerClient;
+import io.spoud.agoora.agents.api.model.DataProfileEnvelope;
 import io.spoud.agoora.agents.api.observers.ProfileResponseObserver;
 import io.spoud.agoora.agents.pgsql.config.data.PgsqlAgooraConfig;
 import io.spoud.agoora.agents.pgsql.database.DatabaseScrapper;
@@ -39,7 +39,6 @@ public class ProfilerService {
   private final DatabaseScrapper databaseScrapper;
   private final DataItemRepository dataItemRepository;
 
-  private final BlobClient blobClient;
   private final ProfilerClient profilerClient;
   private final LookerClient lookerClient;
 
@@ -106,16 +105,13 @@ public class ProfilerService {
                                     .UNKNOWN_ENCODING) // TODO map profilerError.type ?
                             .buildPartial());
                   } else {
-                    String html = profilerResponse.getHtml();
-
-                    LOG.debug("Profile received for table {}: {}bytes", tableName, html.length());
-                    String htmlId =
-                        blobClient.uploadBlobUtf8(
-                            html,
-                            config.transport().getAgooraPathObject().getResourceGroupPath(),
-                            ResourceEntity.Type.DATA_ITEM);
-                    if (htmlId != null) {
-                      dataProfileRequest.setProfileHtmlBlobId(htmlId);
+                    if (profilerResponse.hasProfileJson()) {
+                      String profileJson = profilerResponse.getProfileJson();
+                      LOG.debug("Profile received for table {}: {}bytes", tableName, profileJson.length());
+                      DataProfileEnvelope envelope = DataProfileEnvelope.wrap(profileJson);
+                      dataProfileRequest.setProfileJson(objectMapper.writeValueAsString(envelope));
+                    } else {
+                      LOG.warn("Profile JSON content is null or blank for table {}", tableName);
                     }
                   }
                 }
