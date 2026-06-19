@@ -132,7 +132,7 @@ public class ProfilerService {
       DecodedMessages decodedKeys = decoderService.decodeKey(kafkaTopic.getTopicName(), keyBytes);
       keyFormat = decodedKeys.getEncoding().name();
 
-      if (decodedKeys.getEncoding().name().equals("JSON")) {
+      if (!decodedKeys.getMessages().isEmpty()) {
         ProfileResponseObserver.ProfilerResponse keyProfileResponse =
                 profilerClient.profileData(kafkaTopic.getTopicName() + "-key", decodedKeys.getMessages());
         if (keyProfileResponse.getError().isEmpty() && keyProfileResponse.hasProfileJson()) {
@@ -141,7 +141,32 @@ public class ProfilerService {
       }
     } catch (Exception e) {
       LOG.debug("Key decoding failed for topic {}: {}", kafkaTopic.getTopicName(), e.getMessage());
-      keyFormat = "BINARY";
+      keyFormat = "STRING";
+      try {
+        List<byte[]> wrappedKeys = keyBytes.stream()
+                .map(b -> new String(b, StandardCharsets.UTF_8))
+                .filter(s -> !s.isBlank())
+                .map(s -> {
+                  try {
+                    return objectMapper.writeValueAsBytes(Map.of("key", s));
+                  } catch (Exception ex) {
+                    return null;
+                  }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        if (!wrappedKeys.isEmpty()) {
+          ProfileResponseObserver.ProfilerResponse keyProfileResponse =
+                  profilerClient.profileData(kafkaTopic.getTopicName() + "-key", wrappedKeys);
+          if (keyProfileResponse.getError().isEmpty() && keyProfileResponse.hasProfileJson()) {
+            fullProfileJson = keyProfileResponse.getProfileJson();
+          }
+        }
+      } catch (Exception ex) {
+        LOG.debug("String key profiling failed for topic {}: {}", kafkaTopic.getTopicName(), ex.getMessage());
+        keyFormat = "BINARY";
+      }
     }
 
     return KeyAnalysisResult.builder()
