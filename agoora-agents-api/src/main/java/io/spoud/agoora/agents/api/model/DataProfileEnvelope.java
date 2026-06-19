@@ -19,8 +19,6 @@ public class DataProfileEnvelope {
     @JsonRawValue
     private final String keyProfile;
 
-    private final ValueEncoding valueEncoding;
-
     private final Map<String, Object> sourceMetadata;
 
     public static DataProfileEnvelope wrap(String profileJson) {
@@ -28,13 +26,5 @@ public class DataProfileEnvelope {
                 .version("3")
                 .valueProfile(profileJson)
                 .build();
-    }
-
-    @Data
-    @Builder
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class ValueEncoding {
-        private final String charset;
-        private final double confidence;
     }
 }

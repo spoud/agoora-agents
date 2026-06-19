@@ -231,6 +231,8 @@ public class ProfilerService {
 
             Map<String, Object> sourceMetadata = new LinkedHashMap<>();
             sourceMetadata.put("valueFormat", valueFormat);
+            sourceMetadata.put("charsetEncoding", encodingResult.getCharset());
+            sourceMetadata.put("charsetConfidence", encodingResult.getConfidence());
             sourceMetadata.put("partitionAnalysis", partitionAnalysis);
             sourceMetadata.put("keyAnalysis", keyAnalysis);
 
@@ -238,10 +240,6 @@ public class ProfilerService {
                     .version("3")
                     .valueProfile(valueProfileJson)
                     .keyProfile(keyAnalysis.getFullProfileJson())
-                    .valueEncoding(DataProfileEnvelope.ValueEncoding.builder()
-                            .charset(encodingResult.getCharset())
-                            .confidence(encodingResult.getConfidence())
-                            .build())
                     .sourceMetadata(sourceMetadata)
                     .build();
 
