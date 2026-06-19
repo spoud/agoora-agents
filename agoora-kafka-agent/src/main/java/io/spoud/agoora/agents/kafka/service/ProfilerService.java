@@ -61,13 +61,15 @@ public class ProfilerService {
                 EncodingDetectionService.EncodingResult encodingResult =
                     encodingDetectionService.detectEncoding(rawValueBytes);
 
-                List<byte[]> decodedSamples = decodeMessages(kafkaTopic, rawValueBytes);
+                DecodedMessages decodedValues = decoderService.decodeValue(kafkaTopic.getTopicName(), rawValueBytes);
+                List<byte[]> decodedSamples = decodedValues.getMessages();
+                String valueFormat = decodedValues.getEncoding().name();
 
                 PartitionAnalysis partitionAnalysis = partitionAnalysisService.analyze(sampleResult);
 
                 KeyAnalysisResult keyAnalysis = analyzeKeys(kafkaTopic, sampleResult);
 
-                profileSamples(kafkaTopic, decodedSamples, encodingResult, partitionAnalysis, keyAnalysis);
+                profileSamples(kafkaTopic, decodedSamples, valueFormat, encodingResult, partitionAnalysis, keyAnalysis);
               } catch (Exception ex) {
                 if (LOG.isDebugEnabled()) {
                   LOG.warn("Unable to profile topic '{}'", kafkaTopic.getTopicName(), ex);
@@ -92,9 +94,6 @@ public class ProfilerService {
             });
   }
 
-  private List<byte[]> decodeMessages(KafkaTopic kafkaTopic, List<byte[]> samples) {
-    return decoderService.decodeValue(kafkaTopic.getTopicName(), samples).getMessages();
-  }
 
   private KeyAnalysisResult analyzeKeys(KafkaTopic kafkaTopic, KafkaSampleResult sampleResult) {
     List<byte[]> keyBytes = sampleResult.getKeyBytes();
@@ -186,6 +185,7 @@ public class ProfilerService {
   private void profileSamples(
           KafkaTopic kafkaTopic,
           List<byte[]> samples,
+          String valueFormat,
           EncodingDetectionService.EncodingResult encodingResult,
           PartitionAnalysis partitionAnalysis,
           KeyAnalysisResult keyAnalysis) {
@@ -230,8 +230,7 @@ public class ProfilerService {
             LOG.debug("Profile received for topic {}: {}bytes", kafkaTopic, valueProfileJson.length());
 
             Map<String, Object> sourceMetadata = new LinkedHashMap<>();
-            sourceMetadata.put("detectedEncoding", encodingResult.getCharset());
-            sourceMetadata.put("encodingConfidence", encodingResult.getConfidence());
+            sourceMetadata.put("valueFormat", valueFormat);
             sourceMetadata.put("partitionAnalysis", partitionAnalysis);
             sourceMetadata.put("keyAnalysis", keyAnalysis);
 
@@ -239,6 +238,10 @@ public class ProfilerService {
                     .version("3")
                     .valueProfile(valueProfileJson)
                     .keyProfile(keyAnalysis.getFullProfileJson())
+                    .valueEncoding(DataProfileEnvelope.ValueEncoding.builder()
+                            .charset(encodingResult.getCharset())
+                            .confidence(encodingResult.getConfidence())
+                            .build())
                     .sourceMetadata(sourceMetadata)
                     .build();
 
