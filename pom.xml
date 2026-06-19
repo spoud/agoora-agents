@@ -250,7 +250,7 @@
                 <version>2.7.1</version>
                 <configuration>
                     <excludedScopes>test</excludedScopes>
-                    <fileTemplate>./license/third-party-template.ftl</fileTemplate>
+                    <fileTemplate>${maven.multiModuleProjectDirectory}/license/third-party-template.ftl</fileTemplate>
                     <licensesOutputDirectory>${project.build.directory}</licensesOutputDirectory>
                     <licenseMerges>
                         <licenseMerge>The Apache Software License, Version 2.0|
