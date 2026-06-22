@@ -93,6 +93,7 @@ public class ProfilerGrpcService implements Profiler {
             if (jsonData == null || jsonData.isBlank()) {
                 return List.of(errorMeta(requestId, ProfilerError.Type.UNKNOWN_ENCODING, "Empty json_data field"));
             }
+            jsonData = jsonData.replace("\u0000", "");
             try {
                 Map<String, Object> parsed = objectMapper.readValue(
                         jsonData, new TypeReference<>() {});
