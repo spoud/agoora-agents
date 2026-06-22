@@ -146,33 +146,6 @@ class ProfilerGrpcServiceTest {
         assertThat(responses.get(0).getMeta().getRequestId()).isEqualTo("my-request-id-123");
     }
 
-    @Test
-    void testCorrelationComputedForMultipleNumericColumns() throws Exception {
-        List<ProfileRequest> reqs = List.of(
-                profileRequest("r3", "{\"a\":1,\"b\":2}"),
-                profileRequest("r3", "{\"a\":2,\"b\":4}"),
-                profileRequest("r3", "{\"a\":3,\"b\":6}"),
-                profileRequest("r3", "{\"a\":4,\"b\":8}")
-        );
-
-        List<ProfileDataStreamResponse> responses = stub
-                .profileDataStream(Multi.createFrom().iterable(reqs))
-                .collect().asList()
-                .await().indefinitely();
-
-        StringBuilder profileJson = new StringBuilder();
-        for (int i = 1; i < responses.size(); i++) {
-            profileJson.append(responses.get(i).getProfile());
-        }
-
-        JsonNode root = new ObjectMapper().readTree(profileJson.toString());
-        assertThat(root.has("correlations")).isTrue();
-        assertThat(root.get("correlations").has("pearson")).isTrue();
-        // a and b are perfectly correlated
-        double corr = root.get("correlations").get("pearson").get("a").get("b").asDouble();
-        assertThat(corr).isCloseTo(1.0, org.assertj.core.data.Offset.offset(0.001));
-    }
-
     private JsonNode findColumn(JsonNode root, String name) {
         for (JsonNode col : root.get("columns")) {
             if (name.equals(col.get("name").asText())) return col;

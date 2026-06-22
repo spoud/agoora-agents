@@ -17,9 +17,6 @@ public class ProfilingResult {
     private final List<Map<String, Object>> sampleRowsHead;
     private final List<Map<String, Object>> sampleRowsTail;
     private final List<Warning> warnings;
-
-    // method → col → col → value
-    private final Map<String, Map<String, Map<String, Double>>> correlations;
     private final RecordSizeStats recordSizeStats;
 
     public ProfilingResult(
@@ -29,7 +26,6 @@ public class ProfilingResult {
             List<Map<String, Object>> sampleRowsHead,
             List<Map<String, Object>> sampleRowsTail,
             List<Warning> warnings,
-            Map<String, Map<String, Map<String, Double>>> correlations,
             RecordSizeStats recordSizeStats) {
         this.columns = columns;
         this.totalRecords = totalRecords;
@@ -37,7 +33,6 @@ public class ProfilingResult {
         this.sampleRowsHead = sampleRowsHead;
         this.sampleRowsTail = sampleRowsTail;
         this.warnings = warnings != null && !warnings.isEmpty() ? warnings : null;
-        this.correlations = correlations != null && !correlations.isEmpty() ? correlations : null;
         this.recordSizeStats = recordSizeStats;
     }
 
@@ -48,7 +43,6 @@ public class ProfilingResult {
     public List<Map<String, Object>> getSampleRowsHead() { return sampleRowsHead; }
     public List<Map<String, Object>> getSampleRowsTail() { return sampleRowsTail; }
     public List<Warning> getWarnings() { return warnings; }
-    public Map<String, Map<String, Map<String, Double>>> getCorrelations() { return correlations; }
     public RecordSizeStats getRecordSizeStats() { return recordSizeStats; }
 
     public long getTotalMissingValues() {

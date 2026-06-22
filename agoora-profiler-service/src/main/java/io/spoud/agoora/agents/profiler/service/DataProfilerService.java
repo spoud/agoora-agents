@@ -6,9 +6,6 @@ import io.spoud.agoora.agents.profiler.model.ProfilingResult;
 import io.spoud.agoora.agents.profiler.util.JsonFlattener;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.math3.stat.correlation.KendallsCorrelation;
-import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
-import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.nio.charset.StandardCharsets;
@@ -36,7 +33,6 @@ public class DataProfilerService {
     private static final double EMAIL_THRESHOLD = 0.8;
     private static final double TEXT_CARDINALITY_RATIO = 0.5;
     private static final int CATEGORICAL_MAX_UNIQUE = 50;
-    private static final int MAX_CORRELATION_COLUMNS = 100;
 
     private static final long EPOCH_SEC_MIN = 946684800L;        // 2000-01-01
     private static final long EPOCH_SEC_MAX = 2524608000L;        // 2050-01-01
@@ -76,49 +72,24 @@ public class DataProfilerService {
         if (flatRecords.isEmpty()) {
             return new ProfilingResult(Collections.emptyList(), 0, 0,
                     Collections.emptyList(), Collections.emptyList(),
-                    Collections.emptyList(), Collections.emptyMap(), null);
+                    Collections.emptyList(), null);
         }
 
         Set<String> allColumns = new LinkedHashSet<>();
         flatRecords.forEach(r -> allColumns.addAll(r.keySet()));
 
         List<ColumnStats> columnStats = new ArrayList<>();
-        List<String> numericCols = new ArrayList<>();
-        List<String> categoricalCols = new ArrayList<>();
 
         for (String col : allColumns) {
-            ColumnStats stats = computeStats(col, flatRecords);
-            columnStats.add(stats);
-            if (stats.isNumeric()) {
-                numericCols.add(col);
-            } else if (stats.isCategorical()) {
-                categoricalCols.add(col);
-            }
+            columnStats.add(computeStats(col, flatRecords));
         }
 
         int duplicateCount = computeDuplicateCount(flatRecords);
 
-        Map<String, Map<String, Map<String, Double>>> correlations;
-        if (numericCols.size() + categoricalCols.size() > MAX_CORRELATION_COLUMNS) {
-            LOG.info("Skipping correlations: {} columns exceeds limit of {}",
-                    numericCols.size() + categoricalCols.size(), MAX_CORRELATION_COLUMNS);
-            correlations = Collections.emptyMap();
-        } else {
-            Map<String, double[]> numericArrays = new LinkedHashMap<>();
-            for (String col : numericCols) {
-                numericArrays.put(col, extractNumericArray(col, flatRecords));
-            }
-            Map<String, List<String>> categoricalArrays = new LinkedHashMap<>();
-            for (String col : categoricalCols) {
-                categoricalArrays.put(col, extractCategoricalArray(col, flatRecords));
-            }
-            correlations = computeAllCorrelations(numericArrays, categoricalArrays);
-        }
-
         List<ProfilingResult.Warning> warnings = computeDatasetWarnings(columnStats, duplicateCount, flatRecords.size());
 
         return new ProfilingResult(columnStats, flatRecords.size(), duplicateCount,
-                sampleRowsHead, sampleRowsTail, warnings, correlations, recordSizeStats);
+                sampleRowsHead, sampleRowsTail, warnings, recordSizeStats);
     }
 
     public ProfilingResult profile(List<Map<String, Object>> records, List<String> rawJsonStrings) {
@@ -130,7 +101,7 @@ public class DataProfilerService {
         if (records.isEmpty()) {
             return new ProfilingResult(Collections.emptyList(), 0, 0,
                     Collections.emptyList(), Collections.emptyList(),
-                    Collections.emptyList(), Collections.emptyMap(), null);
+                    Collections.emptyList(), null);
         }
 
         List<Map<String, Object>> flat = records.stream()
@@ -388,30 +359,6 @@ public class DataProfilerService {
         return builder.build();
     }
 
-    // --- Array extraction for correlations ---
-
-    private double[] extractNumericArray(String col, List<Map<String, Object>> flatRecords) {
-        return flatRecords.stream()
-                .mapToDouble(row -> {
-                    Object val = row.get(col);
-                    if (val instanceof Number) return ((Number) val).doubleValue();
-                    if (val != null) {
-                        Double d = tryParseNumber(val.toString().trim());
-                        if (d != null) return d;
-                    }
-                    return Double.NaN;
-                }).toArray();
-    }
-
-    private List<String> extractCategoricalArray(String col, List<Map<String, Object>> flatRecords) {
-        return flatRecords.stream()
-                .map(row -> {
-                    Object val = row.get(col);
-                    return val == null ? null : val.toString();
-                })
-                .collect(Collectors.toList());
-    }
-
     // --- Helpers ---
 
     private List<ColumnStats.TopValue> buildExtremeValues(double[] values, boolean high) {
@@ -490,160 +437,6 @@ public class DataProfilerService {
         return dupes;
     }
 
-    // --- Correlations ---
-
-    private Map<String, Map<String, Map<String, Double>>> computeAllCorrelations(
-            Map<String, double[]> numericArrays,
-            Map<String, List<String>> categoricalArrays) {
-
-        Map<String, Map<String, Map<String, Double>>> result = new LinkedHashMap<>();
-
-        if (numericArrays.size() >= 2) {
-            List<String> cols = new ArrayList<>(numericArrays.keySet());
-            int n = numericArrays.get(cols.get(0)).length;
-            List<Integer> validRows = validRowIndices(cols, numericArrays, n);
-
-            if (validRows.size() >= 2) {
-                double[][] matrix = buildMatrix(cols, numericArrays, validRows);
-                addCorrelationMethod(result, "pearson", cols, computePearson(matrix));
-                addCorrelationMethod(result, "spearman", cols, computeSpearman(matrix));
-                addCorrelationMethod(result, "kendall", cols, computeKendall(cols, numericArrays, validRows));
-            }
-        }
-
-        if (categoricalArrays.size() >= 2) {
-            Map<String, Map<String, Double>> cramers = computeCramersV(categoricalArrays);
-            if (!cramers.isEmpty()) result.put("cramersV", cramers);
-        }
-
-        return result;
-    }
-
-    private List<Integer> validRowIndices(List<String> cols, Map<String, double[]> arrays, int n) {
-        List<Integer> valid = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            boolean ok = true;
-            for (String col : cols) {
-                if (Double.isNaN(arrays.get(col)[i])) { ok = false; break; }
-            }
-            if (ok) valid.add(i);
-        }
-        return valid;
-    }
-
-    private double[][] buildMatrix(List<String> cols, Map<String, double[]> arrays, List<Integer> validRows) {
-        double[][] m = new double[validRows.size()][cols.size()];
-        for (int r = 0; r < validRows.size(); r++) {
-            int ri = validRows.get(r);
-            for (int c = 0; c < cols.size(); c++) m[r][c] = arrays.get(cols.get(c))[ri];
-        }
-        return m;
-    }
-
-    private double[][] computePearson(double[][] matrix) {
-        try { return new PearsonsCorrelation(matrix).getCorrelationMatrix().getData(); }
-        catch (Exception e) { LOG.warn("Pearson failed: {}", e.getMessage()); return null; }
-    }
-
-    private double[][] computeSpearman(double[][] matrix) {
-        try { return new SpearmansCorrelation().computeCorrelationMatrix(matrix).getData(); }
-        catch (Exception e) { LOG.warn("Spearman failed: {}", e.getMessage()); return null; }
-    }
-
-    private double[][] computeKendall(List<String> cols, Map<String, double[]> arrays, List<Integer> validRows) {
-        // KendallsCorrelation operates column-pair by column-pair
-        try {
-            int size = cols.size();
-            double[][] m = new double[size][size];
-            KendallsCorrelation kc = new KendallsCorrelation();
-            for (int i = 0; i < size; i++) {
-                m[i][i] = 1.0;
-                for (int j = i + 1; j < size; j++) {
-                    double[] a = extractValid(arrays.get(cols.get(i)), validRows);
-                    double[] b = extractValid(arrays.get(cols.get(j)), validRows);
-                    double corr = kc.correlation(a, b);
-                    m[i][j] = corr;
-                    m[j][i] = corr;
-                }
-            }
-            return m;
-        } catch (Exception e) { LOG.warn("Kendall failed: {}", e.getMessage()); return null; }
-    }
-
-    private double[] extractValid(double[] arr, List<Integer> validRows) {
-        double[] out = new double[validRows.size()];
-        for (int i = 0; i < validRows.size(); i++) out[i] = arr[validRows.get(i)];
-        return out;
-    }
-
-    private void addCorrelationMethod(
-            Map<String, Map<String, Map<String, Double>>> result,
-            String method, List<String> cols, double[][] matrix) {
-        if (matrix == null) return;
-        Map<String, Map<String, Double>> methodMap = new LinkedHashMap<>();
-        for (int i = 0; i < cols.size(); i++) {
-            Map<String, Double> row = new LinkedHashMap<>();
-            for (int j = 0; j < cols.size(); j++) {
-                if (i != j && !Double.isNaN(matrix[i][j])) {
-                    row.put(cols.get(j), Math.round(matrix[i][j] * 10000.0) / 10000.0);
-                }
-            }
-            if (!row.isEmpty()) methodMap.put(cols.get(i), row);
-        }
-        if (!methodMap.isEmpty()) result.put(method, methodMap);
-    }
-
-    private Map<String, Map<String, Double>> computeCramersV(Map<String, List<String>> catArrays) {
-        List<String> cols = new ArrayList<>(catArrays.keySet());
-        Map<String, Map<String, Double>> result = new LinkedHashMap<>();
-        for (int i = 0; i < cols.size(); i++) {
-            for (int j = i + 1; j < cols.size(); j++) {
-                String ca = cols.get(i), cb = cols.get(j);
-                double v = cramersV(catArrays.get(ca), catArrays.get(cb));
-                if (!Double.isNaN(v)) {
-                    result.computeIfAbsent(ca, k -> new LinkedHashMap<>()).put(cb, round4(v));
-                    result.computeIfAbsent(cb, k -> new LinkedHashMap<>()).put(ca, round4(v));
-                }
-            }
-        }
-        return result;
-    }
-
-    private double cramersV(List<String> colA, List<String> colB) {
-        // Collect unique categories
-        List<String> catsA = colA.stream().filter(Objects::nonNull).distinct().sorted().collect(Collectors.toList());
-        List<String> catsB = colB.stream().filter(Objects::nonNull).distinct().sorted().collect(Collectors.toList());
-        int k = catsA.size(), r = catsB.size();
-        if (k < 2 || r < 2) return Double.NaN;
-
-        Map<String, Integer> idxA = new HashMap<>();
-        for (int i = 0; i < catsA.size(); i++) idxA.put(catsA.get(i), i);
-        Map<String, Integer> idxB = new HashMap<>();
-        for (int i = 0; i < catsB.size(); i++) idxB.put(catsB.get(i), i);
-
-        long[][] table = new long[k][r];
-        int n = 0;
-        for (int row = 0; row < colA.size(); row++) {
-            String a = colA.get(row), b = colB.get(row);
-            if (a != null && b != null) { table[idxA.get(a)][idxB.get(b)]++; n++; }
-        }
-        if (n == 0) return Double.NaN;
-
-        long[] rowSums = new long[k], colSums = new long[r];
-        for (int ri = 0; ri < k; ri++)
-            for (int ci = 0; ci < r; ci++) { rowSums[ri] += table[ri][ci]; colSums[ci] += table[ri][ci]; }
-
-        double chi2 = 0;
-        for (int ri = 0; ri < k; ri++)
-            for (int ci = 0; ci < r; ci++) {
-                double exp = (double) rowSums[ri] * colSums[ci] / n;
-                if (exp > 0) { double d = table[ri][ci] - exp; chi2 += d * d / exp; }
-            }
-
-        int minDim = Math.min(k, r) - 1;
-        return minDim == 0 ? Double.NaN : Math.sqrt(chi2 / ((double) n * minDim));
-    }
-
     // --- Warnings ---
 
     private List<String> computeColumnWarnings(
@@ -714,8 +507,6 @@ public class DataProfilerService {
             default -> code;
         };
     }
-
-    private double round4(double v) { return Math.round(v * 10000.0) / 10000.0; }
 
     // --- Timestamp detection ---
 

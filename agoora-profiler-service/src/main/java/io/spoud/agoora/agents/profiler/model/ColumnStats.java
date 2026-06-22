@@ -1,6 +1,5 @@
 package io.spoud.agoora.agents.profiler.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
@@ -65,19 +64,6 @@ public class ColumnStats {
 
     public double getMissingPercent() {
         return count == 0 ? 0.0 : (missingCount * 100.0 / count);
-    }
-
-    @JsonIgnore
-    public boolean isNumeric() {
-        return type == ColumnType.NUMBER || type == ColumnType.INTEGER || type == ColumnType.TIMESTAMP;
-    }
-
-    @JsonIgnore
-    public boolean isCategorical() {
-        return type == ColumnType.STRING || type == ColumnType.TEXT
-                || type == ColumnType.CATEGORICAL || type == ColumnType.BOOLEAN
-                || type == ColumnType.URL || type == ColumnType.EMAIL
-                || type == ColumnType.UUID;
     }
 
     public record TopValue(String value, long count) {}

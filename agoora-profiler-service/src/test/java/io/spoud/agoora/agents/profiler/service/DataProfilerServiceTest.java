@@ -47,7 +47,6 @@ class DataProfilerServiceTest {
         ColumnStats col = findColumn(profilerService.profile(records), "v");
 
         assertThat(col.getType()).isEqualTo(ColumnType.NUMBER);
-        assertThat(col.isNumeric()).isTrue();
         assertThat(col.getMin()).isNotNull();
         assertThat(col.getMax()).isNotNull();
         assertThat(col.getHistogram()).isNotNull();
@@ -71,20 +70,6 @@ class DataProfilerServiceTest {
         ColumnStats col = findColumn(profilerService.profile(records), "v");
 
         assertThat(col.getType()).isEqualTo(ColumnType.MIXED);
-    }
-
-    @Test
-    void correlations_includeMixedNumericColumn() {
-        List<Map<String, Object>> records = List.of(
-                Map.of("a", 1, "b", 10),
-                Map.of("a", 2, "b", 20),
-                Map.of("a", 3.5, "b", 35),
-                Map.of("a", 4, "b", 40));
-
-        ProfilingResult result = profilerService.profile(records);
-
-        assertThat(result.getCorrelations()).isNotNull();
-        assertThat(result.getCorrelations().get("pearson").get("a")).containsKey("b");
     }
 
     @Test
@@ -114,7 +99,6 @@ class DataProfilerServiceTest {
         assertThat(col.getTimestampFormat()).isEqualTo("EPOCH_SECONDS");
         assertThat(col.getInterpretedMinDate()).isNotNull();
         assertThat(col.getInterpretedMaxDate()).isNotNull();
-        assertThat(col.isNumeric()).isTrue();
         assertThat(col.getMin()).isNotNull();
     }
 
@@ -192,7 +176,6 @@ class DataProfilerServiceTest {
         ColumnStats col = findColumn(profilerService.profile(records), "v");
 
         assertThat(col.getType()).isEqualTo(ColumnType.INTEGER);
-        assertThat(col.isNumeric()).isTrue();
         assertThat(col.getMin()).isEqualTo(1.0);
         assertThat(col.getMax()).isEqualTo(3.0);
         assertThat(col.getMean()).isEqualTo(2.0);
@@ -208,7 +191,6 @@ class DataProfilerServiceTest {
         ColumnStats col = findColumn(result, "v");
 
         assertThat(col.getType()).isEqualTo(ColumnType.NUMBER);
-        assertThat(col.isNumeric()).isTrue();
         assertThat(col.getMin()).isEqualTo(1.5);
         assertThat(col.getMax()).isEqualTo(3.1);
         assertThat(col.getWarnings()).contains("NUMERIC_AS_STRING");
