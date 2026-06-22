@@ -11,7 +11,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.BytesDeserializer;
 import org.apache.kafka.common.serialization.BytesSerializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.utils.Bytes;
 
 import java.util.Map;
@@ -76,7 +75,7 @@ public class KafkaFactory {
       KafkaAgentConfig kafkaAgentConfig, String consumerGroupName) {
     final Properties props = getCommonProperties(kafkaAgentConfig);
 
-    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, BytesDeserializer.class.getName());
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, BytesDeserializer.class.getName());
     props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, MAX_POOL_RECORD);
     props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroupName);
