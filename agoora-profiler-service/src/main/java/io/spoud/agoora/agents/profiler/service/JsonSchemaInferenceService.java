@@ -23,11 +23,20 @@ public class JsonSchemaInferenceService {
      * matching the Python json_normalize behaviour.
      */
     public String infer(List<Map<String, Object>> records) throws Exception {
-        // Collect observed types per flattened field name
+        List<Map<String, Object>> flat = new ArrayList<>(records.size());
+        for (Map<String, Object> record : records) {
+            flat.add(JsonFlattener.flatten(record, ""));
+        }
+        return inferFromFlat(flat);
+    }
+
+    /**
+     * Infers a JSON Schema from pre-flattened records, avoiding redundant flattening.
+     */
+    public String inferFromFlat(List<Map<String, Object>> flatRecords) throws Exception {
         Map<String, Set<String>> fieldTypes = new LinkedHashMap<>();
 
-        for (Map<String, Object> record : records) {
-            Map<String, Object> flat = JsonFlattener.flatten(record, "");
+        for (Map<String, Object> flat : flatRecords) {
             for (Map.Entry<String, Object> e : flat.entrySet()) {
                 fieldTypes.computeIfAbsent(e.getKey(), k -> new LinkedHashSet<>())
                         .add(jsonTypeOf(e.getValue()));

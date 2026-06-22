@@ -64,32 +64,32 @@ public class DataProfilerService {
     );
 
     public ProfilingResult profile(List<Map<String, Object>> records) {
-        return profile(records, null);
+        return profile(records, null, null);
     }
 
-    public ProfilingResult profile(List<Map<String, Object>> records, List<String> rawJsonStrings) {
-        if (records.isEmpty()) {
+    public ProfilingResult profile(
+            List<Map<String, Object>> flatRecords,
+            List<Map<String, Object>> sampleRowsHead,
+            List<Map<String, Object>> sampleRowsTail,
+            ProfilingResult.RecordSizeStats recordSizeStats) {
+        if (flatRecords.isEmpty()) {
             return new ProfilingResult(Collections.emptyList(), 0, 0,
                     Collections.emptyList(), Collections.emptyList(),
                     Collections.emptyList(), Collections.emptyMap(), null);
         }
 
-        List<Map<String, Object>> flat = records.stream()
-                .map(r -> JsonFlattener.flatten(r, ""))
-                .collect(Collectors.toList());
-
         Set<String> allColumns = new LinkedHashSet<>();
-        flat.forEach(r -> allColumns.addAll(r.keySet()));
+        flatRecords.forEach(r -> allColumns.addAll(r.keySet()));
 
         Map<String, double[]> numericArrays = new LinkedHashMap<>();
         Map<String, List<String>> categoricalArrays = new LinkedHashMap<>();
         List<ColumnStats> columnStats = new ArrayList<>();
 
         for (String col : allColumns) {
-            ColumnStats stats = computeStats(col, flat);
+            ColumnStats stats = computeStats(col, flatRecords);
             columnStats.add(stats);
             if (stats.isNumeric()) {
-                numericArrays.put(col, flat.stream()
+                numericArrays.put(col, flatRecords.stream()
                         .mapToDouble(row -> {
                             Object val = row.get(col);
                             if (val instanceof Number) return ((Number) val).doubleValue();
@@ -100,28 +100,49 @@ public class DataProfilerService {
                             return Double.NaN;
                         }).toArray());
             } else if (stats.isCategorical()) {
-                categoricalArrays.put(col, flat.stream()
+                categoricalArrays.put(col, flatRecords.stream()
                         .map(row -> row.get(col) == null ? null : String.valueOf(row.get(col)))
                         .collect(Collectors.toList()));
             }
         }
 
-        int duplicateCount = computeDuplicateCount(flat);
+        int duplicateCount = computeDuplicateCount(flatRecords);
+
+        Map<String, Map<String, Map<String, Double>>> correlations =
+                computeAllCorrelations(numericArrays, categoricalArrays);
+
+        List<ProfilingResult.Warning> warnings = computeDatasetWarnings(columnStats, duplicateCount, flatRecords.size());
+
+        return new ProfilingResult(columnStats, flatRecords.size(), duplicateCount,
+                sampleRowsHead, sampleRowsTail, warnings, correlations, recordSizeStats);
+    }
+
+    public ProfilingResult profile(List<Map<String, Object>> records, List<String> rawJsonStrings) {
+        return profile(records, rawJsonStrings, null);
+    }
+
+    public ProfilingResult profile(List<Map<String, Object>> records, List<String> rawJsonStrings,
+                                   ProfilingResult.RecordSizeStats precomputedRecordSizeStats) {
+        if (records.isEmpty()) {
+            return new ProfilingResult(Collections.emptyList(), 0, 0,
+                    Collections.emptyList(), Collections.emptyList(),
+                    Collections.emptyList(), Collections.emptyMap(), null);
+        }
+
+        List<Map<String, Object>> flat = records.stream()
+                .map(r -> JsonFlattener.flatten(r, ""))
+                .collect(Collectors.toList());
 
         List<Map<String, Object>> head = records.subList(0, Math.min(SAMPLE_SIZE, records.size()));
         List<Map<String, Object>> tail = records.size() > SAMPLE_SIZE
                 ? records.subList(Math.max(0, records.size() - SAMPLE_SIZE), records.size())
                 : Collections.emptyList();
 
-        Map<String, Map<String, Map<String, Double>>> correlations =
-                computeAllCorrelations(numericArrays, categoricalArrays);
+        ProfilingResult.RecordSizeStats recordSizeStats = precomputedRecordSizeStats != null
+                ? precomputedRecordSizeStats
+                : computeRecordSizeStats(rawJsonStrings);
 
-        List<ProfilingResult.Warning> warnings = computeDatasetWarnings(columnStats, duplicateCount, records.size());
-
-        ProfilingResult.RecordSizeStats recordSizeStats = computeRecordSizeStats(rawJsonStrings);
-
-        return new ProfilingResult(columnStats, records.size(), duplicateCount,
-                head, tail, warnings, correlations, recordSizeStats);
+        return profile(flat, head, tail, recordSizeStats);
     }
 
     // --- Type detection ---

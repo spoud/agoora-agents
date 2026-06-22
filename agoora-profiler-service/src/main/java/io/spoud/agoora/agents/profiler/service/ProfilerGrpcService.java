@@ -9,6 +9,7 @@ import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
 import io.spoud.agoora.agents.profiler.config.ProfilerConfig;
 import io.spoud.agoora.agents.profiler.model.ProfilingResult;
+import io.spoud.agoora.agents.profiler.util.JsonFlattener;
 import io.spoud.sdm.profiler.domain.v1alpha1.Meta;
 import io.spoud.sdm.profiler.domain.v1alpha1.ProfilerError;
 import io.spoud.sdm.profiler.service.v1alpha1.InspectionDataStreamResponse;
@@ -41,6 +42,8 @@ public class ProfilerGrpcService implements Profiler {
     private final JsonSchemaInferenceService schemaService;
     private final DataProfilerService profilerService;
 
+    private static final int SAMPLE_SIZE = 5;
+
     @Override
     public Multi<ProfileDataStreamResponse> profileDataStream(Multi<ProfileRequest> requests) {
         return requests
@@ -59,10 +62,15 @@ public class ProfilerGrpcService implements Profiler {
                     errorMeta("", ProfilerError.Type.NO_DATA, "No data provided"));
         }
 
-        // Parse JSON records; fail fast on first decode error
         String requestId = reqs.get(0).getRequestId();
-        List<Map<String, Object>> records = new ArrayList<>(reqs.size());
-        List<String> rawJsonStrings = new ArrayList<>(reqs.size());
+        List<Map<String, Object>> flatRecords = new ArrayList<>(reqs.size());
+        List<Map<String, Object>> sampleHead = new ArrayList<>(SAMPLE_SIZE);
+        List<Map<String, Object>> sampleTail = new ArrayList<>(SAMPLE_SIZE);
+        long sizeMin = Long.MAX_VALUE;
+        long sizeMax = Long.MIN_VALUE;
+        long sizeTotal = 0;
+        int count = 0;
+
         for (ProfileRequest req : reqs) {
             String jsonData = req.getJsonData();
             if (jsonData == null || jsonData.isBlank()) {
@@ -72,8 +80,24 @@ public class ProfilerGrpcService implements Profiler {
             try {
                 Map<String, Object> parsed = objectMapper.readValue(
                         jsonData, new TypeReference<>() {});
-                records.add(parsed);
-                rawJsonStrings.add(jsonData);
+
+                long byteSize = jsonData.getBytes(StandardCharsets.UTF_8).length;
+                if (byteSize < sizeMin) sizeMin = byteSize;
+                if (byteSize > sizeMax) sizeMax = byteSize;
+                sizeTotal += byteSize;
+
+                flatRecords.add(JsonFlattener.flatten(parsed, ""));
+
+                if (count < SAMPLE_SIZE) {
+                    sampleHead.add(parsed);
+                }
+                if (reqs.size() > SAMPLE_SIZE) {
+                    if (sampleTail.size() >= SAMPLE_SIZE) {
+                        sampleTail.remove(0);
+                    }
+                    sampleTail.add(parsed);
+                }
+                count++;
             } catch (Exception e) {
                 LOG.warn("JSON decode error for request {}: {}", requestId, e.getMessage());
                 return Multi.createFrom().item(
@@ -81,14 +105,20 @@ public class ProfilerGrpcService implements Profiler {
             }
         }
 
+        final ProfilingResult.RecordSizeStats recordSizeStats = count > 0
+                ? new ProfilingResult.RecordSizeStats(sizeMin, sizeMax, (double) sizeTotal / count, sizeTotal)
+                : null;
+
         final String finalRequestId = requestId;
-        final List<Map<String, Object>> finalRecords = records;
-        final List<String> finalRawJsonStrings = rawJsonStrings;
+        final List<Map<String, Object>> finalFlatRecords = flatRecords;
+        final List<Map<String, Object>> finalSampleHead = sampleHead;
+        final List<Map<String, Object>> finalSampleTail = sampleTail;
 
         return Uni.createFrom()
                 .item(() -> {
                     try {
-                        return runProfiling(finalRequestId, finalRecords, finalRawJsonStrings);
+                        return runProfiling(finalRequestId, finalFlatRecords,
+                                finalSampleHead, finalSampleTail, recordSizeStats);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -106,10 +136,15 @@ public class ProfilerGrpcService implements Profiler {
     }
 
     private List<ProfileDataStreamResponse> runProfiling(
-            String requestId, List<Map<String, Object>> records, List<String> rawJsonStrings) throws Exception {
+            String requestId,
+            List<Map<String, Object>> flatRecords,
+            List<Map<String, Object>> sampleHead,
+            List<Map<String, Object>> sampleTail,
+            ProfilingResult.RecordSizeStats recordSizeStats) throws Exception {
 
-        String schemaJson = schemaService.infer(records);
-        ProfilingResult profilingResult = profilerService.profile(records, rawJsonStrings);
+        String schemaJson = schemaService.inferFromFlat(flatRecords);
+        ProfilingResult profilingResult = profilerService.profile(
+                flatRecords, sampleHead, sampleTail, recordSizeStats);
         String profileJson = objectMapper.writeValueAsString(profilingResult);
         byte[] profileBytes = profileJson.getBytes(StandardCharsets.UTF_8);
 
@@ -118,7 +153,7 @@ public class ProfilerGrpcService implements Profiler {
         Meta meta = Meta.newBuilder()
                 .setRequestId(requestId)
                 .setSchema(schemaJson)
-                .setTotalRecords(records.size())
+                .setTotalRecords(flatRecords.size())
                 .setSchemaByteSize(schemaJson.getBytes(StandardCharsets.UTF_8).length)
                 .setProfileByteSize(profileBytes.length)
                 .setServiceVersion(config.serviceVersion())
@@ -132,7 +167,7 @@ public class ProfilerGrpcService implements Profiler {
         }
 
         LOG.info("Profiled {} records for request '{}', JSON size: {} bytes, chunks: {}",
-                records.size(), requestId, profileBytes.length, responses.size() - 1);
+                flatRecords.size(), requestId, profileBytes.length, responses.size() - 1);
 
         return responses;
     }

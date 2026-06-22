@@ -16,8 +16,8 @@ import java.util.Optional;
 @Slf4j
 public class ProfileResponseObserver extends AbstractResponseObserver<ProfileDataStreamResponse> {
   @Getter private ProfilerResponse response = new ProfilerResponse();
-  private String profile = "";
-  private String schema = "";
+  private final StringBuilder profile = new StringBuilder();
+  private final StringBuilder schema = new StringBuilder();
 
   @Override
   protected void accumulator(ProfileDataStreamResponse profileDataStreamResponse) {
@@ -25,19 +25,19 @@ public class ProfileResponseObserver extends AbstractResponseObserver<ProfileDat
       final Meta meta = profileDataStreamResponse.getMeta();
       response.setMeta(meta);
       if(StringUtils.isNotBlank(meta.getSchema())){
-        schema += meta.getSchema();
+        schema.append(meta.getSchema());
       }
 
     } else {
-      profile += profileDataStreamResponse.getProfile();
+      profile.append(profileDataStreamResponse.getProfile());
     }
   }
 
   @Override
   public void onCompleted() {
     super.onCompleted();
-    response.setProfileJson(profile);
-    response.setSchema(schema);
+    response.setProfileJson(profile.toString());
+    response.setSchema(schema.toString());
 
     if (!response
         .getMeta()
