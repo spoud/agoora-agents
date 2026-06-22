@@ -243,7 +243,8 @@ public class ProfilerService {
                     .sourceMetadata(sourceMetadata)
                     .build();
 
-            String enrichedJson = objectMapper.writeValueAsString(envelope);
+            String enrichedJson = objectMapper.writeValueAsString(envelope)
+                    .replace("\u0000", "");
             dataProfileRequest.setProfileJson(enrichedJson);
           } else {
             LOG.warn("Profile JSON content is null or blank for topic {}", kafkaTopic);
