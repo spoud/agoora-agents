@@ -36,6 +36,7 @@ public class DataProfilerService {
     private static final double EMAIL_THRESHOLD = 0.8;
     private static final double TEXT_CARDINALITY_RATIO = 0.5;
     private static final int CATEGORICAL_MAX_UNIQUE = 50;
+    private static final int MAX_CORRELATION_COLUMNS = 100;
 
     private static final long EPOCH_SEC_MIN = 946684800L;        // 2000-01-01
     private static final long EPOCH_SEC_MAX = 2524608000L;        // 2050-01-01
@@ -81,35 +82,38 @@ public class DataProfilerService {
         Set<String> allColumns = new LinkedHashSet<>();
         flatRecords.forEach(r -> allColumns.addAll(r.keySet()));
 
-        Map<String, double[]> numericArrays = new LinkedHashMap<>();
-        Map<String, List<String>> categoricalArrays = new LinkedHashMap<>();
         List<ColumnStats> columnStats = new ArrayList<>();
+        List<String> numericCols = new ArrayList<>();
+        List<String> categoricalCols = new ArrayList<>();
 
         for (String col : allColumns) {
             ColumnStats stats = computeStats(col, flatRecords);
             columnStats.add(stats);
             if (stats.isNumeric()) {
-                numericArrays.put(col, flatRecords.stream()
-                        .mapToDouble(row -> {
-                            Object val = row.get(col);
-                            if (val instanceof Number) return ((Number) val).doubleValue();
-                            if (val != null) {
-                                Double d = tryParseNumber(val.toString().trim());
-                                if (d != null) return d;
-                            }
-                            return Double.NaN;
-                        }).toArray());
+                numericCols.add(col);
             } else if (stats.isCategorical()) {
-                categoricalArrays.put(col, flatRecords.stream()
-                        .map(row -> row.get(col) == null ? null : String.valueOf(row.get(col)))
-                        .collect(Collectors.toList()));
+                categoricalCols.add(col);
             }
         }
 
         int duplicateCount = computeDuplicateCount(flatRecords);
 
-        Map<String, Map<String, Map<String, Double>>> correlations =
-                computeAllCorrelations(numericArrays, categoricalArrays);
+        Map<String, Map<String, Map<String, Double>>> correlations;
+        if (numericCols.size() + categoricalCols.size() > MAX_CORRELATION_COLUMNS) {
+            LOG.info("Skipping correlations: {} columns exceeds limit of {}",
+                    numericCols.size() + categoricalCols.size(), MAX_CORRELATION_COLUMNS);
+            correlations = Collections.emptyMap();
+        } else {
+            Map<String, double[]> numericArrays = new LinkedHashMap<>();
+            for (String col : numericCols) {
+                numericArrays.put(col, extractNumericArray(col, flatRecords));
+            }
+            Map<String, List<String>> categoricalArrays = new LinkedHashMap<>();
+            for (String col : categoricalCols) {
+                categoricalArrays.put(col, extractCategoricalArray(col, flatRecords));
+            }
+            correlations = computeAllCorrelations(numericArrays, categoricalArrays);
+        }
 
         List<ProfilingResult.Warning> warnings = computeDatasetWarnings(columnStats, duplicateCount, flatRecords.size());
 
@@ -384,6 +388,30 @@ public class DataProfilerService {
         return builder.build();
     }
 
+    // --- Array extraction for correlations ---
+
+    private double[] extractNumericArray(String col, List<Map<String, Object>> flatRecords) {
+        return flatRecords.stream()
+                .mapToDouble(row -> {
+                    Object val = row.get(col);
+                    if (val instanceof Number) return ((Number) val).doubleValue();
+                    if (val != null) {
+                        Double d = tryParseNumber(val.toString().trim());
+                        if (d != null) return d;
+                    }
+                    return Double.NaN;
+                }).toArray();
+    }
+
+    private List<String> extractCategoricalArray(String col, List<Map<String, Object>> flatRecords) {
+        return flatRecords.stream()
+                .map(row -> {
+                    Object val = row.get(col);
+                    return val == null ? null : val.toString();
+                })
+                .collect(Collectors.toList());
+    }
+
     // --- Helpers ---
 
     private List<ColumnStats.TopValue> buildExtremeValues(double[] values, boolean high) {
@@ -453,13 +481,11 @@ public class DataProfilerService {
     // --- Duplicate detection ---
 
     private int computeDuplicateCount(List<Map<String, Object>> flat) {
-        Set<String> seen = new HashSet<>();
+        Set<Integer> seen = new HashSet<>();
         int dupes = 0;
         for (Map<String, Object> row : flat) {
-            // sort by key first: row's iteration order follows JSON field order,
-            // which can differ between logically identical records
-            String fingerprint = new TreeMap<>(row).toString();
-            if (!seen.add(fingerprint)) dupes++;
+            int hash = new TreeMap<>(row).hashCode();
+            if (!seen.add(hash)) dupes++;
         }
         return dupes;
     }

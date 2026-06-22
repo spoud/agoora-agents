@@ -79,7 +79,8 @@ public class ProfilerGrpcService implements Profiler {
     }
 
     private List<ProfileDataStreamResponse> parseAndProfile(String requestId, List<ProfileRequest> reqs) {
-        List<Map<String, Object>> flatRecords = new ArrayList<>(reqs.size());
+        int totalReqs = reqs.size();
+        List<Map<String, Object>> flatRecords = new ArrayList<>(totalReqs);
         List<Map<String, Object>> sampleHead = new ArrayList<>(SAMPLE_SIZE);
         List<Map<String, Object>> sampleTail = new ArrayList<>(SAMPLE_SIZE);
         long sizeMin = Long.MAX_VALUE;
@@ -96,7 +97,7 @@ public class ProfilerGrpcService implements Profiler {
                 Map<String, Object> parsed = objectMapper.readValue(
                         jsonData, new TypeReference<>() {});
 
-                long byteSize = jsonData.getBytes(StandardCharsets.UTF_8).length;
+                long byteSize = utf8ByteCount(jsonData);
                 if (byteSize < sizeMin) sizeMin = byteSize;
                 if (byteSize > sizeMax) sizeMax = byteSize;
                 sizeTotal += byteSize;
@@ -106,7 +107,7 @@ public class ProfilerGrpcService implements Profiler {
                 if (count < SAMPLE_SIZE) {
                     sampleHead.add(parsed);
                 }
-                if (reqs.size() > SAMPLE_SIZE) {
+                if (totalReqs > SAMPLE_SIZE) {
                     if (sampleTail.size() >= SAMPLE_SIZE) {
                         sampleTail.remove(0);
                     }
@@ -119,6 +120,8 @@ public class ProfilerGrpcService implements Profiler {
             }
         }
 
+        reqs.clear();
+
         ProfilingResult.RecordSizeStats recordSizeStats = count > 0
                 ? new ProfilingResult.RecordSizeStats(sizeMin, sizeMax, (double) sizeTotal / count, sizeTotal)
                 : null;
@@ -128,6 +131,16 @@ public class ProfilerGrpcService implements Profiler {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static long utf8ByteCount(String s) {
+        long bytes = 0;
+        for (int i = 0; i < s.length(); ) {
+            int cp = s.codePointAt(i);
+            bytes += utf8ByteLength(cp);
+            i += Character.charCount(cp);
+        }
+        return bytes;
     }
 
     private List<ProfileDataStreamResponse> runProfiling(
