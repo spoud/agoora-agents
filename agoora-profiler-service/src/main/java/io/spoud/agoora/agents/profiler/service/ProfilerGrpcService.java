@@ -48,7 +48,8 @@ public class ProfilerGrpcService implements Profiler {
     public Multi<ProfileDataStreamResponse> profileDataStream(Multi<ProfileRequest> requests) {
         return requests
                 .collect().asList()
-                .onItem().transformToMulti(this::buildResponseStream);
+                .onItem().transformToUni(this::processAll)
+                .onItem().transformToMulti(responses -> Multi.createFrom().iterable(responses));
     }
 
     @Override
@@ -56,13 +57,28 @@ public class ProfilerGrpcService implements Profiler {
         return Uni.createFrom().failure(new StatusRuntimeException(Status.UNIMPLEMENTED));
     }
 
-    private Multi<ProfileDataStreamResponse> buildResponseStream(List<ProfileRequest> reqs) {
+    private Uni<List<ProfileDataStreamResponse>> processAll(List<ProfileRequest> reqs) {
         if (reqs.isEmpty()) {
-            return Multi.createFrom().item(
-                    errorMeta("", ProfilerError.Type.NO_DATA, "No data provided"));
+            return Uni.createFrom().item(
+                    List.of(errorMeta("", ProfilerError.Type.NO_DATA, "No data provided")));
         }
 
         String requestId = reqs.get(0).getRequestId();
+
+        return Uni.createFrom()
+                .item(() -> parseAndProfile(requestId, reqs))
+                .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+                .ifNoItem().after(Duration.ofSeconds(config.timeout()))
+                .failWith(() -> new TimeoutException(
+                        "Profiling timed out after " + config.timeout() + "s"))
+                .onFailure().recoverWithItem(t -> {
+                    LOG.error("Profiling failed for request {}: {}", requestId, t.getMessage());
+                    return List.of(errorMeta(
+                            requestId, ProfilerError.Type.PROFILE_EXCEPTION, t.getMessage()));
+                });
+    }
+
+    private List<ProfileDataStreamResponse> parseAndProfile(String requestId, List<ProfileRequest> reqs) {
         List<Map<String, Object>> flatRecords = new ArrayList<>(reqs.size());
         List<Map<String, Object>> sampleHead = new ArrayList<>(SAMPLE_SIZE);
         List<Map<String, Object>> sampleTail = new ArrayList<>(SAMPLE_SIZE);
@@ -74,8 +90,7 @@ public class ProfilerGrpcService implements Profiler {
         for (ProfileRequest req : reqs) {
             String jsonData = req.getJsonData();
             if (jsonData == null || jsonData.isBlank()) {
-                return Multi.createFrom().item(
-                        errorMeta(requestId, ProfilerError.Type.UNKNOWN_ENCODING, "Empty json_data field"));
+                return List.of(errorMeta(requestId, ProfilerError.Type.UNKNOWN_ENCODING, "Empty json_data field"));
             }
             try {
                 Map<String, Object> parsed = objectMapper.readValue(
@@ -100,39 +115,19 @@ public class ProfilerGrpcService implements Profiler {
                 count++;
             } catch (Exception e) {
                 LOG.warn("JSON decode error for request {}: {}", requestId, e.getMessage());
-                return Multi.createFrom().item(
-                        errorMeta(requestId, ProfilerError.Type.UNKNOWN_ENCODING, e.getMessage()));
+                return List.of(errorMeta(requestId, ProfilerError.Type.UNKNOWN_ENCODING, e.getMessage()));
             }
         }
 
-        final ProfilingResult.RecordSizeStats recordSizeStats = count > 0
+        ProfilingResult.RecordSizeStats recordSizeStats = count > 0
                 ? new ProfilingResult.RecordSizeStats(sizeMin, sizeMax, (double) sizeTotal / count, sizeTotal)
                 : null;
 
-        final String finalRequestId = requestId;
-        final List<Map<String, Object>> finalFlatRecords = flatRecords;
-        final List<Map<String, Object>> finalSampleHead = sampleHead;
-        final List<Map<String, Object>> finalSampleTail = sampleTail;
-
-        return Uni.createFrom()
-                .item(() -> {
-                    try {
-                        return runProfiling(finalRequestId, finalFlatRecords,
-                                finalSampleHead, finalSampleTail, recordSizeStats);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
-                .ifNoItem().after(Duration.ofSeconds(config.timeout()))
-                .failWith(() -> new TimeoutException(
-                        "Profiling timed out after " + config.timeout() + "s"))
-                .onFailure().recoverWithItem(t -> {
-                    LOG.error("Profiling failed for request {}: {}", finalRequestId, t.getMessage());
-                    return List.of(errorMeta(
-                            finalRequestId, ProfilerError.Type.PROFILE_EXCEPTION, t.getMessage()));
-                })
-                .onItem().transformToMulti(responses -> Multi.createFrom().iterable(responses));
+        try {
+            return runProfiling(requestId, flatRecords, sampleHead, sampleTail, recordSizeStats);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<ProfileDataStreamResponse> runProfiling(
