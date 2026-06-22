@@ -76,7 +76,8 @@ public class ColumnStats {
     public boolean isCategorical() {
         return type == ColumnType.STRING || type == ColumnType.TEXT
                 || type == ColumnType.CATEGORICAL || type == ColumnType.BOOLEAN
-                || type == ColumnType.URL || type == ColumnType.EMAIL;
+                || type == ColumnType.URL || type == ColumnType.EMAIL
+                || type == ColumnType.UUID;
     }
 
     public record TopValue(String value, long count) {}

@@ -47,8 +47,13 @@ public class DataProfilerService {
             Pattern.compile("^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$");
     private static final Pattern URL_PATTERN =
             Pattern.compile("^https?://.*");
+    private static final Pattern UUID_PATTERN =
+            Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+    private static final double UUID_THRESHOLD = 0.8;
 
     private static final List<DateTimeFormatter> DATE_FORMATTERS = List.of(
+            DateTimeFormatter.ISO_OFFSET_DATE_TIME,
+            DateTimeFormatter.ISO_INSTANT,
             DateTimeFormatter.ISO_LOCAL_DATE_TIME,
             DateTimeFormatter.ISO_LOCAL_DATE,
             DateTimeFormatter.ofPattern("MM/dd/yyyy"),
@@ -87,7 +92,12 @@ public class DataProfilerService {
                 numericArrays.put(col, flat.stream()
                         .mapToDouble(row -> {
                             Object val = row.get(col);
-                            return (val instanceof Number) ? ((Number) val).doubleValue() : Double.NaN;
+                            if (val instanceof Number) return ((Number) val).doubleValue();
+                            if (val != null) {
+                                Double d = tryParseNumber(val.toString().trim());
+                                if (d != null) return d;
+                            }
+                            return Double.NaN;
                         }).toArray());
             } else if (stats.isCategorical()) {
                 categoricalArrays.put(col, flat.stream()
@@ -126,6 +136,11 @@ public class DataProfilerService {
 
         if (nonNullSamples.isEmpty()) return ColumnType.STRING;
 
+        // UUID detection
+        long uuidMatches = nonNullSamples.stream()
+                .filter(s -> UUID_PATTERN.matcher(s).matches()).count();
+        if ((double) uuidMatches / nonNullSamples.size() >= UUID_THRESHOLD) return ColumnType.UUID;
+
         // Email detection
         long emailMatches = nonNullSamples.stream()
                 .filter(s -> EMAIL_PATTERN.matcher(s).matches()).count();
@@ -153,9 +168,22 @@ public class DataProfilerService {
         return ColumnType.CATEGORICAL;
     }
 
+    private static boolean isBooleanString(String s) {
+        String lower = s.toLowerCase(Locale.ROOT);
+        return "true".equals(lower) || "false".equals(lower);
+    }
+
+    private static Double tryParseNumber(String s) {
+        try {
+            return Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private boolean tryParseDate(String s, DateTimeFormatter fmt) {
         try {
-            fmt.parseBest(s, LocalDateTime::from, LocalDate::from);
+            fmt.parseBest(s, Instant::from, LocalDateTime::from, LocalDate::from);
             return true;
         } catch (Exception e) {
             return false;
@@ -167,6 +195,8 @@ public class DataProfilerService {
     private ColumnStats computeStats(String col, List<Map<String, Object>> flat) {
         int count = flat.size();
         int missingCount = 0;
+        boolean hasNumericStrings = false;
+        boolean hasBooleanStrings = false;
         DescriptiveStatistics ds = new DescriptiveStatistics();
         Map<String, Long> freq = new LinkedHashMap<>();
         Set<String> observedTypes = new HashSet<>();
@@ -188,7 +218,19 @@ public class DataProfilerService {
                 observedTypes.add("number");
                 ds.addValue(((Number) val).doubleValue());
             } else {
-                observedTypes.add("string");
+                String str = val.toString().trim();
+                Double parsed = tryParseNumber(str);
+                if (parsed != null) {
+                    hasNumericStrings = true;
+                    boolean isInt = !str.contains(".") && !str.contains("e") && !str.contains("E");
+                    observedTypes.add(isInt ? "integer" : "number");
+                    ds.addValue(parsed);
+                } else if (isBooleanString(str)) {
+                    hasBooleanStrings = true;
+                    observedTypes.add("boolean");
+                } else {
+                    observedTypes.add("string");
+                }
             }
         }
 
@@ -316,7 +358,7 @@ public class DataProfilerService {
         }
 
         // Per-column warnings
-        builder.warnings(computeColumnWarnings(type, count, missingCount, freq, ds));
+        builder.warnings(computeColumnWarnings(type, count, missingCount, freq, ds, hasNumericStrings, hasBooleanStrings));
 
         return builder.build();
     }
@@ -559,9 +601,13 @@ public class DataProfilerService {
 
     private List<String> computeColumnWarnings(
             ColumnType type, int count, int missingCount,
-            Map<String, Long> freq, DescriptiveStatistics ds) {
+            Map<String, Long> freq, DescriptiveStatistics ds,
+            boolean hasNumericStrings, boolean hasBooleanStrings) {
         List<String> w = new ArrayList<>();
         if (count == 0) return w;
+
+        if (hasNumericStrings) w.add("NUMERIC_AS_STRING");
+        if (hasBooleanStrings) w.add("BOOLEAN_AS_STRING");
 
         double missingPct = missingCount * 100.0 / count;
         if (missingPct > 20) w.add("HIGH_MISSING");
@@ -616,6 +662,8 @@ public class DataProfilerService {
             case "SKEWED_POSITIVE" -> String.format("High positive skew (%.2f)", col.getSkewness());
             case "SKEWED_NEGATIVE" -> String.format("High negative skew (%.2f)", col.getSkewness());
             case "HIGH_ZEROS" -> "More than 50% zero values";
+            case "NUMERIC_AS_STRING" -> "Values are numeric but encoded as strings in the schema";
+            case "BOOLEAN_AS_STRING" -> "Values are boolean but encoded as strings in the schema";
             default -> code;
         };
     }

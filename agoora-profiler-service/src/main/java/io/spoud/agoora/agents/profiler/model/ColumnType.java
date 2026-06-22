@@ -11,6 +11,7 @@ public enum ColumnType {
     TIMESTAMP,
     URL,
     EMAIL,
+    UUID,
     NULL,
     MIXED
 }
