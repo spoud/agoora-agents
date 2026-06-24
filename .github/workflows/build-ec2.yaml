@@ -17,7 +17,7 @@ jobs:
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
       git-tag:  ${{ steps.git-tag.outputs.git-tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Configure AWS credentials
@@ -52,12 +52,12 @@ jobs:
       MAVEN_OPTS: -Xmx4g
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Maven
-        uses: stCarolas/setup-maven@v4
+        uses: stCarolas/setup-maven@v5
         with:
           maven-version: 3.8.2
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -73,7 +73,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build native
         run: mvn --batch-mode package -DskipTests -Pnative
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: maven-output
           path: |
@@ -97,8 +97,8 @@ jobs:
           - agoora-pgsql-agent
           - agoora-profiler-service
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           name: maven-output
 
@@ -114,7 +114,7 @@ jobs:
         with:
           files: "${{ matrix.agents }}/Dockerfile.native"
 
-      # restore execute permissions lost in actions/upload-artifact@v4 see https://github.com/actions/upload-artifact/issues/38
+      # restore execute permissions lost in actions/upload-artifact@v7 see https://github.com/actions/upload-artifact/issues/38
       - name: restore execute permissions
         run: |
           chmod +x ./**/target/*-runner
@@ -179,8 +179,8 @@ jobs:
       - build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           name: maven-output
       - name: prepare-binaries
