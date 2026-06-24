@@ -1,3 +1,0 @@
-[submodule "agoora-agents-api/src/main/proto"]
-	path = agoora-agents-api/src/main/proto
-	url = git@github.com:spoud/sdm-proto-api.git
