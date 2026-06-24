@@ -78,10 +78,11 @@ public class SampleDecoderAvroConfluent implements SampleDecoder {
       Object avroDatum = datumReader.read(null, decoder);
       return avroDatum.toString().getBytes(StandardCharsets.UTF_8);
     } catch (AvroRuntimeException ex) {
-      LOG.error("Unable to decode avro message, enable DEBUG to see the message", ex);
-      LOG.debug("Unable to decode avro message: '{}'", Hex.encodeHexString(data));
+      LOG.warn("Unable to decode avro message, enable DEBUG to see the message");
+      LOG.debug("Unable to decode avro message: '{}'", Hex.encodeHexString(data), ex);
     } catch (IOException e) {
-      LOG.error("Unable to deserialize object", e);
+      LOG.warn("Unable to deserialize object");
+      LOG.debug("Deserialization error details", e);
     }
     return null;
   }
