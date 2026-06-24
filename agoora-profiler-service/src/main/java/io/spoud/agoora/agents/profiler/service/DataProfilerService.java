@@ -380,7 +380,8 @@ public class DataProfilerService {
     private LocalDate parseToLocalDate(String s) {
         for (DateTimeFormatter fmt : DATE_FORMATTERS) {
             try {
-                var ta = fmt.parseBest(s, LocalDateTime::from, LocalDate::from);
+                var ta = fmt.parseBest(s, Instant::from, LocalDateTime::from, LocalDate::from);
+                if (ta instanceof Instant inst) return inst.atOffset(ZoneOffset.UTC).toLocalDate();
                 if (ta instanceof LocalDateTime ldt) return ldt.toLocalDate();
                 if (ta instanceof LocalDate ld) return ld;
             } catch (Exception ignored) {}
@@ -428,11 +429,10 @@ public class DataProfilerService {
     // --- Duplicate detection ---
 
     private int computeDuplicateCount(List<Map<String, Object>> flat) {
-        Set<Integer> seen = new HashSet<>();
+        Set<Map<String, Object>> seen = new HashSet<>();
         int dupes = 0;
         for (Map<String, Object> row : flat) {
-            int hash = new TreeMap<>(row).hashCode();
-            if (!seen.add(hash)) dupes++;
+            if (!seen.add(new TreeMap<>(row))) dupes++;
         }
         return dupes;
     }

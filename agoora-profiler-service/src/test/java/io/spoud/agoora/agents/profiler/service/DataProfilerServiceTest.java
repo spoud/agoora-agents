@@ -240,6 +240,9 @@ class DataProfilerServiceTest {
         ColumnStats col = findColumn(profilerService.profile(records), "v");
 
         assertThat(col.getType()).isEqualTo(ColumnType.DATE);
+        assertThat(col.getMinDate()).isEqualTo("2024-01-15");
+        assertThat(col.getMaxDate()).isEqualTo("2024-06-20");
+        assertThat(col.getRangeDays()).isEqualTo(157);
     }
 
     @Test

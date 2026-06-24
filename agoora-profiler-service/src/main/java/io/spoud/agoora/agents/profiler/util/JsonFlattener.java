@@ -1,6 +1,7 @@
 package io.spoud.agoora.agents.profiler.util;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class JsonFlattener {
@@ -14,6 +15,11 @@ public final class JsonFlattener {
             for (Map.Entry<String, Object> e : ((Map<String, Object>) value).entrySet()) {
                 String key = prefix.isEmpty() ? e.getKey() : prefix + "/" + e.getKey();
                 result.putAll(flatten(e.getValue(), key));
+            }
+        } else if (value instanceof List<?> list) {
+            for (int i = 0; i < list.size(); i++) {
+                String key = prefix.isEmpty() ? String.valueOf(i) : prefix + "/" + i;
+                result.putAll(flatten(list.get(i), key));
             }
         } else if (!prefix.isEmpty()) {
             result.put(prefix, value);

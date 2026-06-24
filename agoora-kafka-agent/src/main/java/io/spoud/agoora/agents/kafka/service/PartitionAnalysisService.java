@@ -61,15 +61,19 @@ public class PartitionAnalysisService {
                     .map(Map.Entry::getKey)
                     .toList();
 
-            StringBuilder warning = new StringBuilder("PARTITION_SKEW: ");
-            if (!hotPartitions.isEmpty()) {
-                warning.append("hot partitions ").append(hotPartitions);
+            if (!hotPartitions.isEmpty() || !coldPartitions.isEmpty()) {
+                StringBuilder warning = new StringBuilder("PARTITION_SKEW: ");
+                if (!hotPartitions.isEmpty()) {
+                    warning.append("hot partitions ").append(hotPartitions);
+                }
+                if (!coldPartitions.isEmpty()) {
+                    if (!hotPartitions.isEmpty()) warning.append(", ");
+                    warning.append("cold partitions ").append(coldPartitions);
+                }
+                warnings.add(warning.toString());
+            } else {
+                warnings.add(String.format("PARTITION_SKEW: uneven distribution (balance score %.2f)", balanceScore));
             }
-            if (!coldPartitions.isEmpty()) {
-                if (!hotPartitions.isEmpty()) warning.append(", ");
-                warning.append("cold partitions ").append(coldPartitions);
-            }
-            warnings.add(warning.toString());
         }
 
         return PartitionAnalysis.builder()

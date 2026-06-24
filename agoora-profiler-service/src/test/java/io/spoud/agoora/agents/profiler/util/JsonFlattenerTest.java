@@ -37,14 +37,32 @@ class JsonFlattenerTest {
     }
 
     @Test
-    void flatten_arrayLeaf_keptAsIs() {
+    void flatten_arrayOfPrimitives_indexedKeys() {
         List<Integer> array = List.of(1, 2, 3);
         Map<String, Object> record = new LinkedHashMap<>();
-        record.put("a", array);
+        record.put("tags", array);
 
         Map<String, Object> flat = JsonFlattener.flatten(record, "");
 
-        assertThat(flat).containsEntry("a", array);
+        assertThat(flat).containsExactly(
+                Map.entry("tags/0", 1),
+                Map.entry("tags/1", 2),
+                Map.entry("tags/2", 3));
+    }
+
+    @Test
+    void flatten_arrayOfObjects_recursivelyFlattened() {
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("id", 1);
+        item.put("name", "foo");
+        Map<String, Object> record = new LinkedHashMap<>();
+        record.put("items", List.of(item));
+
+        Map<String, Object> flat = JsonFlattener.flatten(record, "");
+
+        assertThat(flat).containsExactly(
+                Map.entry("items/0/id", 1),
+                Map.entry("items/0/name", "foo"));
     }
 
     @Test
