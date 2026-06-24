@@ -16,6 +16,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.spoud.sdm</groupId>
+            <artifactId>sdm-proto-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-grpc</artifactId>
         </dependency>
