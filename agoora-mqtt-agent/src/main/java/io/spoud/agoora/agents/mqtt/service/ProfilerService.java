@@ -119,7 +119,8 @@ public class ProfilerService {
             String profileJson = profilerResponse.getProfileJson();
             LOG.debug("Profile received for topic {}: {}bytes", topicName, profileJson.length());
             DataProfileEnvelope envelope = DataProfileEnvelope.wrap(profileJson);
-            dataProfileRequest.setProfileJson(objectMapper.writeValueAsString(envelope));
+            dataProfileRequest.setProfileJson(
+                    objectMapper.writeValueAsString(envelope).replace("\u0000", ""));
           } else {
             LOG.warn("Profile JSON content is null or blank for topic {}", topicName);
           }
