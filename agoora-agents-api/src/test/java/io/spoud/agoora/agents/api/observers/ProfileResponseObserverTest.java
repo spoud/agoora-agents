@@ -20,7 +20,7 @@ class ProfileResponseObserverTest {
   void testProfilerResponseObserver() {
     assertThat(profileResponseObserver.getResponse()).isNotNull();
     assertThat(profileResponseObserver.getResponse().getMeta()).isNull();
-    assertThat(profileResponseObserver.getResponse().getHtml()).isNull();
+    assertThat(profileResponseObserver.getResponse().getProfileJson()).isNull();
     assertThat(profileResponseObserver.getResponse().getError()).isEmpty();
     assertThat(profileResponseObserver.getResponse().getSchema()).isNull();
 
@@ -33,7 +33,7 @@ class ProfileResponseObserverTest {
     assertThat(profileResponseObserver.getResponse()).isNotNull();
     assertThat(profileResponseObserver.getResponse().getMeta())
         .isEqualTo(Meta.newBuilder().setSchema("schema").build());
-    assertThat(profileResponseObserver.getResponse().getHtml()).isNull();
+    assertThat(profileResponseObserver.getResponse().getProfileJson()).isNull();
     assertThat(profileResponseObserver.getResponse().getError()).isEmpty();
     assertThat(profileResponseObserver.getResponse().getSchema()).isNull();
 
@@ -43,7 +43,7 @@ class ProfileResponseObserverTest {
 
     // don't take in account the profile when there is meta
     assertThat(profileResponseObserver.getResponse().getSchema()).isEqualTo("schema");
-    assertThat(profileResponseObserver.getResponse().getHtml()).isEqualTo("bc");
+    assertThat(profileResponseObserver.getResponse().getProfileJson()).isEqualTo("bc");
 
     assertThat(profileResponseObserver.getError()).isNull();
   }
@@ -59,5 +59,26 @@ class ProfileResponseObserverTest {
     assertThat(profileResponseObserver.getError())
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("b");
+  }
+
+  @Test
+  void hasProfileJson_returnsFalse_whenNull() {
+    ProfileResponseObserver.ProfilerResponse response =
+        ProfileResponseObserver.ProfilerResponse.builder().profileJson(null).build();
+    assertThat(response.hasProfileJson()).isFalse();
+  }
+
+  @Test
+  void hasProfileJson_returnsFalse_whenBlank() {
+    ProfileResponseObserver.ProfilerResponse response =
+        ProfileResponseObserver.ProfilerResponse.builder().profileJson("   ").build();
+    assertThat(response.hasProfileJson()).isFalse();
+  }
+
+  @Test
+  void hasProfileJson_returnsTrue_whenNonBlank() {
+    ProfileResponseObserver.ProfilerResponse response =
+        ProfileResponseObserver.ProfilerResponse.builder().profileJson("{}").build();
+    assertThat(response.hasProfileJson()).isTrue();
   }
 }

@@ -2,6 +2,7 @@ package io.spoud.agoora.agents.kafka.kafka;
 
 import io.quarkus.runtime.StartupEvent;
 import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
+import io.spoud.agoora.agents.kafka.data.KafkaSampleResult;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,20 +32,23 @@ public class KafkaTopicReader {
     globalConsumer = KafkaFactory.createConsumer(config);
   }
 
-  public List<byte[]> getSamples(String topic) {
+  public KafkaSampleResult getSamples(String topic) {
     try (Consumer<Bytes, Bytes> consumer = KafkaFactory.createConsumer(config)) {
       final Instant start = Instant.now();
 
       final Map<TopicPartition, Range> ranges = getRanges(topic, consumer);
       if (ranges.isEmpty()) {
-        return Collections.emptyList();
+        return KafkaSampleResult.builder()
+                .records(Collections.emptyList())
+                .partitionRanges(Collections.emptyMap())
+                .build();
       }
 
       consumer.assign(ranges.keySet());
 
       ranges.forEach((key, value) -> consumer.seek(key, value.getBeginning()));
 
-      List<byte[]> samples = new ArrayList<>();
+      List<KafkaSampleResult.KafkaRecord> records = new ArrayList<>();
 
       Map<Integer, Long> endOffsets =
           ranges.entrySet().stream()
@@ -66,25 +70,40 @@ public class KafkaTopicReader {
             rec -> {
               final Long endOffset = endOffsets.get(rec.partition());
               if (rec.offset() >= endOffset) {
-                // we reached the end, remove partition
                 runningPartitions.remove(rec.partition());
               }
               if (rec.offset() <= endOffset) {
                 if (rec.value() != null) {
-                  samples.add(rec.value().get());
+                  records.add(KafkaSampleResult.KafkaRecord.builder()
+                          .value(rec.value().get())
+                          .key(rec.key() != null ? rec.key().get() : null)
+                          .partition(rec.partition())
+                          .offset(rec.offset())
+                          .build());
                 }
               }
             });
       }
       consumer.assign(Collections.emptyList());
+
+      Map<Integer, KafkaSampleResult.PartitionRange> partitionRanges = new LinkedHashMap<>();
+      ranges.forEach((tp, range) -> partitionRanges.put(tp.partition(),
+              KafkaSampleResult.PartitionRange.builder()
+                      .beginOffset(range.getBeginning())
+                      .endOffset(range.getEnd())
+                      .build()));
+
       LOG.debug(
           "Topic '{}', partition count={}, samples count={}, duration={}, ranges={}",
           topic,
           ranges.keySet().size(),
-          samples.size(),
+          records.size(),
           Duration.between(start, Instant.now()),
           ranges);
-      return samples;
+      return KafkaSampleResult.builder()
+              .records(records)
+              .partitionRanges(partitionRanges)
+              .build();
     }
   }
 

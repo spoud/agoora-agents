@@ -32,14 +32,6 @@ updates:
         patterns:
           - "*"
 
-  - package-ecosystem: "pip"
-    directory: "/agoora-profiler-service"
-    schedule:
-      interval: "weekly"
-    groups:
-      pip-profiler-version:
-        patterns:
-          - "*"
   - package-ecosystem: "docker"
     directory: "/agoora-kafka-agent"
     schedule:
@@ -80,3 +72,8 @@ updates:
       docker-profiler-version:
         patterns:
           - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
