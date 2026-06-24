@@ -11,9 +11,9 @@ idna
 genson
 numba
 pandas
-setuptools<81
+setuptools<83
 fg-data-profiling
 func-timeout
 pillow>=12.2.0
-tornado>=6.5.5
+tornado>=6.5.7
 urllib3>=2.7.0
