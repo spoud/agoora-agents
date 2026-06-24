@@ -133,7 +133,7 @@ jobs:
 
       - name: Trivy scan JVM image
         if: steps.dockerfile_jvm_exists.outputs.files_exists == 'true'
-        uses: aquasecurity/trivy-action@0.31.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: 'spoud/${{ matrix.agents }}:dev'
           format: 'table'
@@ -142,7 +142,7 @@ jobs:
 
       - name: Trivy scan native image
         if: steps.dockerfile_native_exists.outputs.files_exists == 'true'
-        uses: aquasecurity/trivy-action@0.31.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: 'spoud/${{ matrix.agents }}:dev-native'
           format: 'table'
