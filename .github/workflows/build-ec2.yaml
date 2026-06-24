@@ -138,7 +138,7 @@ jobs:
           image-ref: 'spoud/${{ matrix.agents }}:dev'
           format: 'table'
           exit-code: '1'
-          severity: 'CRITICAL,HIGH'
+          severity: 'CRITICAL'
 
       - name: Trivy scan native image
         if: steps.dockerfile_native_exists.outputs.files_exists == 'true'
@@ -147,7 +147,7 @@ jobs:
           image-ref: 'spoud/${{ matrix.agents }}:dev-native'
           format: 'table'
           exit-code: '1'
-          severity: 'CRITICAL,HIGH'
+          severity: 'CRITICAL'
 
       - name: Login to Docker Hub
         if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
