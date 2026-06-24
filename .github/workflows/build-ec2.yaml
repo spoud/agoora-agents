@@ -17,7 +17,7 @@ jobs:
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
       git-tag:  ${{ steps.git-tag.outputs.git-tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Configure AWS credentials
@@ -52,7 +52,7 @@ jobs:
       MAVEN_OPTS: -Xmx4g
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Maven
         uses: stCarolas/setup-maven@v5
         with:
@@ -97,7 +97,7 @@ jobs:
           - agoora-pgsql-agent
           - agoora-profiler-service
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:
           name: maven-output
@@ -179,7 +179,7 @@ jobs:
       - build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:
           name: maven-output
