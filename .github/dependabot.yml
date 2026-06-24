@@ -4,9 +4,17 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
+registries:
+  maven-github:
+    type: maven-repository
+    url: https://maven.pkg.github.com/spoud
+    username: spoudbot
+    password: ${{secrets.DEPENDABOT_PACKAGES_TOKEN}}
 updates:
   - package-ecosystem: "maven"
     directory: "/"
+    registries:
+      - maven-github
     schedule:
       interval: "weekly"
     groups:
