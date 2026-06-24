@@ -3,6 +3,7 @@ package io.spoud.agoora.agents.kafka.data;
 import lombok.Builder;
 import lombok.Data;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -43,5 +44,9 @@ public class KafkaSampleResult {
                 .map(KafkaRecord::getKey)
                 .filter(k -> k != null)
                 .toList();
+    }
+
+    public static String toSafeString(byte[] bytes) {
+        return new String(bytes, StandardCharsets.UTF_8).replace("\u0000", "");
     }
 }

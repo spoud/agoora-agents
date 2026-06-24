@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -116,12 +115,12 @@ public class ProfilerService {
             .summaryStatistics();
 
     Set<String> uniqueKeys = keyBytes.stream()
-            .map(b -> new String(b, StandardCharsets.UTF_8))
+            .map(KafkaSampleResult::toSafeString)
             .collect(Collectors.toSet());
 
     List<String> sampleValues = keyBytes.stream()
             .limit(KEY_SAMPLE_LIMIT)
-            .map(b -> new String(b, StandardCharsets.UTF_8))
+            .map(KafkaSampleResult::toSafeString)
             .toList();
 
     String fullProfileJson = null;
@@ -143,7 +142,7 @@ public class ProfilerService {
       keyFormat = "STRING";
       try {
         List<byte[]> wrappedKeys = keyBytes.stream()
-                .map(b -> new String(b, StandardCharsets.UTF_8))
+                .map(KafkaSampleResult::toSafeString)
                 .filter(s -> !s.isBlank())
                 .map(s -> {
                   try {
@@ -243,8 +242,7 @@ public class ProfilerService {
                     .sourceMetadata(sourceMetadata)
                     .build();
 
-            String enrichedJson = objectMapper.writeValueAsString(envelope)
-                    .replace("\u0000", "");
+            String enrichedJson = objectMapper.writeValueAsString(envelope);
             dataProfileRequest.setProfileJson(enrichedJson);
           } else {
             LOG.warn("Profile JSON content is null or blank for topic {}", kafkaTopic);
@@ -299,4 +297,5 @@ public class ProfilerService {
           kafkaTopic.getTopicName());
     }
   }
+
 }
