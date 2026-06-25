@@ -27,6 +27,7 @@ import org.mockito.ArgumentCaptor;
 import jakarta.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -223,6 +224,32 @@ class ProfilerServiceTest {
         .isEqualTo("No decoder found for the value of topic 'profile-topic-wrong-data'");
     assertThat(captor.getValue().getEntityRef()).isNotNull();
     assertThat(captor.getValue().getEntityRef().getId()).isEqualTo("pqr");
+  }
+
+  @Test
+  @Timeout(30)
+  void testNullBytesRemovedFromProfileJson() {
+    final String topicName = "profile-topic-null-bytes";
+    kafkaTopicRepository.save(
+        KafkaTopic.builder().topicName(topicName).dataPortId("null-dp").build());
+    for (int i = 0; i < 15; i++) {
+      kafkaUtils.produce(topicName, JSON_DATA);
+    }
+
+    when(profilerClient.profileData(eq(topicName), any()))
+        .thenReturn(
+            ProfileResponseObserver.ProfilerResponse.builder()
+                .error(Optional.empty())
+                .schema(ProfilerClientMockProvider.SCHEMA)
+                .profileJson("{\"value\":\"has\u0000null\"}")
+                .build());
+
+    profilerService.profileData();
+
+    ArgumentCaptor<AddDataProfileRequest> captor =
+        ArgumentCaptor.forClass(AddDataProfileRequest.class);
+    verify(lookerClient).addDataProfile(captor.capture());
+    assertThat(captor.getValue().getProfileJson()).doesNotContain("\u0000");
   }
 
   @Test

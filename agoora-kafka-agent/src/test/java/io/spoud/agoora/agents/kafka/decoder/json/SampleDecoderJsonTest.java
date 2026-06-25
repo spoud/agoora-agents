@@ -114,4 +114,18 @@ class SampleDecoderJsonTest {
             Arrays.asList("{abcd}".getBytes(StandardCharsets.UTF_8)));
     assertThat(message).isEmpty();
   }
+
+  @Test
+  void decodeJsonWithNullBytesInValues() {
+    // Jackson rejects literal null bytes; the decoder must strip them before parsing
+    String withNulls = "{\"field\":\"val\u0000ue\"}";
+    Optional<DecodedMessages> message =
+        sampleDecoderJson.decode(
+            "topic",
+            KafkaStreamPart.VALUE,
+            Arrays.asList(withNulls.getBytes(StandardCharsets.UTF_8)));
+    assertThat(message).isPresent();
+    assertThat(message.get().getEncoding()).isEqualTo(DataEncoding.JSON);
+    assertThat(message.get().getUtf8String().get(0)).doesNotContain("\u0000");
+  }
 }
