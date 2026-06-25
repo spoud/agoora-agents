@@ -44,7 +44,7 @@ public class SampleDecoderJson implements SampleDecoder {
     dataList.forEach(
         data -> {
           try {
-            String decodedString = new String(data, StandardCharsets.UTF_8);
+            String decodedString = new String(data, StandardCharsets.UTF_8).replace("\u0000", "");
 
             if (decodedString.equalsIgnoreCase("null")) {
               LOG.warn("Value is null");
@@ -61,7 +61,7 @@ public class SampleDecoderJson implements SampleDecoder {
                   // empty object or array
                   LOG.warn("JSON is empty");
                 } else {
-                  messages.add(data);
+                  messages.add(decodedString.getBytes(StandardCharsets.UTF_8));
                 }
               } else {
                 // all the rest is unknown
