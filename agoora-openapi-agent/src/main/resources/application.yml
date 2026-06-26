@@ -36,9 +36,6 @@ agoora:
   looker:
     endpoint: ${agoora-endpoint}
     insecure: ${agoora-insecure}
-  blob:
-    endpoint: ${agoora-endpoint}
-    insecure: ${agoora-insecure}
   profiler:
     endpoint: localhost:8089
     insecure: true

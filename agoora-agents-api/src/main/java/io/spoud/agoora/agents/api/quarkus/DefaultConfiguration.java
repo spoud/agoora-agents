@@ -49,11 +49,6 @@ public class DefaultConfiguration {
       }
 
       @Override
-      public AgooraAgentEndpointConfig blob() {
-        return null;
-      }
-
-      @Override
       public AgooraAgentEndpointConfig profiler() {
         return null;
       }

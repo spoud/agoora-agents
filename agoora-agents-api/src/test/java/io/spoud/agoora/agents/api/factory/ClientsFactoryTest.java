@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 class ClientsFactoryTest {
@@ -19,7 +18,6 @@ class ClientsFactoryTest {
   AgooraAgentConfig config;
   AgooraAgentClientAuthConfig auth;
   AgooraAgentUserConfig user;
-  AgooraAgentEndpointConfig blob;
   AgooraAgentEndpointConfig logistics;
   AgooraAgentEndpointConfig schema;
   AgooraAgentEndpointConfig profiler;
@@ -44,11 +42,6 @@ class ClientsFactoryTest {
     Mockito.when(auth.user()).thenReturn(user);
     Mockito.when(user.name()).thenReturn("name");
     Mockito.when(user.token()).thenReturn("token");
-
-    blob = mock(AgooraAgentEndpointConfig.class);
-    Mockito.when(config.blob()).thenReturn(blob);
-    Mockito.when(blob.endpoint()).thenReturn(ENDPOINT);
-    Mockito.when(blob.insecure()).thenReturn(true);
 
     logistics = mock(AgooraAgentEndpointConfig.class);
     Mockito.when(config.logistics()).thenReturn(logistics);
@@ -82,25 +75,6 @@ class ClientsFactoryTest {
   @AfterEach
   void tearDown() throws Exception {
     factory.close();
-  }
-
-  @Test
-  void blob() {
-    Mockito.when(config.blob()).thenReturn(null);
-    ClientsFactory factory1 = new ClientsFactoryImpl(config);
-
-    assertThatThrownBy(() -> factory1.getBlobClient())
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("No Endpoint configuration provided");
-
-    blob = mock(AgooraAgentEndpointConfig.class);
-    Mockito.when(config.blob()).thenReturn(blob);
-    Mockito.when(blob.endpoint()).thenReturn(ENDPOINT);
-    Mockito.when(blob.insecure()).thenReturn(true);
-    ClientsFactory factory2 =
-        new ClientsFactoryImpl(config);
-
-    assertThat(factory2.getBlobClient()).isNotNull().isInstanceOf(BlobClient.class);
   }
 
   @Test

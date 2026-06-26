@@ -13,7 +13,5 @@ public interface AgooraAgentConfig {
 
   AgooraAgentEndpointConfig looker();
 
-  AgooraAgentEndpointConfig blob();
-
   AgooraAgentEndpointConfig profiler();
 }

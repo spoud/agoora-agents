@@ -1,6 +1,5 @@
 package io.spoud.agoora.agents.api.factory;
 
-import io.spoud.agoora.agents.api.client.BlobClient;
 import io.spoud.agoora.agents.api.client.DataItemClient;
 import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.agoora.agents.api.client.DataSubscriptionStateClient;
@@ -13,8 +12,6 @@ import io.spoud.agoora.agents.api.client.SchemaClient;
 import io.spoud.agoora.agents.api.client.TransportClient;
 
 public interface ClientsFactory extends AutoCloseable  {
-
-  BlobClient getBlobClient();
 
   DataPortClient getDataPortClient();
 

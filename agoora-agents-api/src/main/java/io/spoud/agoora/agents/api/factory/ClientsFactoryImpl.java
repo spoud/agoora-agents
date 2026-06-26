@@ -1,6 +1,5 @@
 package io.spoud.agoora.agents.api.factory;
 
-import io.spoud.agoora.agents.api.client.BlobClient;
 import io.spoud.agoora.agents.api.client.DataItemClient;
 import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.agoora.agents.api.client.DataSubscriptionStateClient;
@@ -19,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ClientsFactoryImpl implements ClientsFactory {
 
-  private final BlobClientFactory blobClientFactory;
   private final HooksClientFactory hooksClientFactory;
   private final LogisticsClientsFactory logisticsClientsFactory;
   private final LookerFactory lookerFactory;
@@ -27,7 +25,6 @@ public class ClientsFactoryImpl implements ClientsFactory {
   private final SchemaFactory schemaFactory;
 
   public ClientsFactoryImpl(AgooraAgentConfig config) {
-    blobClientFactory = new BlobClientFactory(config);
     hooksClientFactory = new HooksClientFactory(config);
     logisticsClientsFactory = new LogisticsClientsFactory(config);
     lookerFactory = new LookerFactory(config);
@@ -37,17 +34,11 @@ public class ClientsFactoryImpl implements ClientsFactory {
 
   @Override
   public void close() throws Exception {
-    blobClientFactory.close();
     hooksClientFactory.close();
     logisticsClientsFactory.close();
     lookerFactory.close();
     profilerFactory.close();
     schemaFactory.close();
-  }
-
-  @Override
-  public BlobClient getBlobClient() {
-    return new BlobClient(blobClientFactory.blobServiceStub());
   }
 
   @Override

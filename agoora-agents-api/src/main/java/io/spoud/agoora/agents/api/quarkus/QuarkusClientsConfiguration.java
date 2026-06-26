@@ -1,7 +1,6 @@
 package io.spoud.agoora.agents.api.quarkus;
 
 import io.quarkus.arc.profile.UnlessBuildProfile;
-import io.spoud.agoora.agents.api.client.BlobClient;
 import io.spoud.agoora.agents.api.client.DataItemClient;
 import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.agoora.agents.api.client.DataSubscriptionStateClient;
@@ -28,11 +27,6 @@ public class QuarkusClientsConfiguration {
 
   public QuarkusClientsConfiguration(AgooraAgentConfig agooraAgentConfig) {
     clientsFactory = new ClientsFactoryImpl(agooraAgentConfig);
-  }
-
-  @Produces
-  BlobClient blobClient() {
-    return clientsFactory.getBlobClient();
   }
 
   @Produces
