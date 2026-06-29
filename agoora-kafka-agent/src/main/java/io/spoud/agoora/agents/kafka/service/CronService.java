@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,7 +30,13 @@ public class CronService {
 
   private final ExecutorService managedExecutor = Executors.newSingleThreadExecutor();
 
+  private volatile Instant lastTickTime = Instant.now();
+
   private final KafkaAgentConfig sdmConfig;
+
+  public Instant getLastTickTime() {
+    return lastTickTime;
+  }
 
   void onStart(@Observes StartupEvent ev) {
     if (LaunchMode.current() != LaunchMode.TEST) {
@@ -52,6 +59,7 @@ public class CronService {
         .with(
             unused -> {
               if (!running.getAndSet(true)) {
+                lastTickTime = Instant.now();
                 try {
                   operationalMetricsService.iterationStart();
 
