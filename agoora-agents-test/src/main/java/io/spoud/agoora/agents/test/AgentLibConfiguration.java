@@ -1,6 +1,5 @@
 package io.spoud.agoora.agents.test;
 
-import io.spoud.agoora.agents.api.client.BlobClient;
 import io.spoud.agoora.agents.api.client.DataItemClient;
 import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.agoora.agents.api.client.DataSubscriptionStateClient;
@@ -21,11 +20,6 @@ import jakarta.enterprise.inject.Produces;
 public class AgentLibConfiguration {
 
   private static final ClientsFactory clientsFactory = new ClientMocksFactory();
-
-  @Produces
-  BlobClient blobClient() {
-    return clientsFactory.getBlobClient();
-  }
 
   @Produces
   DataPortClient dataPortClient() {

@@ -1,6 +1,5 @@
 package io.spoud.agoora.agents.test;
 
-import io.spoud.agoora.agents.api.client.BlobClient;
 import io.spoud.agoora.agents.api.client.DataItemClient;
 import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.agoora.agents.api.client.DataSubscriptionStateClient;
@@ -24,11 +23,6 @@ public class ClientMocksFactory implements ClientsFactory {
   @Override
   public void close() {
     // nothing to do
-  }
-
-  @Override
-  public BlobClient getBlobClient() {
-    return getSingleton(BlobClient.class);
   }
 
   @Override

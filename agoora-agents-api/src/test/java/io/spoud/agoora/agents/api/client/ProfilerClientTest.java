@@ -2,8 +2,8 @@ package io.spoud.agoora.agents.api.client;
 
 import io.spoud.agoora.agents.api.observers.AllResponseObserver;
 import io.spoud.agoora.agents.api.observers.ProfileResponseObserver;
-import io.spoud.sdm.blob.v1alpha.UploadChunkRequest;
 import io.spoud.sdm.profiler.domain.v1alpha1.Meta;
+import io.spoud.sdm.profiler.service.v1alpha1.ProfileRequest;
 import io.spoud.sdm.profiler.service.v1alpha1.ProfileDataStreamResponse;
 import io.spoud.sdm.profiler.service.v1alpha1.ProfilerGrpc;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ class ProfilerClientTest {
 
   @Test
   void profileData() {
-    AllResponseObserver<UploadChunkRequest> streamObserver = new AllResponseObserver<>();
+    AllResponseObserver<ProfileRequest> streamObserver = new AllResponseObserver<>();
 
     when(stub.profileDataStream(any()))
         .thenAnswer(
