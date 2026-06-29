@@ -61,7 +61,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-          server-id: github-sdm-proto-api
+          server-id: github
       - name: Versions
         run: |
           echo "JAVA_HOME: $JAVA_HOME"
