@@ -7,11 +7,7 @@ public class MqttContainer extends GenericContainer<MqttContainer> {
   public static final int MQTT_PORT = 1883;
 
   public MqttContainer() {
-    this("2");
-  }
-
-  public MqttContainer(String version) {
-    super("eclipse-mosquitto:" + version);
+    super("eclipse-mosquitto");
     withCommand("mosquitto -c /mosquitto-no-auth.conf");
     withExposedPorts(MQTT_PORT);
   }

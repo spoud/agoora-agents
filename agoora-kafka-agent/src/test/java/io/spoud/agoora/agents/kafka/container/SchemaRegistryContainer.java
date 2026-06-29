@@ -5,8 +5,8 @@ import org.testcontainers.containers.KafkaContainer;
 
 public class SchemaRegistryContainer extends GenericContainer<SchemaRegistryContainer> {
 
-  public SchemaRegistryContainer(String version) {
-    super("confluentinc/cp-schema-registry:" + version);
+  public SchemaRegistryContainer() {
+    super("confluentinc/cp-schema-registry");
     withExposedPorts(8081);
   }
 

@@ -8,7 +8,7 @@ import java.util.Map;
 public class PostgresqlResource implements QuarkusTestResourceLifecycleManager {
 
   private PostgreSQLContainer postgres =
-      new PostgreSQLContainer<>("postgres:11-alpine")
+      new PostgreSQLContainer<>("postgres")
           .withDatabaseName("postgres")
           .withUsername("postgres")
           .withPassword("postgres");
