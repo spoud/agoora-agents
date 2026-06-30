@@ -69,6 +69,10 @@ public abstract class AbstractGrpcClientFactory implements AutoCloseable {
           endpointConfig.insecure());
     }
 
+    mcb.keepAliveTime(30, TimeUnit.SECONDS)
+       .keepAliveTimeout(10, TimeUnit.SECONDS)
+       .keepAliveWithoutCalls(true);
+
     return mcb.build();
   }
 }
