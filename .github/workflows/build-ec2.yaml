@@ -186,7 +186,7 @@ jobs:
       - name: prepare-binaries
         run: .github/prepare-binaries.sh
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ secrets.REPOS_ACCESS_TOKEN }}
           GIT_TAG: ${{ needs.start-runner.outputs.git-tag }}
