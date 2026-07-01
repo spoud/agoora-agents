@@ -21,7 +21,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-region: eu-central-1
           role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
@@ -134,7 +134,7 @@ jobs:
 
       - name: Trivy scan JVM image
         if: steps.dockerfile_jvm_exists.outputs.files_exists == 'true'
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: 'spoud/${{ matrix.agents }}:dev'
           format: 'table'
@@ -143,7 +143,7 @@ jobs:
 
       - name: Trivy scan native image
         if: steps.dockerfile_native_exists.outputs.files_exists == 'true'
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: 'spoud/${{ matrix.agents }}:dev-native'
           format: 'table'
@@ -152,7 +152,7 @@ jobs:
 
       - name: Login to Docker Hub
         if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -186,7 +186,7 @@ jobs:
       - name: prepare-binaries
         run: .github/prepare-binaries.sh
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ secrets.REPOS_ACCESS_TOKEN }}
           GIT_TAG: ${{ needs.start-runner.outputs.git-tag }}
@@ -206,7 +206,7 @@ jobs:
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-region: eu-central-1
           role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
