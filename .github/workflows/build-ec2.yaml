@@ -188,9 +188,9 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v3
         env:
-          GITHUB_TOKEN: ${{ secrets.REPOS_ACCESS_TOKEN }}
           GIT_TAG: ${{ needs.start-runner.outputs.git-tag }}
         with:
+          token: ${{ secrets.REPOS_ACCESS_TOKEN }}
           body_path: .github/release-body.md
           files: |
             README.md
