@@ -77,19 +77,18 @@
 #   accessed directly. (example: "foo.example.com,bar.example.com")
 #
 ###
-FROM registry.access.redhat.com/ubi8/openjdk-21
+FROM cgr.dev/chainguard/jre:latest@sha256:9753e9bf7e0f061047a2137a84dfe18b404a97d3e7de2c31dcc6eaa93bef3bce
 
 ENV LANGUAGE='en_US:en'
 
 
 # We make four distinct layers so if there are application changes the library layers can be re-used
-COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
-COPY --chown=185 target/quarkus-app/*.jar /deployments/
-COPY --chown=185 target/quarkus-app/app/ /deployments/app/
-COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
+COPY --chown=java:java target/quarkus-app/lib/ /deployments/lib/
+COPY --chown=java:java target/quarkus-app/*.jar /deployments/
+COPY --chown=java:java target/quarkus-app/app/ /deployments/app/
+COPY --chown=java:java target/quarkus-app/quarkus/ /deployments/quarkus/
 
 EXPOSE 8280 5005
-USER 185
-ENV JAVA_OPTS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
-ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
+USER java
+ENTRYPOINT ["java", "-Dquarkus.http.host=0.0.0.0", "-Djava.util.logging.manager=org.jboss.logmanager.LogManager", "-jar", "/deployments/quarkus-run.jar"]
 
