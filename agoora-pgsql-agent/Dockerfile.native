@@ -14,7 +14,7 @@
 # docker run -i --rm -p 8080:8080 quarkus/code-with-quarkus
 #
 ###
-FROM quay.io/quarkus/quarkus-micro-image:2.0-2026-07-05
+FROM quay.io/quarkus/quarkus-micro-image:2.0-2026-07-12
 WORKDIR /work/
 RUN chown 1001 /work \
     && chmod "g+rwX" /work \
