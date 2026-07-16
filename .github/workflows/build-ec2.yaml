@@ -17,17 +17,17 @@ jobs:
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
       git-tag:  ${{ steps.git-tag.outputs.git-tag }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 0
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v6
+        uses: aws-actions/configure-aws-credentials@517a711dbcd0e402f90c77e7e2f81e849156e31d # v6
         with:
           aws-region: eu-central-1
           role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
       - name: Start EC2 runner
         id: start-ec2-runner
-        uses: machulav/ec2-github-runner@v2
+        uses: machulav/ec2-github-runner@343a1b2ae682e681c3cec9a235d882da17ff04ef # v2
         with:
           mode: start
           github-token: ${{ secrets.REPOS_ACCESS_TOKEN }}
@@ -52,12 +52,12 @@ jobs:
       MAVEN_OPTS: -Xmx4g
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - name: Set up Maven
-        uses: stCarolas/setup-maven@v5
+        uses: stCarolas/setup-maven@d6af6abeda15e98926a57b5aa970a96bb37f97d1 # v5
         with:
           maven-version: 3.8.2
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -73,7 +73,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build native
         run: mvn --batch-mode package -DskipTests -Pnative
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: maven-output
           path: |
@@ -97,20 +97,20 @@ jobs:
           - agoora-pgsql-agent
           - agoora-profiler-service
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: maven-output
 
       - name: Check if docker file exist for jar
         id: dockerfile_jvm_exists
-        uses: andstor/file-existence-action@v3
+        uses: andstor/file-existence-action@558493d6c74bf472d87c84eab196434afc2fa029 # v3
         with:
           files: "${{ matrix.agents }}/Dockerfile.jvm"
 
       - name: Check if docker file exist for native
         id: dockerfile_native_exists
-        uses: andstor/file-existence-action@v3
+        uses: andstor/file-existence-action@558493d6c74bf472d87c84eab196434afc2fa029 # v3
         with:
           files: "${{ matrix.agents }}/Dockerfile.native"
 
@@ -134,7 +134,7 @@ jobs:
 
       - name: Trivy scan JVM image
         if: steps.dockerfile_jvm_exists.outputs.files_exists == 'true'
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: 'spoud/${{ matrix.agents }}:dev'
           format: 'table'
@@ -143,7 +143,7 @@ jobs:
 
       - name: Trivy scan native image
         if: steps.dockerfile_native_exists.outputs.files_exists == 'true'
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: 'spoud/${{ matrix.agents }}:dev-native'
           format: 'table'
@@ -152,7 +152,7 @@ jobs:
 
       - name: Login to Docker Hub
         if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
-        uses: docker/login-action@v4
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -179,14 +179,14 @@ jobs:
       - build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: maven-output
       - name: prepare-binaries
         run: .github/prepare-binaries.sh
       - name: Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3
         env:
           GIT_TAG: ${{ needs.start-runner.outputs.git-tag }}
         with:
@@ -206,12 +206,12 @@ jobs:
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v6
+        uses: aws-actions/configure-aws-credentials@517a711dbcd0e402f90c77e7e2f81e849156e31d # v6
         with:
           aws-region: eu-central-1
           role-to-assume: arn:aws:iam::284098131301:role/github-agoora-agents
       - name: Stop EC2 runner
-        uses: machulav/ec2-github-runner@v2
+        uses: machulav/ec2-github-runner@343a1b2ae682e681c3cec9a235d882da17ff04ef # v2
         with:
           mode: stop
           github-token: ${{ secrets.REPOS_ACCESS_TOKEN }}
