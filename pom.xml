@@ -28,7 +28,7 @@
         <slf4j-jboss-logmanager.version>2.1.0.Final</slf4j-jboss-logmanager.version>
         <junit-jupiter.version>6.1.2</junit-jupiter.version>
         <protobuf.version>4.35.1</protobuf.version>
-        <sdm-proto-api.version>0.14.0</sdm-proto-api.version>
+        <sdm-proto-api.version>0.16.0</sdm-proto-api.version>
         <mockito.version>5.23.0</mockito.version>
         <test-container.version>2.0.5</test-container.version>
 
