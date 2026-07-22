@@ -14,7 +14,7 @@
 # docker run -i --rm -p 8089:8089 -p 8281:8281 spoud/agoora-profiler-service-native
 #
 ###
-FROM quay.io/quarkus/quarkus-micro-image:2.0-2026-07-12
+FROM quay.io/quarkus/quarkus-micro-image:2.0-2026-07-19
 WORKDIR /work/
 RUN chown 1001 /work \
     && chmod "g+rwX" /work \
