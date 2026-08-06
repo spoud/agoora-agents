@@ -53,7 +53,7 @@ public class ProfileResponseObserver extends AbstractResponseObserver<ProfileDat
   @AllArgsConstructor
   public static class ProfilerResponse {
     private Meta meta;
-    private Optional<ProfilerError> error = Optional.empty();
+    @Builder.Default private Optional<ProfilerError> error = Optional.empty();
     private String profileJson;
     private String schema;
 

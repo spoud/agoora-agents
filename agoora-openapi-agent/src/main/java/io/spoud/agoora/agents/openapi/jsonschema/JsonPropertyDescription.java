@@ -17,7 +17,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JsonPropertyDescription {
 
-  private String type = "object";
+  @Builder.Default private String type = "object";
 
   private Map<String, JsonPropertyDescription> properties;
 

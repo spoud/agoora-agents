@@ -20,9 +20,10 @@ import java.util.List;
 public class JsonSchema {
 
   @JsonProperty("$schema")
+  @Builder.Default
   private String schema = "http://json-schema.org/schema#";
 
-  private String type = "object";
+  @Builder.Default private String type = "object";
 
   // Use linked hashmap to keep order
   private LinkedHashMap<String, JsonPropertyDescription> properties;

@@ -9,7 +9,7 @@ import io.spoud.agoora.agents.kafka.data.KafkaTopicMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.ConsumerGroupListing;
+import org.apache.kafka.clients.admin.GroupListing;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 
@@ -63,9 +63,9 @@ public class KafkaAdminScrapper {
 
   public List<KafkaConsumerGroup> getConsumerGroups() {
     try {
-      return adminClient.listConsumerGroups().all().get().stream()
+      return adminClient.listGroups().all().get().stream()
           .filter(cg -> !cg.isSimpleConsumerGroup())
-          .map(ConsumerGroupListing::groupId)
+          .map(GroupListing::groupId)
           .filter(cg -> consumerGroupFilterRegex.matcher(cg).matches())
           .flatMap(
               consumerGroup ->
