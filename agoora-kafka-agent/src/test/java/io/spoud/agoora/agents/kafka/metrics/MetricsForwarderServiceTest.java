@@ -9,14 +9,22 @@ import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
 import io.spoud.agoora.agents.kafka.utils.KafkaUtils;
 import io.spoud.agoora.agents.test.mock.MetricsClientMockProvider;
 import io.spoud.sdm.looker.domain.v1alpha1.ResourceMetricType;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import jakarta.inject.Inject;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.stream.IntStream;
 
+import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @QuarkusTest
@@ -35,6 +43,7 @@ class MetricsForwarderServiceTest {
   @Inject KafkaTopicRepository kafkaTopicRepository;
   @Inject KafkaConsumerGroupRepository kafkaConsumerGroupRepository;
   @Inject KafkaUtils kafkaUtils;
+  @Inject AdminClient adminClient;
 
   @BeforeEach
   void setup() {
@@ -51,6 +60,10 @@ class MetricsForwarderServiceTest {
   void testScrapeMetricsTopic() {
     kafkaTopicRepository.save(KafkaTopic.builder().topicName(TOPIC_1).dataPortId("m-t-1").build());
     kafkaTopicRepository.save(KafkaTopic.builder().topicName(TOPIC_2).dataPortId("m-t-2").build());
+    adminClient.createTopics(Collections.singleton(new NewTopic(TOPIC_3, 1, (short) 1)));
+    await()
+        .atMost(Duration.ofSeconds(5))
+        .until(() -> adminClient.listTopics().names().get().contains(TOPIC_3));
     kafkaTopicRepository.save(KafkaTopic.builder().topicName(TOPIC_3).dataPortId("m-t-3").build());
 
     IntStream.range(0, 10)
@@ -69,6 +82,17 @@ class MetricsForwarderServiceTest {
     verify(metricsClient).updateMetric("m-t-1", ResourceMetricType.Type.DATA_PORT_MESSAGES, 10.0d);
     verify(metricsClient).updateMetric("m-t-2", ResourceMetricType.Type.DATA_PORT_MESSAGES, 14.0d);
     verify(metricsClient).updateMetric("m-t-3", ResourceMetricType.Type.DATA_PORT_MESSAGES, 0.0d);
+  }
+
+  @Test
+  void testSkipsTopicThatNoLongerExists() {
+    kafkaTopicRepository.save(
+        KafkaTopic.builder().topicName("metric-topic-deleted").dataPortId("m-t-deleted").build());
+
+    metricsForwarderService.scrapeMetrics();
+
+    verify(metricsClient, never())
+        .updateMetric(eq("m-t-deleted"), any(), anyDouble());
   }
 
   @Test

@@ -18,6 +18,8 @@ import io.spoud.sdm.looker.domain.v1alpha1.DataProfilingError;
 import io.spoud.sdm.looker.v1alpha1.AddDataProfileRequest;
 import io.spoud.sdm.schema.domain.v1alpha.SchemaEncoding;
 import io.spoud.sdm.schema.domain.v1alpha.SchemaSource;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,10 +28,13 @@ import org.mockito.ArgumentCaptor;
 
 import jakarta.inject.Inject;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -60,6 +65,8 @@ class ProfilerServiceTest {
   KafkaUtils kafkaUtils;
   @Inject
   SchemaRegistryUtil schemaRegistryUtil;
+  @Inject
+  AdminClient adminClient;
 
   @BeforeEach
   void setup() {
@@ -181,6 +188,10 @@ class ProfilerServiceTest {
   void testNoData() {
     reset(profilerClient);
     reset(schemaClient);
+    adminClient.createTopics(Collections.singleton(new NewTopic(PROFILE_TOPIC_NO_DATA, 1, (short) 1)));
+    await()
+        .atMost(Duration.ofSeconds(5))
+        .until(() -> adminClient.listTopics().names().get().contains(PROFILE_TOPIC_NO_DATA));
     kafkaTopicRepository.save(
         KafkaTopic.builder().topicName(PROFILE_TOPIC_NO_DATA).dataPortId("klm").build());
 
@@ -250,6 +261,22 @@ class ProfilerServiceTest {
         ArgumentCaptor.forClass(AddDataProfileRequest.class);
     verify(lookerClient).addDataProfile(captor.capture());
     assertThat(captor.getValue().getProfileJson()).doesNotContain("\u0000");
+  }
+
+  @Test
+  @Timeout(30)
+  void testSkipsTopicThatNoLongerExists() {
+    reset(profilerClient);
+    reset(schemaClient);
+    reset(lookerClient);
+    kafkaTopicRepository.save(
+        KafkaTopic.builder().topicName("topic-deleted-from-broker").dataPortId("vwx").build());
+
+    profilerService.profileData();
+
+    verify(profilerClient, never()).profileData(eq("topic-deleted-from-broker"), any());
+    verify(schemaClient, never()).saveSchema(any(), eq("vwx"), any(), any(), any(), any(), any(), any());
+    verify(lookerClient, never()).addDataProfile(any());
   }
 
   @Test

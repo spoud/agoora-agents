@@ -1,5 +1,6 @@
 package io.spoud.agoora.agents.kafka.metrics;
 
+import io.spoud.agoora.agents.kafka.data.KafkaTopic;
 import io.spoud.agoora.agents.kafka.kafka.KafkaAdminScrapper;
 import io.spoud.agoora.agents.kafka.kafka.KafkaTopicReader;
 import io.spoud.agoora.agents.kafka.repository.KafkaConsumerGroupRepository;
@@ -13,6 +14,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @ApplicationScoped
@@ -38,8 +41,24 @@ public class MetricsForwarderService {
   public Map<String, Long> scrapeDataPortMessagesMetrics() {
     Map<String, Long> dataPortsMetrics = new HashMap<>();
     LOG.info("Metrics scraping for topics");
+
+    Set<String> trackedTopicNames =
+        kafkaService.getTopics().stream().map(KafkaTopic::getTopicName).collect(Collectors.toSet());
+
     kafkaTopicRepository
         .getStates()
+        .stream()
+        .filter(
+            dataPort -> {
+              boolean tracked = trackedTopicNames.contains(dataPort.getTopicName());
+              if (!tracked) {
+                LOG.info(
+                    "Topic '{}' is no longer tracked (deleted or out of filter scope), skipping "
+                        + "metrics scraping. It will be pruned from the catalog on the next topic reconciliation.",
+                    dataPort.getTopicName());
+              }
+              return tracked;
+            })
         .forEach(
             dataPort -> {
               try {

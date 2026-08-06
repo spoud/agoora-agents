@@ -11,6 +11,7 @@ import io.spoud.agoora.agents.kafka.config.data.KafkaAgentConfig;
 import io.spoud.agoora.agents.kafka.data.*;
 import io.spoud.agoora.agents.kafka.decoder.DecodedMessages;
 import io.spoud.agoora.agents.kafka.decoder.DecoderService;
+import io.spoud.agoora.agents.kafka.kafka.KafkaAdminScrapper;
 import io.spoud.agoora.agents.kafka.kafka.KafkaTopicReader;
 import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
 import io.spoud.sdm.global.domain.v1.ResourceEntity;
@@ -38,6 +39,7 @@ public class ProfilerService {
 
   private final KafkaTopicRepository kafkaTopicRepository;
   private final KafkaTopicReader kafkaTopicReader;
+  private final KafkaAdminScrapper kafkaAdminScrapper;
   private final ProfilerClient profilerClient;
   private final LookerClient lookerClient;
   private final SchemaClient schemaClient;
@@ -48,8 +50,22 @@ public class ProfilerService {
   private final ObjectMapper objectMapper;
 
   public void profileData() {
+    Set<String> trackedTopicNames =
+        kafkaAdminScrapper.getTopics().stream().map(KafkaTopic::getTopicName).collect(Collectors.toSet());
+
     kafkaTopicRepository.getStates().stream()
         .filter(topic -> topic.getDataPortId() != null)
+        .filter(
+            topic -> {
+              boolean tracked = trackedTopicNames.contains(topic.getTopicName());
+              if (!tracked) {
+                LOG.info(
+                    "Topic '{}' is no longer tracked (deleted or out of filter scope), skipping "
+                        + "profiling. It will be pruned from the catalog on the next topic reconciliation.",
+                    topic.getTopicName());
+              }
+              return tracked;
+            })
         .forEach(
             kafkaTopic -> {
               try {
