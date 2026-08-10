@@ -19,6 +19,7 @@ import java.util.List;
 @RegisterForReflection(targets = {OperatingSystemMXBean.class})
 public class OperationalMetricsService {
   private final MetricsClient metricsClient;
+  private final String agentVersion;
 
   private Instant lastIterationStart;
   private long loopCounter;
@@ -50,7 +51,7 @@ public class OperationalMetricsService {
     metrics.add(
         new MetricsClient.OperationalMetric(ResourceMetricType.Type.LOOPS_COUNTER, loopCounter));
 
-    metricsClient.updateOperationMetrics(agentUsername, transportPath, metrics);
+    metricsClient.updateOperationMetrics(agentUsername, transportPath, agentVersion, metrics);
     LOG.info("Iteration took {}", actualDuration);
   }
 
