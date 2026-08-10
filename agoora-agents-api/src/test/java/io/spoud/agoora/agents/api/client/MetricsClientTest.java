@@ -72,6 +72,7 @@ class MetricsClientTest {
     metricsClient.updateOperationMetrics(
         agentUsername,
         transportPath,
+        "1.2.3",
         Arrays.asList(
             new MetricsClient.OperationalMetric(ResourceMetricType.Type.AGENT_UPTIME_MS, 12345.0),
             new MetricsClient.OperationalMetric(ResourceMetricType.Type.LOOP_PERCENT, 2.0)));

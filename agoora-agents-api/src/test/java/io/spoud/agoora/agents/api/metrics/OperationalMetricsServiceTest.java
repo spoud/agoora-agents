@@ -23,7 +23,7 @@ class OperationalMetricsServiceTest {
   @BeforeEach
   void setup() {
     metricsClientMock = mock(MetricsClient.class);
-    operationalMetricsService = new OperationalMetricsService(metricsClientMock);
+    operationalMetricsService = new OperationalMetricsService(metricsClientMock, "1.2.3");
   }
 
   @Test
@@ -45,7 +45,7 @@ class OperationalMetricsServiceTest {
     operationalMetricsService.iterationEnd("agent", "/path/transport", Duration.ofMinutes(1));
 
     verify(metricsClientMock)
-        .updateOperationMetrics(eq("agent"), eq("/path/transport"), captor.capture());
+        .updateOperationMetrics(eq("agent"), eq("/path/transport"), eq("1.2.3"), captor.capture());
 
     final List<MetricsClient.OperationalMetric> metrics = captor.getValue();
 

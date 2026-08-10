@@ -63,6 +63,6 @@ public class AgentLibConfiguration {
 
   @Produces
   OperationalMetricsService operationalMetricsService() {
-    return new OperationalMetricsService(clientsFactory.getMetricsClient());
+    return new OperationalMetricsService(clientsFactory.getMetricsClient(), "test");
   }
 }

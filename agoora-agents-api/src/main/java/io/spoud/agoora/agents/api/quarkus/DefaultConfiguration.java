@@ -52,6 +52,11 @@ public class DefaultConfiguration {
       public AgooraAgentEndpointConfig profiler() {
         return null;
       }
+
+      @Override
+      public String agentVersion() {
+        return "default";
+      }
     };
   }
 }

@@ -24,8 +24,10 @@ import jakarta.enterprise.inject.Produces;
 public class QuarkusClientsConfiguration {
 
   private final ClientsFactory clientsFactory;
+  private final AgooraAgentConfig agooraAgentConfig;
 
   public QuarkusClientsConfiguration(AgooraAgentConfig agooraAgentConfig) {
+    this.agooraAgentConfig = agooraAgentConfig;
     clientsFactory = new ClientsFactoryImpl(agooraAgentConfig);
   }
 
@@ -71,6 +73,7 @@ public class QuarkusClientsConfiguration {
 
   @Produces
   OperationalMetricsService operationalMetricsService() {
-    return new OperationalMetricsService(clientsFactory.getMetricsClient());
+    return new OperationalMetricsService(
+        clientsFactory.getMetricsClient(), agooraAgentConfig.agentVersion());
   }
 }

@@ -38,7 +38,10 @@ public class MetricsClient {
   }
 
   public Empty updateOperationMetrics(
-      String agentUsername, String transportPath, List<OperationalMetric> metrics) {
+      String agentUsername,
+      String transportPath,
+      String agentVersion,
+      List<OperationalMetric> metrics) {
     final Instant now = Instant.now();
     return stub.updateOperationalMetric(
         UpdateOperationalMetricRequest.newBuilder()
@@ -46,6 +49,7 @@ public class MetricsClient {
                 AgentRef.newBuilder()
                     .setAgentUsername(agentUsername)
                     .setTransportPath(transportPath)
+                    .setAgentVersion(agentVersion == null ? "" : agentVersion)
                     .build())
             .addAllMetric(
                 metrics.stream()
