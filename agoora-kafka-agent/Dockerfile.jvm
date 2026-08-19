@@ -77,7 +77,7 @@
 #   accessed directly. (example: "foo.example.com,bar.example.com")
 #
 ###
-FROM cgr.dev/chainguard/jre:latest@sha256:8212fb61630e9e8b7388024108f17e53278b9b0df833cf73b685aae0f7603654
+FROM cgr.dev/chainguard/jre:latest@sha256:ae2278961aa50ce0e7f1e716647fee110df0d53c3689c17f7b13b85d966d3df6
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
