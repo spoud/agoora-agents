@@ -14,7 +14,7 @@
 # docker run -i --rm -p 8089:8089 -p 8280:8280 spoud/agoora-profiler-service
 #
 ###
-FROM cgr.dev/chainguard/jre:latest@sha256:ae2278961aa50ce0e7f1e716647fee110df0d53c3689c17f7b13b85d966d3df6
+FROM cgr.dev/chainguard/jre:latest@sha256:aca19e6c8e1a5be89d5f28c4c5e0bec09a208ab00d8c6c794b8a8add925b0d08
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
