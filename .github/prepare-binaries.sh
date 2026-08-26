@@ -10,9 +10,6 @@ for agent in agoora-*-agent; do
     echo ""
     echo "Processing $agent"
 
-    # Binaries
-    cp $agent/target/*-runner binaries/$agent-$GIT_TAG || echo "no binary for $agent"
-
     # Jar
     cp -R $agent/target/quarkus-app $agent/target/$agent
     tar -czf binaries/$agent-jar-$GIT_TAG.tar.gz --directory=./$agent/target $agent
