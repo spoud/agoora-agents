@@ -21,6 +21,11 @@
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
         <quarkus.platform.version>3.39.4</quarkus.platform.version>
+        <!-- Kept separate from quarkus.platform.version: Dependabot's Maven updater can't
+             resolve a property shared across both a dependency/BOM declaration and a
+             build-plugin declaration ("Requirements to unlock: update_not_possible"),
+             which silently blocked all quarkus-platform group updates. -->
+        <quarkus-plugin.version>3.39.4</quarkus-plugin.version>
 
         <lombok.version>1.18.48</lombok.version>
         <assertj-core.version>3.27.7</assertj-core.version>
@@ -210,7 +215,7 @@
                 <plugin>
                     <groupId>io.quarkus</groupId>
                     <artifactId>quarkus-bootstrap-maven-plugin</artifactId>
-                    <version>${quarkus.platform.version}</version>
+                    <version>${quarkus-plugin.version}</version>
                     <configuration>
                         <parentFirstArtifacts>
                             <parentFirstArtifact>io.quarkus:quarkus-bootstrap-core</parentFirstArtifact>
@@ -225,7 +230,7 @@
                 <plugin>
                     <groupId>io.quarkus</groupId>
                     <artifactId>quarkus-maven-plugin</artifactId>
-                    <version>${quarkus.platform.version}</version>
+                    <version>${quarkus-plugin.version}</version>
                     <extensions>true</extensions>
                     <executions>
                         <execution>
