@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,6 +40,32 @@ public class LogisticsService {
   private final DataSubscriptionStateClient dataSubscriptionStateClient;
   private final LogisticsRefService logisticsRefService;
   private final PropertyTemplateService propertyTemplateService;
+
+  /**
+   * All data ports of this agent's transport that logistics considers available. Empty when
+   * logistics cannot be reached, so callers can skip deletions instead of acting on partial data.
+   */
+  public Optional<List<DataPort>> listAvailableDataPorts() {
+    try {
+      return Optional.of(dataPortClient.listAvailable(logisticsRefService.getTransportRef()));
+    } catch (final StatusRuntimeException e) {
+      LOG.error("Error while listing data ports from logistics, will skip removals this time.", e);
+      return Optional.empty();
+    }
+  }
+
+  /** Same as {@link #listAvailableDataPorts()} for data subscription states. */
+  public Optional<List<DataSubscriptionState>> listAvailableDataSubscriptionStates() {
+    try {
+      return Optional.of(
+          dataSubscriptionStateClient.listAvailable(logisticsRefService.getTransportRef()));
+    } catch (final StatusRuntimeException e) {
+      LOG.error(
+          "Error while listing data subscription states from logistics, will skip removals this time.",
+          e);
+      return Optional.empty();
+    }
+  }
 
   public Optional<DataPort> updateDataPort(final KafkaTopic dataPort) {
     String topicName = dataPort.getTopicName();
