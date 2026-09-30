@@ -20,7 +20,7 @@
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
-        <quarkus.platform.version>3.39.4</quarkus.platform.version>
+        <quarkus.platform.version>3.39.5</quarkus.platform.version>
         <!-- Kept separate from quarkus.platform.version: Dependabot's Maven updater can't
              resolve a property shared across both a dependency/BOM declaration and a
              build-plugin declaration ("Requirements to unlock: update_not_possible"),
