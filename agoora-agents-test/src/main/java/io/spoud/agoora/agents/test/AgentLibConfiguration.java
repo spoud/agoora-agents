@@ -8,6 +8,7 @@ import io.spoud.agoora.agents.api.client.LookerClient;
 import io.spoud.agoora.agents.api.client.MetricsClient;
 import io.spoud.agoora.agents.api.client.ProfilerClient;
 import io.spoud.agoora.agents.api.client.SchemaClient;
+import io.spoud.agoora.agents.api.client.TransportClient;
 import io.spoud.agoora.agents.api.factory.ClientsFactory;
 import io.spoud.agoora.agents.api.metrics.OperationalMetricsService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,11 @@ public class AgentLibConfiguration {
   @Produces
   DataSubscriptionStateClient dataSubscriptionStateClient() {
     return clientsFactory.getDataSubscriptionStateClient();
+  }
+
+  @Produces
+  TransportClient transportClient() {
+    return clientsFactory.getTransportClient();
   }
 
   @Produces

@@ -1,6 +1,7 @@
 package io.spoud.agoora.agents.kafka.logistics;
 
 import com.google.protobuf.StringValue;
+import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.agoora.agents.api.client.DataSubscriptionStateClient;
@@ -27,8 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Slf4j
 @ApplicationScoped
@@ -39,6 +45,77 @@ public class LogisticsService {
   private final DataSubscriptionStateClient dataSubscriptionStateClient;
   private final LogisticsRefService logisticsRefService;
   private final PropertyTemplateService propertyTemplateService;
+
+  /**
+   * Ids whose removal logistics refused, so the refusal is only logged once per agent run while
+   * the removal keeps being retried every iteration.
+   */
+  private final Set<String> refusedRemovals = ConcurrentHashMap.newKeySet();
+
+  /**
+   * All data ports of this agent's transport that logistics considers available. Empty when
+   * logistics cannot be reached, so callers can skip deletions instead of acting on partial data.
+   */
+  public Optional<List<DataPort>> listAvailableDataPorts() {
+    try {
+      final String transportId = logisticsRefService.getTransportId();
+      return Optional.of(
+          ofTransport(
+              dataPortClient.listAvailable(logisticsRefService.getTransportRef()),
+              transportId,
+              p -> p.getTransport().getId(),
+              DataPort::getDeleted,
+              "data ports"));
+    } catch (final StatusRuntimeException | IllegalStateException e) {
+      LOG.error("Error while listing data ports from logistics, will skip removals this time.", e);
+      return Optional.empty();
+    }
+  }
+
+  /** Same as {@link #listAvailableDataPorts()} for data subscription states. */
+  public Optional<List<DataSubscriptionState>> listAvailableDataSubscriptionStates() {
+    try {
+      final String transportId = logisticsRefService.getTransportId();
+      return Optional.of(
+          ofTransport(
+              dataSubscriptionStateClient.listAvailable(logisticsRefService.getTransportRef()),
+              transportId,
+              s -> s.getTransport().getId(),
+              DataSubscriptionState::getDeleted,
+              "data subscription states"));
+    } catch (final StatusRuntimeException | IllegalStateException e) {
+      LOG.error(
+          "Error while listing data subscription states from logistics, will skip removals this time.",
+          e);
+      return Optional.empty();
+    }
+  }
+
+  /**
+   * Keep only the entities of this agent's transport that are not deleted. Logistics already
+   * filters on both, this is a safeguard: the agent removes whatever is in the list and missing in
+   * Kafka, so an entity of another transport slipping through must never be removed.
+   */
+  private static <T> List<T> ofTransport(
+      List<T> entities,
+      String transportId,
+      Function<T, String> transportIdOf,
+      Predicate<T> deleted,
+      String what) {
+    final List<T> result =
+        entities.stream()
+            .filter(e -> transportId.equals(transportIdOf.apply(e)) && !deleted.test(e))
+            .toList();
+    if (result.size() != entities.size()) {
+      LOG.warn(
+          "Logistics listed {} {} that are deleted or belong to another transport than {}, ignoring"
+              + " them.",
+          entities.size() - result.size(),
+          what,
+          transportId);
+    }
+    return result;
+  }
 
   public Optional<DataPort> updateDataPort(final KafkaTopic dataPort) {
     String topicName = dataPort.getTopicName();
@@ -198,11 +275,23 @@ public class LogisticsService {
                           .build())
                   .build());
     } catch (final StatusRuntimeException e) {
+      if (isRefused(e)) {
+        if (refusedRemovals.add(dataPort.getDataPortId())) {
+          LOG.warn(
+              "Data port '{}' (topic '{}') is gone from Kafka but this agent may not retire it (no"
+                  + " write permission). Retire or delete it in Agoora, or grant the agent write"
+                  + " permission on its path.",
+              dataPort.getDataPortId(),
+              dataPort.getTopicName());
+        }
+        return Optional.empty();
+      }
       LOG.error(
           "Error while updating data port in logistics (set state to deleted), will skip and continue.",
           e);
       return Optional.empty();
     }
+    refusedRemovals.remove(dataPort.getDataPortId());
     LOG.info(
         "Inactivated data port with id '{}' and name '{}'", saved.getId(), saved.getName());
     return Optional.of(saved);
@@ -235,14 +324,40 @@ public class LogisticsService {
                           .build())
                   .build());
     } catch (final StatusRuntimeException e) {
+      if (isRefused(e)) {
+        if (refusedRemovals.add(dataSubscriptionState.getDataSubscriptionStateId())) {
+          LOG.warn(
+              "Data subscription state '{}' (consumer group '{}', topic '{}') is gone from Kafka but"
+                  + " this agent may not retire it (no write permission). Retire or delete it in"
+                  + " Agoora, or grant the agent write permission on its path.",
+              dataSubscriptionState.getDataSubscriptionStateId(),
+              dataSubscriptionState.getConsumerGroupName(),
+              dataSubscriptionState.getTopicName());
+        }
+        return Optional.empty();
+      }
       LOG.error(
           "Error while updating data subscription state in logistics, will skip and continue.", e);
       return Optional.empty();
     }
+    refusedRemovals.remove(dataSubscriptionState.getDataSubscriptionStateId());
     LOG.info(
         "Inactivated data subscription state with id '{}' and name '{}'",
         saved.getId(),
         saved.getName());
     return Optional.of(saved);
+  }
+
+  /**
+   * Logistics answers NOT_FOUND when the caller may not write an entity (to not leak its
+   * existence), e.g. a data port in a path the agent has no write permission on.
+   */
+  private static boolean isRefused(StatusRuntimeException e) {
+    return e.getStatus().getCode() == Status.Code.NOT_FOUND;
+  }
+
+  /** Ids whose removal was refused and not retried successfully since. Visible for tests. */
+  Set<String> getRefusedRemovals() {
+    return refusedRemovals;
   }
 }
