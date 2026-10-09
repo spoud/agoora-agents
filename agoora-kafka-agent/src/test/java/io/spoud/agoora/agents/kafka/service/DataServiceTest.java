@@ -4,6 +4,7 @@ import com.google.protobuf.StringValue;
 import io.quarkus.test.junit.QuarkusTest;
 import io.spoud.agoora.agents.api.client.DataPortClient;
 import io.spoud.agoora.agents.api.client.DataSubscriptionStateClient;
+import io.spoud.agoora.agents.api.client.TransportClient;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.spoud.agoora.agents.kafka.AbstractService;
@@ -14,6 +15,7 @@ import io.spoud.agoora.agents.kafka.repository.KafkaTopicRepository;
 import io.spoud.agoora.agents.kafka.utils.KafkaUtils;
 import io.spoud.agoora.agents.test.mock.DataPortClientMockProvider;
 import io.spoud.agoora.agents.test.mock.DataSubscriptionStateClientMockProvider;
+import io.spoud.agoora.agents.test.mock.TransportClientMockProvider;
 import io.spoud.sdm.global.domain.v1.IdReference;
 import io.spoud.sdm.logistics.domain.v1.DataPort;
 import io.spoud.sdm.logistics.domain.v1.DataSubscriptionState;
@@ -56,14 +58,19 @@ class DataServiceTest extends AbstractService {
   @Inject AdminClient adminClient;
   @Inject DataPortClient dataPortClient;
   @Inject DataSubscriptionStateClient dataSubscriptionStateClient;
+  @Inject TransportClient transportClient;
   @Inject DataService dataService;
   @Inject KafkaTopicRepository kafkaTopicRepository;
   @Inject KafkaConsumerGroupRepository kafkaConsumerGroupRepository;
+
+  private static final IdReference OWN_TRANSPORT =
+      IdReference.newBuilder().setId(TransportClientMockProvider.TRANSPORT_ID).build();
 
   @BeforeEach
   void setup() {
     DataPortClientMockProvider.defaultMock(dataPortClient);
     DataSubscriptionStateClientMockProvider.defaultMock(dataSubscriptionStateClient);
+    TransportClientMockProvider.defaultMock(transportClient);
   }
 
   @AfterEach
@@ -83,6 +90,7 @@ class DataServiceTest extends AbstractService {
             List.of(
                 DataPort.newBuilder()
                     .setId("to-remove-abc")
+                    .setTransport(OWN_TRANSPORT)
                     .putProperties(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "data-topicX")
                     .build()));
 
@@ -156,12 +164,51 @@ class DataServiceTest extends AbstractService {
 
   @Test
   @Timeout(30)
+  void testDataPortsOfOtherTransportsAreNeverRemoved() {
+    when(dataPortClient.listAvailable(any()))
+        .thenReturn(
+            List.of(
+                DataPort.newBuilder()
+                    .setId("other-transport")
+                    .setTransport(IdReference.newBuilder().setId("another-transport"))
+                    .putProperties(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "data-topicO")
+                    .build(),
+                DataPort.newBuilder()
+                    .setId("already-deleted")
+                    .setTransport(OWN_TRANSPORT)
+                    .setDeleted(true)
+                    .putProperties(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "data-topicD")
+                    .build(),
+                DataPort.newBuilder()
+                    .setId("own-transport")
+                    .setTransport(OWN_TRANSPORT)
+                    .putProperties(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "data-topicW")
+                    .build()));
+    adminClient.createTopics(List.of(new NewTopic("data-topic1", 1, (short) 1)));
+    await()
+        .atMost(Duration.ofSeconds(5))
+        .until(() -> adminClient.listTopics().names().get().contains("data-topic1"));
+
+    dataService.updateTopics();
+
+    ArgumentCaptor<SaveDataPortRequest> captor = ArgumentCaptor.forClass(SaveDataPortRequest.class);
+    verify(dataPortClient, timeout(5000).times(2)).save(captor.capture());
+    assertThat(captor.getAllValues())
+        .extracting(SaveDataPortRequest::getInput)
+        .filteredOn(input -> input.getState() == StateChange.DELETED)
+        .extracting(input -> input.getSelf().getIdPath().getId())
+        .containsExactly("own-transport");
+  }
+
+  @Test
+  @Timeout(30)
   void testDataPortsFailedRemovalIsRetried() {
     when(dataPortClient.listAvailable(any()))
         .thenReturn(
             List.of(
                 DataPort.newBuilder()
                     .setId("to-remove-retry")
+                    .setTransport(OWN_TRANSPORT)
                     .putProperties(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "data-topicZ")
                     .build()));
     adminClient.createTopics(List.of(new NewTopic("data-topic1", 1, (short) 1)));
@@ -190,6 +237,7 @@ class DataServiceTest extends AbstractService {
             List.of(
                 DataSubscriptionState.newBuilder()
                     .setId("to-delete-subId")
+                    .setTransport(OWN_TRANSPORT)
                     .setDataPort(IdReference.newBuilder().setId("abc").build())
                     .putProperties(Constants.AGOORA_PROPERTIES_KAFKA_TOPIC, "data-topic1")
                     .putProperties(Constants.AGOORA_PROPERTIES_KAFKA_CONSUMER_GROUP, "groupX")

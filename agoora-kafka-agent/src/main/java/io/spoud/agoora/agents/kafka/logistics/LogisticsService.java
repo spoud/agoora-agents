@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Slf4j
 @ApplicationScoped
@@ -56,8 +58,15 @@ public class LogisticsService {
    */
   public Optional<List<DataPort>> listAvailableDataPorts() {
     try {
-      return Optional.of(dataPortClient.listAvailable(logisticsRefService.getTransportRef()));
-    } catch (final StatusRuntimeException e) {
+      final String transportId = logisticsRefService.getTransportId();
+      return Optional.of(
+          ofTransport(
+              dataPortClient.listAvailable(logisticsRefService.getTransportRef()),
+              transportId,
+              p -> p.getTransport().getId(),
+              DataPort::getDeleted,
+              "data ports"));
+    } catch (final StatusRuntimeException | IllegalStateException e) {
       LOG.error("Error while listing data ports from logistics, will skip removals this time.", e);
       return Optional.empty();
     }
@@ -66,14 +75,46 @@ public class LogisticsService {
   /** Same as {@link #listAvailableDataPorts()} for data subscription states. */
   public Optional<List<DataSubscriptionState>> listAvailableDataSubscriptionStates() {
     try {
+      final String transportId = logisticsRefService.getTransportId();
       return Optional.of(
-          dataSubscriptionStateClient.listAvailable(logisticsRefService.getTransportRef()));
-    } catch (final StatusRuntimeException e) {
+          ofTransport(
+              dataSubscriptionStateClient.listAvailable(logisticsRefService.getTransportRef()),
+              transportId,
+              s -> s.getTransport().getId(),
+              DataSubscriptionState::getDeleted,
+              "data subscription states"));
+    } catch (final StatusRuntimeException | IllegalStateException e) {
       LOG.error(
           "Error while listing data subscription states from logistics, will skip removals this time.",
           e);
       return Optional.empty();
     }
+  }
+
+  /**
+   * Keep only the entities of this agent's transport that are not deleted. Logistics already
+   * filters on both, this is a safeguard: the agent removes whatever is in the list and missing in
+   * Kafka, so an entity of another transport slipping through must never be removed.
+   */
+  private static <T> List<T> ofTransport(
+      List<T> entities,
+      String transportId,
+      Function<T, String> transportIdOf,
+      Predicate<T> deleted,
+      String what) {
+    final List<T> result =
+        entities.stream()
+            .filter(e -> transportId.equals(transportIdOf.apply(e)) && !deleted.test(e))
+            .toList();
+    if (result.size() != entities.size()) {
+      LOG.warn(
+          "Logistics listed {} {} that are deleted or belong to another transport than {}, ignoring"
+              + " them.",
+          entities.size() - result.size(),
+          what,
+          transportId);
+    }
+    return result;
   }
 
   public Optional<DataPort> updateDataPort(final KafkaTopic dataPort) {
