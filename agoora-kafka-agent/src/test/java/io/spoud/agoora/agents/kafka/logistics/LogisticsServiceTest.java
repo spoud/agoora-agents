@@ -58,7 +58,7 @@ class LogisticsServiceTest {
   @Test
   void refusedRemovalIsOnlyWarnedOnceAndClearedOnSuccess() {
     KafkaTopic topic = KafkaTopic.builder().dataPortId("refused").topicName("gone").build();
-    // logistics refuses writes without permission with NOT_FOUND
+    // older logistics versions refuse writes without permission with NOT_FOUND
     doThrow(new StatusRuntimeException(Status.NOT_FOUND.withDescription("Offer State not found.")))
         .when(dataPortClient)
         .save(any());
@@ -72,6 +72,21 @@ class LogisticsServiceTest {
     doReturn(DataPort.newBuilder().setId("refused").build()).when(dataPortClient).save(any());
     assertThat(logisticsService.deleteDataPort(topic)).isPresent();
     assertThat(logisticsService.getRefusedRemovals()).isEmpty();
+  }
+
+  @Test
+  void permissionDeniedIsARefusedRemovalToo() {
+    KafkaTopic topic = KafkaTopic.builder().dataPortId("denied").topicName("gone").build();
+    doThrow(
+            new StatusRuntimeException(
+                Status.PERMISSION_DENIED.withDescription(
+                    "You need write permission on /team/ to change data port gone.")))
+        .when(dataPortClient)
+        .save(any());
+
+    assertThat(logisticsService.deleteDataPort(topic)).isEmpty();
+
+    assertThat(logisticsService.getRefusedRemovals()).containsExactly("denied");
   }
 
   @Test

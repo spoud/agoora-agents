@@ -349,11 +349,13 @@ public class LogisticsService {
   }
 
   /**
-   * Logistics answers NOT_FOUND when the caller may not write an entity (to not leak its
-   * existence), e.g. a data port in a path the agent has no write permission on.
+   * The agent may not write the entity, e.g. a data port in a path it has no write permission on.
+   * Logistics answers PERMISSION_DENIED for entities the agent can see, older versions answered
+   * NOT_FOUND.
    */
   private static boolean isRefused(StatusRuntimeException e) {
-    return e.getStatus().getCode() == Status.Code.NOT_FOUND;
+    final Status.Code code = e.getStatus().getCode();
+    return code == Status.Code.PERMISSION_DENIED || code == Status.Code.NOT_FOUND;
   }
 
   /** Ids whose removal was refused and not retried successfully since. Visible for tests. */
