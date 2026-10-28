@@ -36,7 +36,7 @@
         <mockito.version>5.24.0</mockito.version>
         <test-container.version>2.0.5</test-container.version>
 
-        <surefire-plugin.version>3.6.0</surefire-plugin.version>
+        <surefire-plugin.version>3.6.1</surefire-plugin.version>
         <compiler-plugin.version>3.16.0</compiler-plugin.version>
     </properties>
 
